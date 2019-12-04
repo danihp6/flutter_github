@@ -42,53 +42,40 @@ void main() => runApp(MyApp());
 
   void changeAllStars(){
     setState(() {
-       star1._changeStar();
-    });
-   
-    
+    }); 
   }
 
 }
 
 class Star extends StatefulWidget{
   Star({this.i});
-  int i;
-  IconData _icon=Icons.star_border;
+  final int i;
+  
   @override
   _Star createState()=> _Star();
-
-  void _changeStar(){
-    _icon == Icons.star_border ? _icon=Icons.star : _icon=Icons.star_border;
-  }
 
 }
 
 class _Star extends State<Star>{
+  IconData _icon=Icons.star_border;
   @override
   Widget build(BuildContext context) {
 
     return IconButton(
       icon: Icon(
-        widget._icon,
+        _icon,
         size: 48,
         color: Colors.blue[200],
       ), 
     padding: EdgeInsets.all(0), 
-    onPressed: ()=>{
-      setState((){
-      widget._changeStar();
-    })
-      },
+    onPressed: _changeStar
     );
-  }
+  } 
 
-  Function _changeStar2(){
-    return (){
+    void _changeStar(){
       setState(() {
-      widget._icon == Icons.star_border ? widget._icon=Icons.star : widget._icon=Icons.star_border;
+        _icon == Icons.star_border ? _icon=Icons.star : _icon=Icons.star_border;
       });
-    };
-  }
 
-    
+  }
 }
