@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
 
   String _email;
   String _password;
-  FormType _formType = FormType.login;
+  FormType _formType;
   String _authHint = '';
 
   bool validateAndSave() {
@@ -35,6 +35,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void validateAndSubmit() async {
     if (validateAndSave()) {
+      print(_formType.toString());
       try {
         String userId = _formType == FormType.login
             ? await widget.auth.signIn(_email, _password)
@@ -84,7 +85,15 @@ class _LoginPageState extends State<LoginPage> {
           key: new Key('login'),
           text: 'Login',
           height: 44.0,
-          onPressed: validateAndSubmit),
+          onPressed:() {_formType=FormType.login;validateAndSubmit();}),
+          Padding(
+            padding: const EdgeInsets.only(top:8.0),
+            child: new PrimaryButton(
+            key: new Key('register'),
+            text: 'Sign in',
+            height: 44.0,
+            onPressed:() {_formType=FormType.register;validateAndSubmit();},),
+          ),
       new FlatButton(
           key: new Key('need-account'),
           child: new Text("Forgot password?"),
