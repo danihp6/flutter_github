@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:twins_test_multiplayer/models/game.dart';
 import 'package:twins_test_multiplayer/models/player.dart';
+import 'package:twins_test_multiplayer/pages/game_page.dart';
 import 'package:twins_test_multiplayer/widgets/my_loading.dart';
 
 import '../db.dart';
-
 
 class MatchmakingPage extends StatelessWidget {
   @override
@@ -30,29 +30,7 @@ Widget matchmaking(Player player) {
         for (int i = 0; i < games.length; i++) {
           Game game = games[i];
           if (game.players.contains(player.id)) {
-            if (game.players.length == 2)
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text('${game.players.first} VS ${game.players[1]}'),
-                  Expanded(
-                    child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4),
-                        itemCount: game.list.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              color: Colors.greenAccent,
-                              child: Center(
-                                  child: Text(game.list[index].toString())),
-                            ),
-                          );
-                        }),
-                  ),
-                ],
-              );
+            if (game.players.length == 2) return GamePage(game.id);
             return MyLoading('Esperando jugadores');
           }
           if (game.players.length < 2) {
@@ -64,3 +42,6 @@ Widget matchmaking(Player player) {
         return MyLoading('creando partida');
       });
 }
+
+
+
