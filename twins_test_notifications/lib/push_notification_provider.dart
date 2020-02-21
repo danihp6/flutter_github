@@ -24,7 +24,11 @@ class PushNotificationProvider{
       onMessage: (info){
         print('==== ON MESSAGE ====');
         print(info);
-
+String argumento = 'no-data';
+        if(Platform.isAndroid){
+          argumento=info['data']['comida']??'no-data';
+        }
+        _messagingStreamController.sink.add(argumento);
         
       },
       onLaunch: (info){
@@ -37,11 +41,7 @@ class PushNotificationProvider{
         print(info);
         // final notification = info["data"]['comida'];
         // print(notification);
-        String argumento = 'no-data';
-        if(Platform.isAndroid){
-          argumento=info['data']['comida']??'no-data';
-        }
-        _messagingStreamController.sink.add(argumento);
+        
       },
     );
   }
