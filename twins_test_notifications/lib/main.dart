@@ -13,6 +13,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final GlobalKey<NavigatorState> navigationKey=GlobalKey<NavigatorState>();
   @override
   void initState() {
     super.initState();
@@ -23,11 +24,15 @@ class _MyAppState extends State<MyApp> {
       // Navigator.pushNamed(context, '/message');
       print('ARGUMENTO DEL PUSH');
       print(arg);
+
+      navigationKey.currentState.pushNamed('/message',arguments: arg);
     });
   }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      navigatorKey: navigationKey,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,

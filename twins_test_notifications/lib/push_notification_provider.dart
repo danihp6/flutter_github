@@ -16,6 +16,8 @@ class PushNotificationProvider{
       print('==== FCM TOKEN ====');  
       print(token);
       //d5JRzh5_fRI:APA91bH5NlKVLZKJIWkx0aVOzXxfwo_2APlifLIPsO6TUXdJZvabbVE6oH9kA7yR_Hb6ts6tBhxSR7fC3fYbKt4PjIolnuhwwBYbjTaIFeiq66-zuBixXh8WQJ-w1BXJvIFU66X7iX3j
+      //====PC====
+      //eDE3uo2CgIk:APA91bHKyAdSvf9AT9FJceVww44LZEn4JwXm_xfMiR5-95lAMIzvUF5XYg_kla9_Zjm1jyVZYelk_RXoKvUK58cSEOnCU3xtUR5OqZHtdiLNtgeSXINzlN78xJ3MB5U4ipN-CmeAXgVa
     });
 
     _firebaseMessaging.configure(
@@ -23,11 +25,7 @@ class PushNotificationProvider{
         print('==== ON MESSAGE ====');
         print(info);
 
-        String argumento = 'no-data';
-        if(Platform.isAndroid){
-          argumento=info['data']['comida']??'no-data';
-        }
-        _messagingStreamController.sink.add(argumento);
+        
       },
       onLaunch: (info){
         print('==== ON LAUNCH ====');
@@ -39,6 +37,11 @@ class PushNotificationProvider{
         print(info);
         // final notification = info["data"]['comida'];
         // print(notification);
+        String argumento = 'no-data';
+        if(Platform.isAndroid){
+          argumento=info['data']['comida']??'no-data';
+        }
+        _messagingStreamController.sink.add(argumento);
       },
     );
   }
