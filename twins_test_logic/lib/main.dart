@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:twins_test_logic/models/deck.dart';
+import 'package:twins_test_logic/models/single_game.dart';
 import 'package:twins_test_logic/pages/game_page.dart';
 import 'package:twins_test_logic/models/game.dart';
-import 'package:twins_test_logic/models/token.dart';
+import 'models/deck.dart';
 
 void main() => runApp(MyApp());
 
@@ -16,7 +18,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/':(context)=>GamePage(Game(board: animalsBoard))
+        '/':(context)=>GamePage(SingleGame.run(deck: animals))
       },
     );
   }

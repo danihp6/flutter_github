@@ -1,4 +1,5 @@
 import 'package:twins_test_logic/dirImages.dart';
+import 'package:twins_test_logic/models/deck.dart';
 
 const int HIDED = 0;
 const int SHOWED = 1;
@@ -25,27 +26,19 @@ class Token {
 
   bool isPar(Token token) => this.id == token.id;
 
-  void compareCards(Token token) {
-    if (this.isPar(token)) {
-      this.pair();
-      token.pair();
+  @override
+  String toString() {
+    return 'id: $id image:$image state:$state';
+  }
+}
+
+bool arePair(List<Token> tokens) {
+  Token token1=tokens.first;
+  Token token2=tokens[1];
+    if (token1.isPar(token2)) {
+      return true;
     } else {
-      Future.delayed(const Duration(seconds: 2));
-      this.hide();
-      token.hide();
+      return false;
     }
   }
 
-
-
-}
-  Token chamaleon = Token(image: chamaleonImg);
- Token rabbit = Token(image: rabbitImg);
-  Token elephant = Token(image: elephantImg);
-  Token cat = Token(image: catImg);
-  Token gorilla = Token(image: gorillaImg);
-  Token giraffe = Token(image: giraffeImg);
-  Token lion = Token(image: lionImg);
-  Token dog = Token(image: dogImg);
-
-  List<Token> animalsBoard=[chamaleon,rabbit,elephant,cat,gorilla,giraffe,lion,dog];
