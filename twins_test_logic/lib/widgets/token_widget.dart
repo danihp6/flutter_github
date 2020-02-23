@@ -33,7 +33,6 @@ class _TokenWidgetState extends State<TokenWidget> {
   void tapToken() {
     SingleGame game = widget.getGame();
     if (widget.token.getState == HIDED && game.getTurnState != STOPED) {
-      game.setTurnState=STOPED;
       setState(() {
         widget.token.show();
       });
@@ -47,12 +46,17 @@ class _TokenWidgetState extends State<TokenWidget> {
           widget.setStateParent();
 
           game.twins++;
+          game.setTurnState = FIRST_TOKEN;
         } else {
-          
-            showedTokens.forEach((token) => token.hide());
-            widget.setStateParent();
+          game.setTurnState = STOPED;
+            sleep(1).then((_) {
+              
+              showedTokens.forEach((token) => token.hide());
+              widget.setStateParent();
+              game.setTurnState = FIRST_TOKEN;
+            });
         }
-        game.setTurnState = FIRST_TOKEN;
+        
       }
     }
     
