@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:twins_test_multiplayer/models/game.dart';
 import 'package:twins_test_multiplayer/widgets/my_loading.dart';
 import 'package:twins_test_multiplayer/widgets/my_player_info.dart';
-import 'package:twins_test_multiplayer/widgets/my_timer.dart';
 
 import '../db.dart';
 
@@ -23,7 +22,7 @@ class GamePage extends StatelessWidget {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-              
+                Text(game.timer.toString()),
                 Padding(
                   padding: const EdgeInsets.only(top:10),
                   child: Row(
