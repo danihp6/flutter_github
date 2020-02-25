@@ -48,9 +48,6 @@ Future<void> joinPlayerToGame(String gameId, String playerId) {
           })
           .catchError((e) {})
           .whenComplete(() {});
-          DocumentSnapshot snapshotGame = await docGame.get();
-          int numPlayers = snapshotGame.data['players'].length;
-          if(numPlayers==1)
           await transaction
           .update(docGame, {
             'state': IN_PROGRESS,
