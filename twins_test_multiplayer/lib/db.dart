@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'models/game.dart';
 import 'models/player.dart';
@@ -37,7 +39,7 @@ Stream<Player> getPlayerByDocumentReference(DocumentReference docRef){
   return docRef.snapshots().map(toPlayer);
 }
 
-Future<void> joinPlayerToGame(String gameId, String playerId) {
+Future<void> joinPlayerToGame(String gameId, String playerId){
     Firestore db =Firestore.instance;
    DocumentReference docGame = db.collection("games").document(gameId);
 
@@ -45,16 +47,12 @@ Future<void> joinPlayerToGame(String gameId, String playerId) {
           await transaction
           .update(docGame, {
             'players': FieldValue.arrayUnion([playerId]),
-          })
-          .catchError((e) {})
-          .whenComplete(() {});
-          await transaction
-          .update(docGame, {
+            'timer':DateTime.now().add(Duration(seconds: 10)),
             'state': IN_PROGRESS,
+            'turnOfPlayer':Random().nextInt(2)
           })
           .catchError((e) {})
           .whenComplete(() {
-            print('game in progress');
           });
     }).catchError((e) {
       return false;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:twins_test_multiplayer/models/game.dart';
+import 'package:twins_test_multiplayer/widgets/clock_widget.dart';
 import 'package:twins_test_multiplayer/widgets/my_loading.dart';
 import 'package:twins_test_multiplayer/widgets/my_player_info.dart';
 
@@ -22,15 +23,16 @@ class GamePage extends StatelessWidget {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text(game.timer.toString()),
+                ClockWidget(duration: durationByDateTime(game.timer),start: durationByDateTime(game.timer),onDone: (){print('done');},),
+                Text('Turn: ${game.turn}'),
                 Padding(
                   padding: const EdgeInsets.only(top:10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      MyPlayerInfo(game.players.first),
+                      MyPlayerInfo(id:game.players.first,),
                       Text('VS'),
-                      MyPlayerInfo(game.players[1]),
+                      MyPlayerInfo(id:game.players[1],),
                     ],
                   ),
                 ),
@@ -57,5 +59,9 @@ class GamePage extends StatelessWidget {
             );
           }),
     );
+  }
+
+  Color infoPlayerColor(Game game,String playerId){
+   return game.players[game.turnOfPlayer]==playerId?Colors.blueAccent:Colors.greenAccent;
   }
 }
