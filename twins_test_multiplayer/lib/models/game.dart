@@ -11,19 +11,14 @@ class Game {
   int state;
   DateTime datetime;
   List<String> players;
-  DateTime timer;
-  int turn;
-  int turnOfPlayer;
 
-  Game({this.id, this.list, this.datetime, this.state,this.players,this.timer,this.turn,this.turnOfPlayer});
+  Game({this.id, this.list, this.datetime, this.state,this.players,});
 
   Game.fourxfour() {
     list = pairsRandomNumbers(16);
     players=List<String>();
     datetime = DateTime.now();
     state = NOT_STARTED;
-    timer=DateTime.now();
-    turn=1;
   }
 
   factory Game.fromFirestore(DocumentSnapshot doc) {
@@ -33,9 +28,6 @@ class Game {
         datetime: (doc.data['datetime'] as Timestamp).toDate(),
         state: doc.data['state'],
         players:List<String>.from(doc.data['players']),
-        timer: (doc.data['timer'] as Timestamp).toDate(),
-        turn: doc.data['turn'],
-        turnOfPlayer:doc.data['turnOfPlayer']
         );
   }
 
@@ -44,14 +36,11 @@ Map<String, dynamic> toJson() =>{
         'datetime': datetime,
         'state': state,
         'players':players,
-        'timer':timer,
-        'turn':turn,
-        'turnOfPlayer':turnOfPlayer
   };
 
   @override
   String toString() {
-    return 'id:$id,state:$state,players:$players,list:${list.toString()},datetime:$datetime,timer:$timer,turn:$turn,turnOfPlayer:$turnOfPlayer';
+    return 'id:$id,state:$state,players:$players,list:${list.toString()},datetime:$datetime';
   }
 }
 
@@ -60,8 +49,6 @@ List<Game> toGameList(QuerySnapshot query) {
 }
 
 Game toGame(DocumentSnapshot document) {
-  Game game = Game.fromFirestore(document);
-  print(game.toString());
   return Game.fromFirestore(document);
 }
 

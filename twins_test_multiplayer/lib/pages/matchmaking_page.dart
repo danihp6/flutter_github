@@ -31,7 +31,7 @@ Widget matchmaking(Player player) {
           print('====${game.id}====');
           if (game.players.contains(player.id)) {
             print('====EN PARTIDA...====');
-            if (game.players.length == 2) return GamePage(game.id);
+            if (game.state==IN_PROGRESS) return GamePage(game.id);
             return MyLoading('Esperando jugadores');
           }
           if (game.players.length < 2) {

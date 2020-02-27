@@ -3,6 +3,7 @@ import 'package:twins_test_multiplayer/models/game.dart';
 import 'package:twins_test_multiplayer/widgets/clock_widget.dart';
 import 'package:twins_test_multiplayer/widgets/my_loading.dart';
 import 'package:twins_test_multiplayer/widgets/my_player_info.dart';
+import 'package:twins_test_multiplayer/widgets/turn_info_widget.dart';
 
 import '../db.dart';
 
@@ -23,8 +24,7 @@ class GamePage extends StatelessWidget {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                ClockWidget(duration: durationByDateTime(game.timer),start: durationByDateTime(game.timer),onDone: (){print('done');},),
-                Text('Turn: ${game.turn}'),
+                TurnInfo(game.id),
                 Padding(
                   padding: const EdgeInsets.only(top:10),
                   child: Row(
@@ -59,9 +59,5 @@ class GamePage extends StatelessWidget {
             );
           }),
     );
-  }
-
-  Color infoPlayerColor(Game game,String playerId){
-   return game.players[game.turnOfPlayer]==playerId?Colors.blueAccent:Colors.greenAccent;
   }
 }

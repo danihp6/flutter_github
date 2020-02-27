@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'models/game.dart';
 import 'models/player.dart';
+import 'models/turn.dart';
 
 Future<void> newGame(Game game) async {
   Firestore.instance.collection('games').add(game.toJson());
@@ -10,6 +11,10 @@ Future<void> newGame(Game game) async {
 
 Future<DocumentReference> newPlayer(Player player) async {
   return await Firestore.instance.collection('players').add(player.toJson());
+}
+
+Future<DocumentReference> newTurn(Turn turn,String gameId) async {
+  return await Firestore.instance.collection('games/$gameId/turns').add(turn.toJson());
 }
 
 Stream<Player> getPlayerById(String id) {
@@ -35,26 +40,22 @@ Stream<Game> getGameById(String id) {
       .snapshots()
       .map(toGame);
 }
+
+Stream<List<Turn>> getTurns(String gameId) {
+  return Firestore.instance
+      .collection('games/$gameId/turns')
+      .orderBy('turn')
+      .snapshots()
+      .map(toTurnList);
+}
 Stream<Player> getPlayerByDocumentReference(DocumentReference docRef){
   return docRef.snapshots().map(toPlayer);
 }
 
 Future<void> joinPlayerToGame(String gameId, String playerId){
-    Firestore db =Firestore.instance;
-   DocumentReference docGame = db.collection("games").document(gameId);
-
-    Firestore.instance.runTransaction((transaction) async {
-          await transaction
-          .update(docGame, {
-            'players': FieldValue.arrayUnion([playerId]),
-            'timer':DateTime.now().add(Duration(seconds: 10)),
-            'state': IN_PROGRESS,
-            'turnOfPlayer':Random().nextInt(2)
-          })
-          .catchError((e) {})
-          .whenComplete(() {
-          });
-    }).catchError((e) {
-      return false;
+  Firestore.instance.collection('games').document(gameId).updateData(
+    {
+      'players': FieldValue.arrayUnion([playerId]),
+      'state': IN_PROGRESS,
     });
 }
