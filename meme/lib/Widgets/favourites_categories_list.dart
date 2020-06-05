@@ -41,10 +41,10 @@ class _FavouritesCategoriesListState extends State<FavouritesCategoriesList> {
             jumpToMyIndex();
           };
           return FavouriteCategoryWidget(
-            favouriteCategory: widget.favouritesCategories[index],
-            selectCategory: selectCategory,
-            isSelectedCategory: isSelectedCategory,
-          );
+              favouriteCategory: widget.favouritesCategories[index],
+              selectCategory: selectCategory,
+              isSelectedCategory: isSelectedCategory,
+            );
         });
   }
 }

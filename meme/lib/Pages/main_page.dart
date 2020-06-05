@@ -9,6 +9,7 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
+  bool _isTabBarVisible = false;
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -19,13 +20,13 @@ class _MainPageState extends State<MainPage> {
             FavouritePage()
             ]),
             floatingActionButton: FloatingButtons(refresh: (){setState(() {});},),
-        bottomNavigationBar: Container(
+        bottomNavigationBar: _isTabBarVisible?Container(
           color: Colors.grey[300],
           child: TabBar(
             tabs: [
               Tab(icon: Icon(Icons.star,color: Colors.black,size: 30,),)
             ]),
-        ),
+        ):SizedBox(),
       ),
     );
   }

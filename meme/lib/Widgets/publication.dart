@@ -25,6 +25,7 @@ class _PublicationWidgetState extends State<PublicationWidget> {
     _author = _publication.getAuthor();
     _comments = _publication.getComments();
     return Container(
+      height: 460,
       child: Column(children: [
         Image.network(
           _publication.getImage(),
