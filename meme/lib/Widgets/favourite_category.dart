@@ -29,7 +29,7 @@ class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
         _isSelected ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up;
     List<Publication> publications = _favouriteCategory.getPublications();
     return Container(
-      color:Colors.blue,
+      color: Colors.blue,
       child: Column(
         children: [
           GestureDetector(
@@ -63,7 +63,8 @@ class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
             onTap: widget.selectCategory,
           ),
           _isSelected
-              ? Expanded(
+              ? Container(
+                height: 2000,
                   child: CategoryPublicationList(publications: publications),
                 )
               : SizedBox()

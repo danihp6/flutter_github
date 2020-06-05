@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Models/FavouriteCategory.dart';
 import 'package:meme/Widgets/favourite_category.dart';
+import 'package:meme/Widgets/favourite_category_2.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:meme/Widgets/new_favourite_category.dart';
 
@@ -40,7 +41,7 @@ class _FavouritesCategoriesListState extends State<FavouritesCategoriesList> {
             else widget.setIndexSelectioned(index);
             jumpToMyIndex();
           };
-          return FavouriteCategoryWidget(
+          return FavouriteCategoryWidget2(
               favouriteCategory: widget.favouritesCategories[index],
               selectCategory: selectCategory,
               isSelectedCategory: isSelectedCategory,
