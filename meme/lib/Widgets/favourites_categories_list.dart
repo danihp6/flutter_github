@@ -6,10 +6,8 @@ import 'package:meme/Widgets/new_favourite_category.dart';
 
 class FavouritesCategoriesList extends StatefulWidget {
   List<FavouriteCategory> favouritesCategories;
-  int indexSelectioned;
-  Function setIndexSelectioned;
 
-  FavouritesCategoriesList({this.favouritesCategories,this.indexSelectioned,this.setIndexSelectioned});
+  FavouritesCategoriesList({this.favouritesCategories});
 
   @override
   _FavouritesCategoriesListState createState() =>
@@ -17,33 +15,15 @@ class FavouritesCategoriesList extends StatefulWidget {
 }
 
 class _FavouritesCategoriesListState extends State<FavouritesCategoriesList> {
-  final ItemScrollController itemScrollController = ItemScrollController();
-  final ItemPositionsListener itemPositionListener =
-      ItemPositionsListener.create();
-  int _indexSelectioned;
   
 
   @override
   Widget build(BuildContext context) {
-    _indexSelectioned = widget.indexSelectioned;
-    return ScrollablePositionedList.builder(
-    physics: _indexSelectioned==-1? AlwaysScrollableScrollPhysics():NeverScrollableScrollPhysics(),
-    itemScrollController: itemScrollController,
-    itemPositionsListener: itemPositionListener,
+    return ListView.builder(
     itemCount: widget.favouritesCategories.length,
     itemBuilder: (BuildContext context, int index) {
-      Function jumpToMyIndex =
-          () => itemScrollController.jumpTo(index: index);
-      bool isSelectedCategory = index == _indexSelectioned;
-      Function selectCategory = () {
-        if(isSelectedCategory) widget.setIndexSelectioned(-1);
-        else widget.setIndexSelectioned(index);
-        jumpToMyIndex();
-      };
       return FavouriteCategoryWidget(
           favouriteCategory: widget.favouritesCategories[index],
-          selectCategory: selectCategory,
-          isSelectedCategory: isSelectedCategory,
         );
     });
   }

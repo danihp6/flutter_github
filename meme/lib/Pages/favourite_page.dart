@@ -3,7 +3,6 @@ import 'package:meme/Models/FavouriteCategory.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/favourite_category.dart';
 import 'package:meme/Widgets/favourite_header.dart';
-import 'package:meme/Widgets/favourites_categories_list2.dart';
 import 'package:meme/Widgets/new_favourite_category.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../Models/Publication.dart';
@@ -17,20 +16,12 @@ class FavouritePage extends StatefulWidget {
 }
 
 class _FavouritePageState extends State<FavouritePage> {
-  User _user;
-  int _indexSelectioned = -1;
-
-  
+  User _user;  
 
   @override
   Widget build(BuildContext context) {
     _user = UserInfo.of(context).user;
 
-    Function setIndexSelectioned = (index){
-    setState(() {
-      _indexSelectioned = index;
-    });
-  };
     return SafeArea(
           child: Scaffold(
         body: Container(
@@ -40,7 +31,7 @@ class _FavouritePageState extends State<FavouritePage> {
               children:[
                 FavouriteHeader(user: _user),
                 NewFavouriteCategory(),
-                Expanded(child: FavouritesCategoriesList2(favouritesCategories:_user.getFavouritesCategories()))
+                Expanded(child: FavouritesCategoriesList(favouritesCategories:_user.getFavouritesCategories()))
               ]
               ),
           ),

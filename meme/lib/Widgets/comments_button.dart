@@ -19,6 +19,7 @@ class _CommentsButtonState extends State<CommentsButton> {
     print(_isShowedComments);
     _icon = _isShowedComments?Icons.comment:Icons.mode_comment;
     return FloatingActionButton(
+      heroTag: 'showComments',
       onPressed: (){
         configuration.setIsShowedComments(!_isShowedComments);
         widget.showTools();
