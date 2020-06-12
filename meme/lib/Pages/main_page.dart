@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/favourite_page.dart';
 import 'package:meme/Widgets/floating_buttons.dart';
-import 'package:meme/Widgets/user_info.dart';
 
 class MainPage extends StatefulWidget {
+  User user;
+  MainPage({this.user});
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -18,7 +20,7 @@ class _MainPageState extends State<MainPage> {
         body: TabBarView(
           physics: NeverScrollableScrollPhysics(),
           children: [
-            FavouritePage()
+            FavouritePage(user:widget.user)
             ]),
             floatingActionButton: FloatingButtons(refresh: (){setState(() {});},),
         bottomNavigationBar: _isTabBarVisible?Container(

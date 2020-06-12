@@ -37,6 +37,14 @@ class Publication {
 
   setComments(comments){ this._comments = comments; }
 
+  getBestComment(){
+    Comment comment = _comments[0];
+    for(int i = 0; i < _comments.length; i++){
+      if(comment.getLikes() < _comments[i].getLikes()) comment = _comments[i].getLikes();
+    }
+    return comment;
+  }
+
   String getPastTime() {
     DateTime dateTime = this._dateTime;
     DateTime now = DateTime.now();

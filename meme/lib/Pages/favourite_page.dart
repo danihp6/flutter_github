@@ -7,9 +7,10 @@ import 'package:meme/Widgets/new_favourite_category.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../Models/Publication.dart';
 import 'package:meme/Widgets/favourites_categories_list.dart';
-import 'package:meme/Widgets/user_info.dart';
 
 class FavouritePage extends StatefulWidget {
+  User user;
+  FavouritePage({this.user});
 
   @override
   _FavouritePageState createState() => _FavouritePageState();
@@ -20,7 +21,7 @@ class _FavouritePageState extends State<FavouritePage> {
 
   @override
   Widget build(BuildContext context) {
-    _user = UserInfo.of(context).user;
+    _user = widget.user;
 
     return SafeArea(
           child: Scaffold(

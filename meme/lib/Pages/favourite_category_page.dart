@@ -17,35 +17,26 @@ class _FavouriteCategoryPageState extends State<FavouriteCategoryPage> {
   Widget build(BuildContext context) {
     FavouriteCategory _favouriteCategory = widget.favouriteCategory;
     return Scaffold(
-      floatingActionButton: FloatingButtons(refresh: (){setState(() {});},),
+        floatingActionButton: FloatingButtons(
+          refresh: () {
+            setState(() {});
+          },
+        ),
         body: CustomScrollView(slivers: [
           SliverAppBar(
             backgroundColor: Colors.deepOrange,
             pinned: true,
-            expandedHeight: 150,
-            flexibleSpace: ListView(
-              physics: NeverScrollableScrollPhysics(),
-              children: [
-                AppBar(
-                  title: Text(_favouriteCategory.getName()),
-                  backgroundColor: Colors.deepOrange,
-                  elevation: 0,
-                ),
-                Container(
-                  child: Column(
-                    children: [
-                      SizedBox(height:80,child: Image.network(_favouriteCategory.getImage())),
-                      Text(_favouriteCategory.getName())
-                    ],
-                  ),
-                )
-              ],
+            expandedHeight: 200,
+            flexibleSpace: FlexibleSpaceBar(
+              centerTitle: true,
+              title: Text(_favouriteCategory.getName()),
+              background: Padding(
+                padding: const EdgeInsets.all(50),
+                child: Image.network(_favouriteCategory.getImage()),
+              ),
             ),
             actions: [
-              IconButton(
-                icon: Icon(Icons.more_vert), 
-                onPressed: (){}
-                )
+              IconButton(icon: Icon(Icons.more_vert), onPressed: () {})
             ],
           ),
           SliverList(
@@ -53,8 +44,13 @@ class _FavouriteCategoryPageState extends State<FavouriteCategoryPage> {
               var publications = _favouriteCategory.getPublications();
               return Column(
                 children: [
-                  if(index!=0 && !configuration.getIsShowedComments()) SizedBox(height: 10,),
-                  PublicationWidget(publication: publications[index],),
+                  if (index != 0 && !configuration.getIsShowedComments())
+                    SizedBox(
+                      height: 10,
+                    ),
+                  PublicationWidget(
+                    publication: publications[index],
+                  ),
                 ],
               );
             }, childCount: _favouriteCategory.getPublications().length),

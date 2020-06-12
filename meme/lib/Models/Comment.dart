@@ -5,11 +5,13 @@ class Comment {
   int _likes;
   User _author;
   DateTime _dateTime;
-  Comment(comment,likes,author,dateTime){
+  List<Comment> _comments;
+  Comment(comment,likes,author,dateTime,comments){
     this._comment = comment;
     this._likes = likes;
     this._author = author;
     this._dateTime = dateTime;
+    this._comments = comments;
   }
 
   getComment(){ return this._comment; }
@@ -27,6 +29,10 @@ class Comment {
   getDateTime(){ return this._dateTime; }
 
   setDateTime(dateTime){ this._dateTime = dateTime; }
+
+  getComments(){ return this._comments; }
+
+  setComments(comments){ this._comments = comments; }
 
   String getPastTime() {
     DateTime dateTime = this._dateTime;
