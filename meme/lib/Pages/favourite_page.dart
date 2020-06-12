@@ -4,7 +4,6 @@ import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/favourite_category.dart';
 import 'package:meme/Widgets/favourite_header.dart';
 import 'package:meme/Widgets/new_favourite_category.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import '../Models/Publication.dart';
 import 'package:meme/Widgets/favourites_categories_list.dart';
 

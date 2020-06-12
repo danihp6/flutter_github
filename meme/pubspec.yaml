@@ -21,7 +21,8 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  scrollable_positioned_list: ^0.1.6
+  firebase_core: ^0.4.5
+  firebase_analytics: ^5.0.15
   flutter:
     sdk: flutter
 
