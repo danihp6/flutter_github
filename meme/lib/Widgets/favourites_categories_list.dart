@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Models/FavouriteCategory.dart';
 import 'package:meme/Widgets/favourite_category.dart';
-import 'package:meme/Widgets/favourite_category_2.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:meme/Widgets/new_favourite_category.dart';
 
@@ -28,24 +27,24 @@ class _FavouritesCategoriesListState extends State<FavouritesCategoriesList> {
   Widget build(BuildContext context) {
     _indexSelectioned = widget.indexSelectioned;
     return ScrollablePositionedList.builder(
-        physics: _indexSelectioned==-1? AlwaysScrollableScrollPhysics():NeverScrollableScrollPhysics(),
-        itemScrollController: itemScrollController,
-        itemPositionsListener: itemPositionListener,
-        itemCount: widget.favouritesCategories.length,
-        itemBuilder: (BuildContext context, int index) {
-          Function jumpToMyIndex =
-              () => itemScrollController.jumpTo(index: index);
-          bool isSelectedCategory = index == _indexSelectioned;
-          Function selectCategory = () {
-            if(isSelectedCategory) widget.setIndexSelectioned(-1);
-            else widget.setIndexSelectioned(index);
-            jumpToMyIndex();
-          };
-          return FavouriteCategoryWidget2(
-              favouriteCategory: widget.favouritesCategories[index],
-              selectCategory: selectCategory,
-              isSelectedCategory: isSelectedCategory,
-            );
-        });
+    physics: _indexSelectioned==-1? AlwaysScrollableScrollPhysics():NeverScrollableScrollPhysics(),
+    itemScrollController: itemScrollController,
+    itemPositionsListener: itemPositionListener,
+    itemCount: widget.favouritesCategories.length,
+    itemBuilder: (BuildContext context, int index) {
+      Function jumpToMyIndex =
+          () => itemScrollController.jumpTo(index: index);
+      bool isSelectedCategory = index == _indexSelectioned;
+      Function selectCategory = () {
+        if(isSelectedCategory) widget.setIndexSelectioned(-1);
+        else widget.setIndexSelectioned(index);
+        jumpToMyIndex();
+      };
+      return FavouriteCategoryWidget(
+          favouriteCategory: widget.favouritesCategories[index],
+          selectCategory: selectCategory,
+          isSelectedCategory: isSelectedCategory,
+        );
+    });
   }
 }

@@ -28,48 +28,42 @@ class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
     IconData _icon =
         _isSelected ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up;
     List<Publication> publications = _favouriteCategory.getPublications();
-    return Container(
-      color: Colors.blue,
-      child: Column(
-        children: [
-          GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            child: Container(
-              height: 70,
-              child: Row(
-                children: [
-                  Container(
-                    height: 60,
-                    width: 60,
-                    color: Colors.grey[300],
-                    child: Image.network(_favouriteCategory.getImage()),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    _favouriteCategory.getName(),
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  SizedBox(),
-                  Expanded(
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [Icon(_icon)]),
-                  )
-                ],
-              ),
-            ),
-            onTap: widget.selectCategory,
-          ),
-          _isSelected
-              ? Container(
-                height: 2000,
-                  child: CategoryPublicationList(publications: publications),
+    return Column(
+      children: [
+        GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          child: Container(
+            height: 70,
+            child: Row(
+              children: [
+                Container(
+                  height: 60,
+                  width: 60,
+                  color: Colors.grey[300],
+                  child: Image.network(_favouriteCategory.getImage()),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Text(
+                  _favouriteCategory.getName(),
+                  style: TextStyle(fontSize: 18),
+                ),
+                SizedBox(),
+                Expanded(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [Icon(_icon)]),
                 )
-              : SizedBox()
-        ],
-      ),
+              ],
+            ),
+          ),
+          onTap: widget.selectCategory,
+        ),
+        _isSelected
+            ? CategoryPublicationList(publications: publications)
+            : SizedBox()
+      ],
     );
   }
 }

@@ -11,14 +11,9 @@ class CategoryPublicationList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      shrinkWrap: true,
+    return ListView.builder(
+        shrinkWrap: true,
         itemCount: publications.length,
-        separatorBuilder: (BuildContext context, int index) {
-          return SizedBox(
-            height: 10,
-          );
-        },
         itemBuilder: (BuildContext context, int index) {
           return PublicationWidget(publication: publications[index]);
         });
