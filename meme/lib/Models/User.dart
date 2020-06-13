@@ -8,8 +8,10 @@ class User {
   int _followers;
   int _followed;
   String _description;
+  String _publications;
+  List<String> _favouritesCategories;
 
-  User(id, name, image, followers, followed, description, favoritesCategories) {
+  User(id, name, image, followers, followed, description) {
     this._id = id;
     this._name = name;
     this._image = image;
@@ -24,7 +26,10 @@ class User {
         _image = doc.data['image'],
         _followers = doc.data['followers'].length,
         _followed = doc.data['followed'].length,
-        _description = doc.data['description'];
+        _description = doc.data['description'],
+        _publications = doc.data['publications'],
+        _favouritesCategories =
+            List<String>.from(doc.data['favouritesCategories']);
 
   getId() {
     return this._id;
@@ -74,8 +79,19 @@ class User {
     this._description = description;
   }
 
-}
+  getPublications() {
+    return this._publications;
+  }
 
-User toUser(DocumentSnapshot doc) {
-  return User.fromFirestore(doc);
+  setPublications(publications) {
+    this._publications = publications;
+  }
+
+  getFavouritesCategories() {
+    return this._favouritesCategories;
+  }
+
+  setFavouritesCategories(favouritesCategories) {
+    this._favouritesCategories = favouritesCategories;
+  }
 }

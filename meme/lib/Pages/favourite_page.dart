@@ -25,40 +25,53 @@ class _FavouritePageState extends State<FavouritePage> {
         body: Container(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                StreamBuilder(
-                    stream: getUser(_userId),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) print(snapshot.error);
-                      if (!snapshot.hasData) return CircularProgressIndicator();
-                      User user = snapshot.data;
-                      print(user);
-                      return FavouriteHeader(user: user);
-                    }),
-                StreamBuilder(
-                  stream: getFavouritesCategories(_userId),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) print(snapshot.error);
-                    if (!snapshot.hasData) return CircularProgressIndicator();
-                    List<FavouriteCategory> favouritesCategories =
-                        snapshot.data;
-                    print(favouritesCategories);
-                    return Expanded(
-                      child: Column(
-                        children: [
-                          NewFavouriteCategory(),
-                          Expanded(
-                              child: FavouritesCategoriesList(
-                            favouritesCategories: favouritesCategories,
-                          )),
-                        ],
+            child: StreamBuilder(
+                stream: getUser(_userId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) print(snapshot.error);
+                  if (!snapshot.hasData) return CircularProgressIndicator();
+                  User user = snapshot.data;
+                  String publications = user.getPublications();
+                  List<String> favouritesCategories =
+                      user.getFavouritesCategories();
+                  return Column(
+                    children: [
+                      FavouriteHeader(user: user),
+                      NewFavouriteCategory(userId: _userId),
+                      StreamBuilder(
+                        stream: getFavouriteCategory(publications),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) print(snapshot.error);
+                          if (!snapshot.hasData)
+                            return CircularProgressIndicator();
+                          FavouriteCategory favouriteCategory = snapshot.data;
+                          return FavouriteCategoryWidget(
+                            favouriteCategory: favouriteCategory,
+                          );
+                        },
                       ),
-                    );
-                  },
-                )
-              ],
-            ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                          itemCount: favouritesCategories.length,
+                          itemBuilder: (context, index) {
+                            return StreamBuilder(
+                              stream: getFavouriteCategory(
+                                  favouritesCategories[index]),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) print(snapshot.error);
+                                if (!snapshot.hasData)
+                                  return CircularProgressIndicator();
+                                FavouriteCategory favouriteCategory =
+                                    snapshot.data;
+                                return FavouriteCategoryWidget(
+                                  favouriteCategory: favouriteCategory,
+                                );
+                              },
+                            );
+                          })
+                    ],
+                  );
+                }),
           ),
         ),
       ),

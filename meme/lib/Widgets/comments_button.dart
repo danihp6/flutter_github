@@ -16,7 +16,6 @@ class _CommentsButtonState extends State<CommentsButton> {
   @override
   Widget build(BuildContext context) {
     _isShowedComments = configuration.getIsShowedComments();
-    print(_isShowedComments);
     _icon = _isShowedComments?Icons.comment:Icons.mode_comment;
     return FloatingActionButton(
       heroTag: 'showComments',

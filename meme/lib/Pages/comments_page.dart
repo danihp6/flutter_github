@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/db.dart';
 import 'package:meme/Widgets/comment_widget.dart';
 import '../Models/Comment.dart';
 
 class CommentsPage extends StatelessWidget {
-  List<Comment> comments;
-  CommentsPage({this.comments});
+  String publicationId;
+  CommentsPage({@required this.publicationId});
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +15,21 @@ class CommentsPage extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.only(left:8,right:8),
-        child: ListView.builder(
-          itemCount: comments.length,
-          itemBuilder: (context,index){
-            return SizedBox(child: CommentWidget(comment:comments[index],activeInnerComments: true,level:0));
+        child: StreamBuilder(
+          stream: getComments(publicationId),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) print(snapshot.error);
+                        if (!snapshot.hasData)
+                          return CircularProgressIndicator();
+            List<Comment> parentComments = getParentComments( snapshot.data);
+            return ListView.builder(
+              itemCount: parentComments.length,
+              itemBuilder: (context,index){
+                return CommentWidget(comment: parentComments[index],activeInnerComments: true);
+              }
+              );
           }
-          ),
+        ),
       ),
     );
   }

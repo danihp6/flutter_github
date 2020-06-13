@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/favourite_page.dart';
 import 'package:meme/Widgets/floating_buttons.dart';
@@ -18,7 +19,7 @@ class _MainPageState extends State<MainPage> {
         body: TabBarView(
           physics: NeverScrollableScrollPhysics(),
           children: [
-            FavouritePage(userId: '9bvBOvfIzvMZBmnRzaQL',)
+            FavouritePage(userId: configuration.getUserId(),)
             ]),
             floatingActionButton: FloatingButtons(refresh: (){setState(() {});},),
         bottomNavigationBar: _isTabBarVisible?Container(

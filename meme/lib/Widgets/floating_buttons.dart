@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Pages/publication_upload_page.dart';
 import 'package:meme/Widgets/comments_button.dart';
+import 'package:meme/Widgets/slide_left_route.dart';
 import '../Controller/Configuration.dart';
 
 class FloatingButtons extends StatefulWidget {
@@ -14,9 +16,15 @@ class _FloatingButtonsState extends State<FloatingButtons> {
   @override
   Widget build(BuildContext context) {
     _isShowedTools = configuration.getIsShowedTools();
+
     Function showTools() {
       configuration.setIsShowedTools(!_isShowedTools);
       setState(() {});
+    }
+
+    Function goPublicationUploadPage(){
+      showTools();
+      Navigator.push(context, SlideLeftRoute(page: PublicationUploadPage(userId: configuration.getUserId(),)));
     }
 
     return Column(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -24,7 +32,7 @@ class _FloatingButtonsState extends State<FloatingButtons> {
           ? Container(
               height: 45,
               child: FloatingActionButton(
-                onPressed: null,
+                onPressed: goPublicationUploadPage,
                 backgroundColor: Colors.deepOrange,
                 child: Icon(Icons.file_upload),
               ))

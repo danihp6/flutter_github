@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Publication.dart';
+import 'package:meme/Models/User.dart';
 
 class PublicationHeaderWidget extends StatelessWidget {
   Publication publication;
@@ -7,18 +9,24 @@ class PublicationHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var author = publication.getAuthor();
+    String author = publication.getAuthorId();
 
-    return Row(
+    return StreamBuilder(
+        stream: getUser(author),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+          if (!snapshot.hasData) return CircularProgressIndicator();
+          User user = snapshot.data;
+          return Row(
             children: [
               CircleAvatar(
                 radius: 16,
-                backgroundImage: NetworkImage(author.getImage()),
+                backgroundImage: NetworkImage(user.getImage()),
               ),
               SizedBox(width: 10),
               Text(
-                author.getName(),
-                style: TextStyle(fontSize: 18 , fontWeight: FontWeight.bold),
+                user.getName(),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Expanded(
                 child: Row(
@@ -28,14 +36,39 @@ class PublicationHeaderWidget extends StatelessWidget {
                       publication.getFavourites().toString(),
                       style: TextStyle(fontSize: 18),
                     ),
-                    IconButton(
-                        icon: Icon(Icons.star_border),
-                        iconSize: 30,
-                        onPressed: () {}),
+                    SizedBox(
+                      width: 35,
+                      child: IconButton(
+                          icon: Icon(Icons.star_border),
+                          iconSize: 30,
+                          onPressed: () {}),
+                    ),
+                    SizedBox(
+                      width: 35,
+                                          child: PopupMenuButton(
+                        child: Icon(Icons.more_vert),
+                        itemBuilder: (context){
+                          return [
+                            PopupMenuItem(
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.add), 
+                                    onPressed: (){}
+                                    ),
+                                    Text('Añadir a categoria')
+                                ],
+                              ),
+                            )
+                          ];
+                        },
+                      ),
+                    )
                   ],
                 ),
               ),
             ],
           );
+        });
   }
 }
