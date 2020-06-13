@@ -2,7 +2,7 @@ import 'package:meme/Models/User.dart';
 
 class Comment {
   String _comment;
-  int _likes;
+  List<User> _likes;
   User _author;
   DateTime _dateTime;
   List<Comment> _comments;

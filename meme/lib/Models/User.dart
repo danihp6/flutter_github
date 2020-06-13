@@ -1,42 +1,81 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meme/Models/FavouriteCategory.dart';
 
 class User {
+  String _id;
   String _name;
   String _image;
   int _followers;
   int _followed;
   String _description;
-  List<FavouriteCategory> _favouritesCategories;
-  User(name,image,followers,followed,description,favoritesCategories){
-    this._name=name;
+
+  User(id, name, image, followers, followed, description, favoritesCategories) {
+    this._id = id;
+    this._name = name;
     this._image = image;
     this._followers = followers;
     this._followed = followed;
     this._description = description;
-    this._favouritesCategories = favoritesCategories;
   }
 
-  getName(){ return this._name; }
+  User.fromFirestore(DocumentSnapshot doc)
+      : _id = doc.documentID,
+        _name = doc.data['name'],
+        _image = doc.data['image'],
+        _followers = doc.data['followers'].length,
+        _followed = doc.data['followed'].length,
+        _description = doc.data['description'];
 
-  setName(name){ this._name = name; }
+  getId() {
+    return this._id;
+  }
 
-  getImage(){ return this._image; }
+  setId(id) {
+    this._id = id;
+  }
 
-  setImage(image){ this._image = image; }
+  getName() {
+    return this._name;
+  }
 
-  getFollowers(){ return this._followers; }
+  setName(name) {
+    this._name = name;
+  }
 
-  setFollowers(followers){ this._followers = followers; }
+  getImage() {
+    return this._image;
+  }
 
-  getFollowed(){ return this._followed; }
+  setImage(image) {
+    this._image = image;
+  }
 
-  setFollowed(followed){ this._followed = followed; }
+  getFollowers() {
+    return this._followers;
+  }
 
-  getDescription(){ return this._description; }
+  setFollowers(followers) {
+    this._followers = followers;
+  }
 
-  setDescription(description){ this._description = description; }
+  getFollowed() {
+    return this._followed;
+  }
 
-  getFavouritesCategories(){ return this._favouritesCategories; }
+  setFollowed(followed) {
+    this._followed = followed;
+  }
 
-  setFavouritesCategories(favouritesCategories){ this._favouritesCategories = favouritesCategories; }
+  getDescription() {
+    return this._description;
+  }
+
+  setDescription(description) {
+    this._description = description;
+  }
+
+}
+
+User toUser(DocumentSnapshot doc) {
+  return User.fromFirestore(doc);
 }

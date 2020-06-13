@@ -1,25 +1,50 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:meme/Models/Publication.dart';
 
 class FavouriteCategory {
+  String _id;
   String _name;
   String _image;
-  List <Publication> _publications;
-  FavouriteCategory(name,image,publications){
+
+  FavouriteCategory(id, name, image) {
+    this._id = id;
     this._name = name;
     this._image = image;
-    this._publications = publications;
   }
 
-  getPublications(){ return this._publications; }
+  FavouriteCategory.fromFirestore(DocumentSnapshot doc)
+      : _id = doc.documentID,
+        _name = doc.data['name'],
+        _image = doc.data['image'];
 
-  setPublications(publications){ this._publications = publications; }
+  getId() {
+    return this._id;
+  }
 
-  getName(){ return this._name; }
+  setId(id) {
+    this._id = id;
+  }
 
-  setName(name){ this._name = name; }
+  getName() {
+    return this._name;
+  }
 
-  getImage(){ return this._image; }
+  setName(name) {
+    this._name = name;
+  }
 
-  setImage(image){ this._image = image; }
+  getImage() {
+    return this._image;
+  }
+
+  setImage(image) {
+    this._image = image;
+  }
+}
+
+List<FavouriteCategory> toFavouriteCategoryList(QuerySnapshot query) {
+  return query.documents
+      .map((doc) => FavouriteCategory.fromFirestore(doc))
+      .toList();
 }

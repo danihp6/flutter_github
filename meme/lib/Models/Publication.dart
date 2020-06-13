@@ -5,7 +5,7 @@ class Publication {
   String _image;
   User _author;
   String _description;
-  int _favourites;
+  List<User> _favourites;
   List<Comment> _comments;
   DateTime _dateTime;
   Publication(image,author,description,favourites,comments,dateTime){
