@@ -85,9 +85,26 @@ Future<void> newPublication(String userId, Publication publication) async {
       });
       newComment(
           publicationDoc.documentID,
-          new Comment(publication.getDescription(), <String>[], userId, DateTime.now(),
-              publicationDoc.documentID, <String>[], 0));
+          new Comment(publication.getDescription(), <String>[], userId,
+              DateTime.now(), publicationDoc.documentID, <String>[], 0));
     });
+  });
+}
+
+Future<void> deletePublication(Publication publication) async {
+  DocumentReference doc =
+      firestore.document('Publications/${publication.getId()}');
+  firestore
+      .document('Users/${publication.getAuthorId()}')
+      .get()
+      .then((userDoc) {
+        print(userDoc.data['publications']);
+    firestore
+        .document('FavouritesCategories/${userDoc.data['publications']}')
+        .updateData({
+      'favouritesCategories': FieldValue.arrayRemove([doc.documentID])
+    }).then((_) => doc.delete());
+    
   });
 }
 

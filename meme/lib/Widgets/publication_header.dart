@@ -45,23 +45,31 @@ class PublicationHeaderWidget extends StatelessWidget {
                     ),
                     SizedBox(
                       width: 35,
-                                          child: PopupMenuButton(
+                      child: PopupMenuButton(
                         child: Icon(Icons.more_vert),
-                        itemBuilder: (context){
+                        itemBuilder: (context) {
                           return [
                             PopupMenuItem(
                               child: Row(
                                 children: [
+                                  Icon(Icons.delete),
+                                  Text('Eliminar publicación'),
+                                ],
+                              ),
+                              value: () => deletePublication(publication),
+                            ),
+                            PopupMenuItem(
+                              child: Row(
+                                children: [
                                   IconButton(
-                                    icon: Icon(Icons.add), 
-                                    onPressed: (){}
-                                    ),
-                                    Text('Añadir a categoria')
+                                      icon: Icon(Icons.add), onPressed: () {}),
+                                  Text('Añadir a categoria')
                                 ],
                               ),
                             )
                           ];
                         },
+                        onSelected: (function)=>function(),
                       ),
                     )
                   ],
