@@ -38,17 +38,19 @@ Future<void> newFavouriteCategory(FavouriteCategory favouriteCategory) async {
   });
 }
 
-Future<void> addPublicationInFavouriteCategory(
-    String userId, String favouriteCategoryId, Publication publication) async {
-  firestore
-      .document('Users/$userId/favouritesCategories/$favouriteCategoryId')
-      .updateData({
-    'publications': FieldValue.arrayUnion([publication])
-  });
-}
+// Future<void> addPublicationInFavouriteCategory(
+//     String userId, String favouriteCategoryId, Publication publication) async {
+//   firestore
+//       .document('Users/$userId/favouritesCategories/$favouriteCategoryId')
+//       .updateData({
+//     'publications': FieldValue.arrayUnion([publication])
+//   });
+// }
 
-Future<void> deleteFavouriteCategory(FavouriteCategory favouriteCategory) async {
-  DocumentReference doc = firestore.document('FavouritesCategories/${favouriteCategory.getId()}');
+Future<void> deleteFavouriteCategory(
+    FavouriteCategory favouriteCategory) async {
+  DocumentReference doc =
+      firestore.document('FavouritesCategories/${favouriteCategory.getId()}');
   firestore.document('Users/${favouriteCategory.getAuthorId()}').updateData({
     'favouritesCategories': FieldValue.arrayRemove([doc.documentID])
   });
@@ -71,7 +73,22 @@ Stream<Publication> getPublication(String publicationId) {
 }
 
 Future<void> newPublication(String userId, Publication publication) async {
-  firestore.collection('Publications').add(publication.toFirestore());
+  firestore
+      .collection('Publications')
+      .add(publication.toFirestore())
+      .then((publicationDoc) {
+    firestore.document('Users/$userId').get().then((doc) {
+      firestore
+          .document('FavouritesCategories/${doc.data['publications']}')
+          .updateData({
+        'publications': FieldValue.arrayUnion([publicationDoc.documentID])
+      });
+      newComment(
+          publicationDoc.documentID,
+          new Comment(publication.getDescription(), <String>[], userId, DateTime.now(),
+              publicationDoc.documentID, <String>[], 0));
+    });
+  });
 }
 
 Stream<List<Comment>> getComments(String publicationId) {
@@ -86,4 +103,10 @@ Stream<Comment> getComment(String publicationId, String commentId) {
       .document('Publications/$publicationId/comments/$commentId')
       .snapshots()
       .map((doc) => Comment.fromFirestore(doc));
+}
+
+Future<void> newComment(String publicationId, Comment comment) {
+  return firestore
+      .collection('Publications/$publicationId/comments')
+      .add(comment.toFirestore());
 }

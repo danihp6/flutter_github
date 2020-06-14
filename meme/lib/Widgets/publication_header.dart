@@ -33,7 +33,7 @@ class PublicationHeaderWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      publication.getFavourites().toString(),
+                      publication.getFavourites().length.toString(),
                       style: TextStyle(fontSize: 18),
                     ),
                     SizedBox(

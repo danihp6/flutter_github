@@ -32,7 +32,7 @@ class PublicationDescriptionWidget extends StatelessWidget {
             if(snapshot.hasError)print(snapshot.error);
             if(!snapshot.hasData)return CircularProgressIndicator();
             List<Comment> comments = snapshot.data;
-            if(comments.length>0)
+            if(comments.length==1) return Container();
             return Column(
               children: [
                 Padding(

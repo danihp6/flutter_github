@@ -12,7 +12,7 @@ class Configuration {
 
   Configuration._internal() {
     this._isShowedComments = true;
-    this._isShowedTools = false;
+    this._isShowedTools = true;
     this._userId = '9bvBOvfIzvMZBmnRzaQL';
   }
 

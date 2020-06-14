@@ -57,7 +57,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                   }),
               Expanded(
                 child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  Text(_comment.getLikes().toString()),
+                  Text(_comment.getLikes().length.toString()),
                   SizedBox(
                     width: 30,
                     child: IconButton(

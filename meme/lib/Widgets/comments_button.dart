@@ -3,8 +3,8 @@ import 'package:meme/Controller/Configuration.dart';
 
 class CommentsButton extends StatefulWidget {
   Function refresh;
-  Function showTools;
-  CommentsButton({this.refresh,this.showTools});
+  Function openTools;
+  CommentsButton({this.refresh,this.openTools});
   @override
   _CommentsButtonState createState() => _CommentsButtonState();
 }
@@ -21,7 +21,7 @@ class _CommentsButtonState extends State<CommentsButton> {
       heroTag: 'showComments',
       onPressed: (){
         configuration.setIsShowedComments(!_isShowedComments);
-        widget.showTools();
+        widget.openTools();
         widget.refresh();
       },
       backgroundColor: Colors.deepOrange,

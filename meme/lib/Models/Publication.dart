@@ -7,7 +7,7 @@ class Publication {
   String _image;
   String _authorId;
   String _description;
-  int _favourites;
+  List<String> _favourites;
   DateTime _dateTime;
 
   Publication( image, authorId, description, favourites, dateTime) {
@@ -23,7 +23,7 @@ class Publication {
         _image = doc.data['image'],
         _authorId = doc.data['authorId'],
         _description = doc.data['description'],
-        _favourites = doc.data['favourites'].length,
+        _favourites = List<String>.from(doc.data['favourites']),
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate();
 
         Map<String, dynamic> toFirestore() => {'image': _image, 'authorId': _authorId,'description':_description,'favourites':_favourites,'dateTime':_dateTime};

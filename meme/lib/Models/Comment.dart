@@ -4,15 +4,15 @@ import 'package:meme/Models/User.dart';
 class Comment {
   String _id;
   String _comment;
-  int _likes;
+  List<String> _likes;
   String _authorId;
   DateTime _dateTime;
   String _publicationId;
   List<String> _comments;
   int _level;
 
-  Comment(id, comment, likes, authorId, dateTime,publicationId,comments,level) {
-    this._id = id;
+  Comment(
+      comment, likes, authorId, dateTime, publicationId, comments, level) {
     this._comment = comment;
     this._likes = likes;
     this._authorId = authorId;
@@ -20,18 +20,26 @@ class Comment {
     this._publicationId = publicationId;
     this._comments = comments;
     this._level = level;
-
   }
 
   Comment.fromFirestore(DocumentSnapshot doc)
       : _id = doc.documentID,
         _comment = doc.data['comment'],
-        _likes = doc.data['likes'].length,
+        _likes = List<String>.from(doc.data['likes']),
         _authorId = doc.data['authorId'],
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
         _comments = List<String>.from(doc.data['comments']),
         _publicationId = doc.reference.parent().parent().documentID,
         _level = doc.data['level'];
+
+  Map<String, dynamic> toFirestore() => {
+        'comment': _comment,
+        'likes': _likes,
+        'authorId': _authorId,
+        'dateTime': _dateTime,
+        'level':_level,
+        'comments':_comments
+      };
 
   getId() {
     return this._id;
@@ -121,18 +129,18 @@ List<Comment> toCommentList(QuerySnapshot query) {
   return query.documents.map((doc) => Comment.fromFirestore(doc)).toList();
 }
 
-Comment getBestComment (List<Comment> comments){
+Comment getBestComment(List<Comment> comments) {
   Comment comment = comments[0];
   for (var i = 1; i < comments.length; i++) {
-    if(comment.getLikes() < comments[i].getLikes() ) comment = comments[i];
+    if (comment.getLikes().length < comments[i].getLikes().length) comment = comments[i];
   }
   return comment;
 }
 
-List<Comment> getParentComments (List<Comment> comments){
+List<Comment> getParentComments(List<Comment> comments) {
   List<Comment> parentComments = [];
   for (var comment in comments) {
-    if(comment.getLevel() == 0) parentComments.add(comment);
+    if (comment.getLevel() == 0) parentComments.add(comment);
   }
   return parentComments;
 }
