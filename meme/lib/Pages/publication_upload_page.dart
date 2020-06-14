@@ -24,10 +24,10 @@ class _PublicationUploadPageState extends State<PublicationUploadPage> {
     _image = widget.image;
 
     uploadPublication() {
-      uploadImage(_image).then((url) => newPublication(
+      uploadImage(_image).then((map) => newPublication(
           configuration.getUserId(),
-          new Publication(url, configuration.getUserId(), _description, <String>[],
-              DateTime.now())));
+          new Publication(map['image'], configuration.getUserId(), _description, <String>[],
+              DateTime.now(),map['url'])));
       Navigator.pop(context);
     }
 

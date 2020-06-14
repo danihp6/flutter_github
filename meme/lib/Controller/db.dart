@@ -49,20 +49,17 @@ Future<void> newFavouriteCategory(FavouriteCategory favouriteCategory) async {
 
 Future<void> deleteFavouriteCategory(
     FavouriteCategory favouriteCategory) async {
-  DocumentReference doc =
+  DocumentReference favouriteCategoryDoc =
       firestore.document('FavouritesCategories/${favouriteCategory.getId()}');
-  firestore.document('Users/${favouriteCategory.getAuthorId()}').updateData({
-    'favouritesCategories': FieldValue.arrayRemove([doc.documentID])
-  });
-  doc.delete();
-}
-
-Stream<List<Publication>> getPublications(String author) {
-  return firestore
-      .collection('Publications')
-      .where('author', isEqualTo: 'author')
-      .snapshots()
-      .map(toPublicationList);
+  firestore
+      .collection('Users')
+      .getDocuments()
+      .then((query) => query.documents.forEach((doc) {
+            doc.reference.updateData({
+              'favouritesCategories':
+                  FieldValue.arrayRemove([favouriteCategoryDoc.documentID])
+            }).then((_) => favouriteCategoryDoc.delete());
+          }));
 }
 
 Stream<Publication> getPublication(String publicationId) {
@@ -70,6 +67,17 @@ Stream<Publication> getPublication(String publicationId) {
       .document('Publications/$publicationId')
       .snapshots()
       .map((doc) => Publication.fromFirestore(doc));
+}
+
+Stream<List<Publication>> getUserPublications(String userId) {
+  Stream<List<Publication>> stream;
+  firestore.document('Users/$userId').get().then((userDoc) {
+    List<String> publicationsId =
+        List<String>.from(userDoc.data['publications']);
+    List<DocumentReference> refs = publicationsId.map((publicationId) => firestore.document('Publications/$publicationId'));
+    Stream<DocumentSnapshot> snapshots = Stream.fromFutures(refs.map((ref) => ref.get()));
+    stream = snapshots.map(toPublicationList);
+  });
 }
 
 Future<void> newPublication(String userId, Publication publication) async {
@@ -92,20 +100,18 @@ Future<void> newPublication(String userId, Publication publication) async {
 }
 
 Future<void> deletePublication(Publication publication) async {
-  DocumentReference doc =
+  DocumentReference publicationDoc =
       firestore.document('Publications/${publication.getId()}');
   firestore
-      .document('Users/${publication.getAuthorId()}')
-      .get()
-      .then((userDoc) {
-        print(userDoc.data['publications']);
-    firestore
-        .document('FavouritesCategories/${userDoc.data['publications']}')
-        .updateData({
-      'favouritesCategories': FieldValue.arrayRemove([doc.documentID])
-    }).then((_) => doc.delete());
-    
-  });
+      .collection('FavouritesCategories')
+      .getDocuments()
+      .then((query) => query.documents.forEach((doc) {
+            doc.reference.updateData({
+              'publications':
+                  FieldValue.arrayRemove([publicationDoc.documentID])
+            });
+          }))
+      .then((_) => publicationDoc.delete());
 }
 
 Stream<List<Comment>> getComments(String publicationId) {

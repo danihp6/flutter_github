@@ -37,9 +37,18 @@ class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
             SizedBox(
               width: 10,
             ),
-            Text(
-              _favouriteCategory.getName(),
-              style: TextStyle(fontSize: 18),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  _favouriteCategory.getName(),
+                  style: TextStyle(fontSize: 18),
+                ),
+                Text(
+                  _favouriteCategory.getPublications().length.toString(),
+                  style: TextStyle(fontSize: 12),
+                ),
+              ],
             ),
             SizedBox(),
             _favouriteCategory.getName()!='Subidas'?Expanded(

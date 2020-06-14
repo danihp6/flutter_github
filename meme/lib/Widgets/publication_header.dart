@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/db.dart' as db;
+import 'package:meme/Controller/storage.dart';
 import 'package:meme/Models/Publication.dart';
 import 'package:meme/Models/User.dart';
 
@@ -11,8 +12,13 @@ class PublicationHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     String author = publication.getAuthorId();
 
+    Future<void> deletePublication(Publication publication){
+      deleteImage(publication.getUrl());
+      db.deletePublication(publication);
+    }
+
     return StreamBuilder(
-        stream: getUser(author),
+        stream: db.getUser(author),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return CircularProgressIndicator();

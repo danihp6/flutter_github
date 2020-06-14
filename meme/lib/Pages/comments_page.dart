@@ -13,23 +13,34 @@ class CommentsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Comentarios'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(left:8,right:8),
-        child: StreamBuilder(
-          stream: getComments(publicationId),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) print(snapshot.error);
-                        if (!snapshot.hasData)
-                          return CircularProgressIndicator();
-            List<Comment> parentComments = getParentComments( snapshot.data);
-            return ListView.builder(
-              itemCount: parentComments.length,
-              itemBuilder: (context,index){
-                return CommentWidget(comment: parentComments[index],activeInnerComments: true);
-              }
-              );
-          }
-        ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left:8,right:8),
+            child: StreamBuilder(
+                stream: getComments(publicationId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) print(snapshot.error);
+                  if (!snapshot.hasData) return CircularProgressIndicator();
+                  List<Comment> parentComments =
+                      getParentComments(snapshot.data);
+                  return ListView.builder(
+                      itemCount: parentComments.length,
+                      itemBuilder: (context, index) {
+                        return CommentWidget(
+                            comment: parentComments[index],
+                            activeInnerComments: true);
+                      });
+                }),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: 100,
+              color: Colors.black,
+            ),
+          )
+        ],
       ),
     );
   }

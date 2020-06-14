@@ -9,13 +9,15 @@ class Publication {
   String _description;
   List<String> _favourites;
   DateTime _dateTime;
+  String _url;
 
-  Publication( image, authorId, description, favourites, dateTime) {
+  Publication( image, authorId, description, favourites, dateTime,url) {
     this._image = image;
     this._authorId = authorId;
     this._description = description;
     this._favourites = favourites;
     this._dateTime = dateTime;
+    this._url = url;
   }
 
   Publication.fromFirestore(DocumentSnapshot doc)
@@ -24,9 +26,10 @@ class Publication {
         _authorId = doc.data['authorId'],
         _description = doc.data['description'],
         _favourites = List<String>.from(doc.data['favourites']),
-        _dateTime = (doc.data['dateTime'] as Timestamp).toDate();
+        _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
+        _url = doc.data['url'];
 
-        Map<String, dynamic> toFirestore() => {'image': _image, 'authorId': _authorId,'description':_description,'favourites':_favourites,'dateTime':_dateTime};
+        Map<String, dynamic> toFirestore() => {'image': _image, 'authorId': _authorId,'description':_description,'favourites':_favourites,'dateTime':_dateTime,'url':_url};
 
   getId() {
     return this._id;
@@ -66,6 +69,14 @@ class Publication {
 
   setFavourites(favourites) {
     this._favourites = favourites;
+  }
+
+  getUrl() {
+    return this._url;
+  }
+
+  setUrl(url) {
+    this._url = url;
   }
 
 

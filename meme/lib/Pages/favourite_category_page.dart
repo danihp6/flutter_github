@@ -44,7 +44,7 @@ class _FavouriteCategoryPageState extends State<FavouriteCategoryPage> {
                             padding: const EdgeInsets.all(50),
                             child: Image.network(favouriteCategory.getImage()),
                           )
-                        : null,
+                        : Container(),
                   );
                 }),
             actions: [
@@ -64,7 +64,7 @@ class _FavouriteCategoryPageState extends State<FavouriteCategoryPage> {
                       builder: (context, snapshot) {
                         if (snapshot.hasError) print(snapshot.error);
                         if (!snapshot.hasData)
-                          return CircularProgressIndicator();
+                          return Container();
                         Publication publication = snapshot.data;
                         return PublicationWidget(
                           publication: publication,
