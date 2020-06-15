@@ -50,25 +50,22 @@ class _FavouritePageState extends State<FavouritePage> {
                           );
                         },
                       ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                          itemCount: favouritesCategories.length,
-                          itemBuilder: (context, index) {
-                            return StreamBuilder(
-                              stream: getFavouriteCategory(
-                                  favouritesCategories[index]),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasError) print(snapshot.error);
-                                if (!snapshot.hasData)
-                                  return CircularProgressIndicator();
-                                FavouriteCategory favouriteCategory =
-                                    snapshot.data;
-                                return FavouriteCategoryWidget(
-                                  favouriteCategory: favouriteCategory,
-                                );
-                              },
-                            );
-                          })
+                      StreamBuilder(
+                         stream: getFavouritesCategoriesFromUser(_userId),
+                         builder: (context,snapshot){
+                           if (snapshot.hasError) print(snapshot.error);
+                          if (!snapshot.hasData)
+                            return CircularProgressIndicator();
+                          List<FavouriteCategory> favouritesCategories = snapshot.data;
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: favouritesCategories.length,
+                            itemBuilder: (context,index){
+                              return FavouriteCategoryWidget(favouriteCategory: favouritesCategories[index],);
+                            },
+                          );
+                         },
+                      )
                     ],
                   );
                 }),

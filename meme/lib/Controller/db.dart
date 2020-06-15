@@ -27,6 +27,17 @@ Stream<FavouriteCategory> getFavouriteCategory(String favouriteCategoryId) {
       .map((doc) => FavouriteCategory.fromFirestore(doc));
 }
 
+Stream<List<FavouriteCategory>> getFavouritesCategoriesFromUser(String userId) {
+  return firestore.document('Users/$userId').snapshots().asyncMap((snap) async {
+    List<String> favouritesCategoriesId = List<String>.from(snap.data['favouritesCategories']);
+    var favouritesCategories = <FavouriteCategory>[];
+    for (var favouriteCategoryId in favouritesCategoriesId) {
+      favouritesCategories.add(FavouriteCategory.fromFirestore(await firestore.document('FavouritesCategories/$favouriteCategoryId').get()));
+    }
+    return favouritesCategories;
+  });
+}
+
 Future<void> newFavouriteCategory(FavouriteCategory favouriteCategory) async {
   firestore
       .collection('FavouritesCategories')
@@ -69,14 +80,14 @@ Stream<Publication> getPublication(String publicationId) {
       .map((doc) => Publication.fromFirestore(doc));
 }
 
-Stream<List<Publication>> getUserPublications(String userId) {
-  Stream<List<Publication>> stream;
-  firestore.document('Users/$userId').get().then((userDoc) {
-    List<String> publicationsId =
-        List<String>.from(userDoc.data['publications']);
-    List<DocumentReference> refs = publicationsId.map((publicationId) => firestore.document('Publications/$publicationId'));
-    Stream<DocumentSnapshot> snapshots = Stream.fromFutures(refs.map((ref) => ref.get()));
-    stream = snapshots.map(toPublicationList);
+Stream<List<Publication>> getPublicationsFromFavouriteCategory(String favouriteCategoryId) {
+  return firestore.document('FavouritesCategories/$favouriteCategoryId').snapshots().asyncMap((snap) async {
+    List<String> publicationsId = List<String>.from(snap.data['publications']);
+    var publications = <Publication>[];
+    for (var publicationId in publicationsId) {
+      publications.add(Publication.fromFirestore(await firestore.document('Publications/$publicationId').get()));
+    }
+    return publications;
   });
 }
 
@@ -91,10 +102,6 @@ Future<void> newPublication(String userId, Publication publication) async {
           .updateData({
         'publications': FieldValue.arrayUnion([publicationDoc.documentID])
       });
-      newComment(
-          publicationDoc.documentID,
-          new Comment(publication.getDescription(), <String>[], userId,
-              DateTime.now(), publicationDoc.documentID, <String>[], 0));
     });
   });
 }
@@ -121,12 +128,12 @@ Stream<List<Comment>> getComments(String publicationId) {
       .map(toCommentList);
 }
 
-Stream<Comment> getComment(String publicationId, String commentId) {
-  return firestore
-      .document('Publications/$publicationId/comments/$commentId')
-      .snapshots()
-      .map((doc) => Comment.fromFirestore(doc));
-}
+// Stream<Comment> getComment(String publicationId, String commentId) {
+//   return firestore
+//       .document('Publications/$publicationId/comments/$commentId')
+//       .snapshots()
+//       .map((doc) => Comment.fromFirestore(doc));
+// }
 
 Future<void> newComment(String publicationId, Comment comment) {
   return firestore

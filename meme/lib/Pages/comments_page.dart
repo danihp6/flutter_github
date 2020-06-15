@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Models/Publication.dart';
+import 'package:meme/Models/User.dart';
+import 'package:meme/Widgets/add_comment_field.dart';
 import 'package:meme/Widgets/comment_widget.dart';
 import '../Models/Comment.dart';
 
@@ -15,29 +19,86 @@ class CommentsPage extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left:8,right:8),
-            child: StreamBuilder(
-                stream: getComments(publicationId),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) print(snapshot.error);
-                  if (!snapshot.hasData) return CircularProgressIndicator();
-                  List<Comment> parentComments =
-                      getParentComments(snapshot.data);
-                  return ListView.builder(
-                      itemCount: parentComments.length,
-                      itemBuilder: (context, index) {
-                        return CommentWidget(
-                            comment: parentComments[index],
-                            activeInnerComments: true);
-                      });
-                }),
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  StreamBuilder(
+                    stream: getPublication(publicationId),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) print(snapshot.error);
+                      if (!snapshot.hasData) return CircularProgressIndicator();
+                      Publication publication = snapshot.data;
+                      return StreamBuilder(
+                          stream: getUser(publication.getAuthorId()),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) print(snapshot.error);
+                            if (!snapshot.hasData)
+                              return CircularProgressIndicator();
+                            User user = snapshot.data;
+                            return Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 10,
+                                  backgroundImage:
+                                      NetworkImage(user.getImage()),
+                                ),
+                                SizedBox(width: 10),
+                                RichText(
+                                  text: TextSpan(
+                                    style: DefaultTextStyle.of(context).style,
+                                    children: [
+                                      TextSpan(
+                                          text: user.getName() + ' ',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold)),
+                                      TextSpan(
+                                          text: publication.getDescription()),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                          });
+                    },
+                  ),
+                  Divider(),
+                  StreamBuilder(
+                      stream: getComments(publicationId),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) print(snapshot.error);
+                        if (!snapshot.hasData)
+                          return CircularProgressIndicator();
+                        List<Comment> parentComments =
+                            getParentComments(snapshot.data);
+                        return ListView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: parentComments.length,
+                            itemBuilder: (context, index) {
+                              return CommentWidget(
+                                  comment: parentComments[index],
+                                  activeInnerComments: true);
+                            });
+                      }),
+                ],
+              ),
+            ),
           ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              height: 100,
-              color: Colors.black,
+                        child: StreamBuilder(
+              stream: getUser(configuration.getUserId()),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) print(snapshot.error);
+                if (!snapshot.hasData) return CircularProgressIndicator();
+                User user = snapshot.data;
+                return AddCommentField(
+                  user: user,
+                  publicationId: publicationId,
+                );
+              },
             ),
           )
         ],

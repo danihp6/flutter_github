@@ -31,7 +31,7 @@ class _FavouriteCategoryPageState extends State<FavouriteCategoryPage> {
             pinned: true,
             expandedHeight: 200,
             flexibleSpace: StreamBuilder(
-                stream: getFavouriteCategory( _favouriteCategory.getId()),
+                stream: getFavouriteCategory(_favouriteCategory.getId()),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) print(snapshot.error);
                   if (!snapshot.hasData) return CircularProgressIndicator();
@@ -51,28 +51,36 @@ class _FavouriteCategoryPageState extends State<FavouriteCategoryPage> {
               IconButton(icon: Icon(Icons.more_vert), onPressed: () {})
             ],
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate((context, index) {
-              return Column(
-                children: [
-                  if (index != 0 && !configuration.getIsShowedComments())
-                    SizedBox(
-                      height: 10,
-                    ),
-                  StreamBuilder(
-                      stream: getPublication(publications[index]),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) print(snapshot.error);
-                        if (!snapshot.hasData)
-                          return Container();
-                        Publication publication = snapshot.data;
-                        return PublicationWidget(
-                          publication: publication,
-                        );
-                      }),
-                ],
+          StreamBuilder(
+            stream: getPublicationsFromFavouriteCategory(_favouriteCategory.getId()),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) print(snapshot.error);
+              if (!snapshot.hasData) return SliverToBoxAdapter(
+                child: CircularProgressIndicator(),
               );
-            }, childCount: publications.length),
+              List<Publication> publications = snapshot.data;
+              print(publications);
+              return SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  return Column(
+                      children: [
+                        if (index != 0 && !configuration.getIsShowedComments())
+                          SizedBox(
+                            height: 10,
+                          ),
+                        PublicationWidget(
+                          publication: publications[index],
+                        )
+                      ],
+                    );
+                }, childCount: publications.length),
+              );
+            },
+          ),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 100,
+            ),
           )
         ]));
   }

@@ -101,6 +101,6 @@ class Publication {
   }
 }
 
-List<Publication> toPublicationList(QuerySnapshot query) {
-  return query.documents.map((doc) => Publication.fromFirestore(doc)).toList();
+List<Publication> toPublicationList(List<DocumentSnapshot> docs) {
+  return docs.map((doc) => Publication.fromFirestore(doc)).toList();
 }

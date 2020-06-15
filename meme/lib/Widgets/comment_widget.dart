@@ -7,7 +7,8 @@ import '../Controller/db.dart';
 class CommentWidget extends StatefulWidget {
   Comment comment;
   bool activeInnerComments;
-  CommentWidget({this.comment, this.activeInnerComments});
+  bool activeLikesAndTime;
+  CommentWidget({@required this.comment,  this.activeInnerComments = true , this.activeLikesAndTime = true});
 
   bool isShowedInnedComments = false;
 
@@ -108,25 +109,25 @@ class _CommentWidgetState extends State<CommentWidget> {
             ),
           ),
         if (_isShowedInnedComments)
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: _comment.getComments().length,
-            itemBuilder: (context, index) {
-              var comments = _comment.getComments();
-              return StreamBuilder(
-                stream: getComment(_comment.getPublicationId(), comments[index]),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) print(snapshot.error);
-                    if (!snapshot.hasData) return CircularProgressIndicator();
-                    Comment comment = snapshot.data;
-                  return CommentWidget(
-                    comment: comment,
-                    activeInnerComments: true,
-                  );
-                }
-              );
-            },
-          ),
+          // ListView.builder(
+          //   shrinkWrap: true,
+          //   itemCount: _comment.getComments().length,
+          //   itemBuilder: (context, index) {
+          //     var comments = _comment.getComments();
+          //     return StreamBuilder(
+          //       stream: getComment(_comment.getPublicationId(), comments[index]),
+          //       builder: (context, snapshot) {
+          //         if (snapshot.hasError) print(snapshot.error);
+          //           if (!snapshot.hasData) return CircularProgressIndicator();
+          //           Comment comment = snapshot.data;
+          //         return CommentWidget(
+          //           comment: comment,
+          //           activeInnerComments: true,
+          //         );
+          //       }
+          //     );
+          //   },
+          // ),
         if (_isShowedInnedComments && _comment.getLevel() == 0)
           Divider(
             thickness: 1,
