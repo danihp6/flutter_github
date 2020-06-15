@@ -39,6 +39,7 @@ class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   _favouriteCategory.getName(),
@@ -46,7 +47,7 @@ class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
                 ),
                 Text(
                   _favouriteCategory.getPublications().length.toString(),
-                  style: TextStyle(fontSize: 12),
+                  style: TextStyle(fontSize: 12,color: Colors.grey[600]),
                 ),
               ],
             ),

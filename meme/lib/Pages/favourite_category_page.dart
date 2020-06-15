@@ -3,6 +3,7 @@ import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/FavouriteCategory.dart';
 import 'package:meme/Models/Publication.dart';
+import 'package:meme/Widgets/icon_button_comments.dart';
 import 'package:meme/Widgets/publication.dart';
 import '../Widgets/floating_buttons.dart';
 
@@ -18,7 +19,6 @@ class _FavouriteCategoryPageState extends State<FavouriteCategoryPage> {
   @override
   Widget build(BuildContext context) {
     FavouriteCategory _favouriteCategory = widget.favouriteCategory;
-    List<String> publications = _favouriteCategory.getPublications();
     return Scaffold(
         floatingActionButton: FloatingButtons(
           refresh: () {
@@ -48,7 +48,7 @@ class _FavouriteCategoryPageState extends State<FavouriteCategoryPage> {
                   );
                 }),
             actions: [
-              IconButton(icon: Icon(Icons.more_vert), onPressed: () {})
+              IconButtonComments(refresh: (){setState(() {});},)
             ],
           ),
           StreamBuilder(
@@ -59,7 +59,6 @@ class _FavouriteCategoryPageState extends State<FavouriteCategoryPage> {
                 child: CircularProgressIndicator(),
               );
               List<Publication> publications = snapshot.data;
-              print(publications);
               return SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   return Column(

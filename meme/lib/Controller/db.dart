@@ -124,6 +124,7 @@ Future<void> deletePublication(Publication publication) async {
 Stream<List<Comment>> getComments(String publicationId) {
   return firestore
       .collection('Publications/$publicationId/comments')
+      .orderBy('dateTime')
       .snapshots()
       .map(toCommentList);
 }

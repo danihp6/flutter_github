@@ -37,35 +37,38 @@ class _AddCommentFieldState extends State<AddCommentField> {
       focus.unfocus();
     }
 
-    return Container(
-      height: 50,
-      color: Colors.grey[200],
-      child: Row(
-        children: [
-          SizedBox(
-            width: 10,
+    return Row(
+      children: [
+        SizedBox(
+          width: 10,
+        ),
+        CircleAvatar(
+          radius: 15,
+          backgroundImage: NetworkImage(widget.user.getImage()),
+        ),
+        SizedBox(width: 10),
+        Expanded(
+          child: TextField(
+            decoration: InputDecoration(
+                prefixIcon: Icon(Icons.comment),
+                hintText: 'Escribe un comentario',
+                border: InputBorder.none),
+
+            onChanged: (text){ 
+              setState(() {
+                comment = text;
+              });
+              },
+            controller: controller,
+            focusNode: focus,
           ),
-          CircleAvatar(
-            radius: 15,
-            backgroundImage: NetworkImage(widget.user.getImage()),
-          ),
-          SizedBox(width: 10),
-          Expanded(
-            child: TextField(
-              decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.comment),
-                  hintText: 'Escribe un comentario'),
-              onChanged: (text) => comment = text,
-              controller: controller,
-              focusNode: focus,
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.send),
-            onPressed: sendComment,
-          )
-        ],
-      ),
+        ),
+        if(comment.length>0)
+        IconButton(
+          icon: Icon(Icons.send),
+          onPressed: sendComment,
+        )
+      ],
     );
   }
 }

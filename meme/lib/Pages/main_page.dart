@@ -16,19 +16,30 @@ class _MainPageState extends State<MainPage> {
     return DefaultTabController(
       length: 1,
       child: Scaffold(
-        body: TabBarView(
-          physics: NeverScrollableScrollPhysics(),
-          children: [
-            FavouritePage(userId: configuration.getUserId(),)
-            ]),
-            floatingActionButton: FloatingButtons(refresh: (){setState(() {});},),
-        bottomNavigationBar: _isTabBarVisible?Container(
-          color: Colors.grey[300],
-          child: TabBar(
-            tabs: [
-              Tab(icon: Icon(Icons.star,color: Colors.black,size: 30,),)
-            ]),
-        ):SizedBox(),
+        body: TabBarView(physics: NeverScrollableScrollPhysics(), children: [
+          FavouritePage(
+            userId: configuration.getUserId(),
+          )
+        ]),
+        floatingActionButton: FloatingButtons(
+          refresh: () {
+            setState(() {});
+          },
+        ),
+        bottomNavigationBar: _isTabBarVisible
+            ? Container(
+                color: Colors.grey[300],
+                child: TabBar(tabs: [
+                  Tab(
+                    icon: Icon(
+                      Icons.star,
+                      color: Colors.black,
+                      size: 30,
+                    ),
+                  )
+                ]),
+              )
+            : SizedBox(),
       ),
     );
   }

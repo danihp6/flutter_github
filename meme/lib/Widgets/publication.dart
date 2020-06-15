@@ -27,6 +27,7 @@ class _PublicationWidgetState extends State<PublicationWidget> {
 
     return Container(
       child: Column(children: [
+        if(_isShowedComments)
         Padding(
           padding: const EdgeInsets.only(left:8),
           child: PublicationHeaderWidget(publication: _publication,),
