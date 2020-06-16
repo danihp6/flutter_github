@@ -57,7 +57,7 @@ class FavouriteCategory {
     this._authorId = authorId;
   }
 
-  getPublications() {
+  List<String> getPublications() {
     return this._publications;
   }
 

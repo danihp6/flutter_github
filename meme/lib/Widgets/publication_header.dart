@@ -1,24 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:meme/Controller/db.dart' as db;
+import 'package:meme/Controller/Configuration.dart';
+import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/storage.dart';
+import 'package:meme/Models/FavouriteCategory.dart';
 import 'package:meme/Models/Publication.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Widgets/favourite_publication_button.dart';
 
 class PublicationHeaderWidget extends StatelessWidget {
   Publication publication;
-  PublicationHeaderWidget({this.publication});
+  FavouriteCategory favouriteCategory;
+  PublicationHeaderWidget({@required this.publication,@required this.favouriteCategory});
 
   @override
   Widget build(BuildContext context) {
     String author = publication.getAuthorId();
 
-    Future<void> deletePublication(Publication publication){
-      deleteImage(publication.getUrl());
-      db.deletePublication(publication);
+    Future<void> deleteOrRemovePublication(Publication publication){
+      if(publication.getAuthorId() == configuration.getUserId() && favouriteCategory.getName() == 'Subidos')
+      {
+        print('borrar');
+        deleteImage(publication.getUrl());
+        deletePublication(publication);
+      }
+      else {
+        print('remover');
+        removePublicationOnFavouriteCategory(publication.getId(), favouriteCategory.getId());}
     }
 
     return StreamBuilder(
-        stream: db.getUser(author),
+        stream: getUser(author),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return CircularProgressIndicator();
@@ -42,12 +53,11 @@ class PublicationHeaderWidget extends StatelessWidget {
                       publication.getFavourites().length.toString(),
                       style: TextStyle(fontSize: 18),
                     ),
+                    SizedBox(width: 5,),
                     SizedBox(
-                      width: 35,
-                      child: IconButton(
-                          icon: Icon(Icons.star_border),
-                          iconSize: 30,
-                          onPressed: () {}),
+                      width: 25,
+                      height: 40,
+                      child: FavouritePublicationButton(publicationId: publication.getId(),favouriteCategoryId: user.getFavouritesPublications(),),
                     ),
                     SizedBox(
                       width: 35,
@@ -62,7 +72,7 @@ class PublicationHeaderWidget extends StatelessWidget {
                                   Text('Eliminar publicación'),
                                 ],
                               ),
-                              value: () => deletePublication(publication),
+                              value: () => deleteOrRemovePublication(publication),
                             ),
                             PopupMenuItem(
                               child: Row(
@@ -86,3 +96,4 @@ class PublicationHeaderWidget extends StatelessWidget {
         });
   }
 }
+

@@ -29,7 +29,7 @@ class _ImagesGalleryPageState extends State<ImagesGalleryPage> {
 
     onSelectFile(File file) async {
       File cropedImage = await cropImage(file);
-      if (file != null)
+      if (cropedImage != null)
         Navigator.push(context,
             SlideLeftRoute(page: UploadPublicationPage(file: cropedImage)));
     }

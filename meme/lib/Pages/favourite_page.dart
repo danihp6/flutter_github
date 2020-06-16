@@ -31,41 +31,65 @@ class _FavouritePageState extends State<FavouritePage> {
                   if (snapshot.hasError) print(snapshot.error);
                   if (!snapshot.hasData) return CircularProgressIndicator();
                   User user = snapshot.data;
-                  String publications = user.getPublications();
                   List<String> favouritesCategories =
                       user.getFavouritesCategories();
                   return Column(
                     children: [
                       FavouriteHeader(user: user),
                       NewFavouriteCategory(userId: _userId),
-                      StreamBuilder(
-                        stream: getFavouriteCategory(publications),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) print(snapshot.error);
-                          if (!snapshot.hasData)
-                            return CircularProgressIndicator();
-                          FavouriteCategory favouriteCategory = snapshot.data;
-                          return FavouriteCategoryWidget(
-                            favouriteCategory: favouriteCategory,
-                          );
-                        },
+                      SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            StreamBuilder(
+                              stream: getFavouriteCategory(user.getPublications()),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) print(snapshot.error);
+                                if (!snapshot.hasData)
+                                  return CircularProgressIndicator();
+                                FavouriteCategory favouriteCategory =
+                                    snapshot.data;
+                                return FavouriteCategoryWidget(
+                                  favouriteCategory: favouriteCategory,
+                                );
+                              },
+                            ),
+                            StreamBuilder(
+                              stream: getFavouriteCategory(user.getFavouritesPublications()),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) print(snapshot.error);
+                                if (!snapshot.hasData)
+                                  return CircularProgressIndicator();
+                                FavouriteCategory favouriteCategory =
+                                    snapshot.data;
+                                return FavouriteCategoryWidget(
+                                  favouriteCategory: favouriteCategory,
+                                );
+                              },
+                            ),
+                            StreamBuilder(
+                              stream: getFavouritesCategoriesFromUser(_userId),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) print(snapshot.error);
+                                if (!snapshot.hasData)
+                                  return CircularProgressIndicator();
+                                List<FavouriteCategory> favouritesCategories =
+                                    snapshot.data;
+                                return ListView.builder(
+                                  physics: NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: favouritesCategories.length,
+                                  itemBuilder: (context, index) {
+                                    return FavouriteCategoryWidget(
+                                      favouriteCategory:
+                                          favouritesCategories[index],
+                                    );
+                                  },
+                                );
+                              },
+                            )
+                          ],
+                        ),
                       ),
-                      StreamBuilder(
-                         stream: getFavouritesCategoriesFromUser(_userId),
-                         builder: (context,snapshot){
-                           if (snapshot.hasError) print(snapshot.error);
-                          if (!snapshot.hasData)
-                            return CircularProgressIndicator();
-                          List<FavouriteCategory> favouritesCategories = snapshot.data;
-                          return ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: favouritesCategories.length,
-                            itemBuilder: (context,index){
-                              return FavouriteCategoryWidget(favouriteCategory: favouritesCategories[index],);
-                            },
-                          );
-                         },
-                      )
                     ],
                   );
                 }),

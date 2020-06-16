@@ -10,14 +10,16 @@ class User {
   String _description;
   String _publications;
   List<String> _favouritesCategories;
+  String _favouritesPublications;
 
-  User(id, name, image, followers, followed, description) {
+  User(id, name, image, followers, followed, description,favouritesPublications) {
     this._id = id;
     this._name = name;
     this._image = image;
     this._followers = followers;
     this._followed = followed;
     this._description = description;
+    this._favouritesPublications = favouritesPublications;
   }
 
   User.fromFirestore(DocumentSnapshot doc)
@@ -29,7 +31,8 @@ class User {
         _description = doc.data['description'],
         _publications = doc.data['publications'],
         _favouritesCategories =
-            List<String>.from(doc.data['favouritesCategories']);
+            List<String>.from(doc.data['favouritesCategories']),
+            _favouritesPublications = doc.data['favouritesPublications'];
 
   getId() {
     return this._id;
@@ -93,5 +96,13 @@ class User {
 
   setFavouritesCategories(favouritesCategories) {
     this._favouritesCategories = favouritesCategories;
+  }
+
+  getFavouritesPublications() {
+    return this._favouritesPublications;
+  }
+
+  setFavouritesPublications(favouritesPublications) {
+    this._favouritesPublications = favouritesPublications;
   }
 }

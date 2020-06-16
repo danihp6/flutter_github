@@ -69,6 +69,7 @@ class _FavouriteCategoryPageState extends State<FavouriteCategoryPage> {
                           ),
                         PublicationWidget(
                           publication: publications[index],
+                          favouriteCategory: _favouriteCategory,
                         )
                       ],
                     );

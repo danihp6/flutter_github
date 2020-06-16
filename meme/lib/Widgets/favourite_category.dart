@@ -52,7 +52,7 @@ class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
               ],
             ),
             SizedBox(),
-            _favouriteCategory.getName()!='Subidas'?Expanded(
+            _favouriteCategory.getName()!='Subidos' && _favouriteCategory.getName()!= 'Favoritos'?Expanded(
               child: Align(
                 alignment: Alignment.centerRight,
                 child: SizedBox(

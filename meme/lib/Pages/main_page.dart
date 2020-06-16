@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
-import 'package:meme/Controller/web_scraping.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/favourite_page.dart';
 import 'package:meme/Widgets/floating_buttons.dart';
@@ -12,12 +11,6 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   bool _isTabBarVisible = true;
-
-@override
-  void initState() {
-    super.initState();
-    initiate();
-  }
 
   @override
   Widget build(BuildContext context) {

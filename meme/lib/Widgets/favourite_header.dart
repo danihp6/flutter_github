@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Pages/edit_profile_page.dart';
+import 'package:meme/Widgets/slide_left_route.dart';
 
 class FavouriteHeader extends StatelessWidget {
   User user;
@@ -23,7 +25,7 @@ class FavouriteHeader extends StatelessWidget {
             SizedBox(
               width: 70,
               child: RaisedButton(
-                onPressed: () {},
+                onPressed: () =>Navigator.push(context, SlideLeftRoute(page:EditProfilePage(user:user))),
                 color: Colors.deepOrange,
                 textColor: Colors.white,
                 child: Text('Editar'),

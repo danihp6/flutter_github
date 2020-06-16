@@ -13,6 +13,14 @@ Stream<User> getUser(String userId) {
       .map((doc) => User.fromFirestore(doc));
 }
 
+Future<void> editUser(String userId, String name, String description,String image){
+  firestore.document('Users/$userId').updateData({
+    'name' : name,
+    'description' : description,
+    'image' : image
+  });
+}
+
 // Stream<List<FavouriteCategory>> getFavouritesCategories(String userId) {
 //   return firestore
 //       .collection('Users/$userId/favouritesCategories')
@@ -119,6 +127,19 @@ Future<void> deletePublication(Publication publication) async {
             });
           }))
       .then((_) => publicationDoc.delete());
+      //DO IN SERVER DELETE PUBLICATION IN EACH USER
+}
+
+Future<void> addPublicationToFavouriteCategory(String publicationId,String favouriteCategoryId) async {
+  firestore.document('FavouritesCategories/$favouriteCategoryId').updateData({
+    'publications' : FieldValue.arrayUnion([publicationId])
+  });
+}
+
+Future<void> removePublicationOnFavouriteCategory(String publicationId,String favouriteCategoryId) async {
+  firestore.document('FavouritesCategories/$favouriteCategoryId').updateData({
+    'publications' : FieldValue.arrayRemove([publicationId])
+  });
 }
 
 Stream<List<Comment>> getComments(String publicationId) {
