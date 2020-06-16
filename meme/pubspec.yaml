@@ -29,6 +29,8 @@ dependencies:
   image_cropper: ^1.2.3
   image_gallery: ^1.2.0
   camera: ^0.5.8+2
+  html: ^0.14.0+3
+  http: ^0.12.1
   flutter:
     sdk: flutter
 
