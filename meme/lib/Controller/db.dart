@@ -130,14 +130,20 @@ Future<void> deletePublication(Publication publication) async {
       //DO IN SERVER DELETE PUBLICATION IN EACH USER
 }
 
-Future<void> addPublicationToFavouriteCategory(String publicationId,String favouriteCategoryId) async {
-  firestore.document('FavouritesCategories/$favouriteCategoryId').updateData({
+Future<void> addPublicationToFavouriteCategory(String publicationId,User user) async {
+  firestore.document('Publications/$publicationId').updateData({
+    'favourites' : FieldValue.arrayUnion([user.getId()])
+  });
+  firestore.document('FavouritesCategories/${user.getFavouritesPublications()}').updateData({
     'publications' : FieldValue.arrayUnion([publicationId])
   });
 }
 
-Future<void> removePublicationOnFavouriteCategory(String publicationId,String favouriteCategoryId) async {
-  firestore.document('FavouritesCategories/$favouriteCategoryId').updateData({
+Future<void> removePublicationOnFavouriteCategory(String publicationId,User user) async {
+  firestore.document('Publications/$publicationId').updateData({
+    'favourites' : FieldValue.arrayRemove([user.getId()])
+  });
+  firestore.document('FavouritesCategories/${user.getFavouritesPublications()}').updateData({
     'publications' : FieldValue.arrayRemove([publicationId])
   });
 }

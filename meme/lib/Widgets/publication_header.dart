@@ -10,22 +10,24 @@ import 'package:meme/Widgets/favourite_publication_button.dart';
 class PublicationHeaderWidget extends StatelessWidget {
   Publication publication;
   FavouriteCategory favouriteCategory;
-  PublicationHeaderWidget({@required this.publication,@required this.favouriteCategory});
+  PublicationHeaderWidget(
+      {@required this.publication, @required this.favouriteCategory});
 
   @override
   Widget build(BuildContext context) {
     String author = publication.getAuthorId();
+    print(publication.getFavourites());
 
-    Future<void> deleteOrRemovePublication(Publication publication){
-      if(publication.getAuthorId() == configuration.getUserId() && favouriteCategory.getName() == 'Subidos')
-      {
+    Future<void> deleteOrRemovePublication(Publication publication, User user) {
+      if (publication.getAuthorId() == configuration.getUserId() &&
+          favouriteCategory.getName() == 'Subidos') {
         print('borrar');
         deleteImage(publication.getUrl());
         deletePublication(publication);
-      }
-      else {
+      } else {
         print('remover');
-        removePublicationOnFavouriteCategory(publication.getId(), favouriteCategory.getId());}
+        removePublicationOnFavouriteCategory(publication.getId(), user);
+      }
     }
 
     return StreamBuilder(
@@ -53,41 +55,56 @@ class PublicationHeaderWidget extends StatelessWidget {
                       publication.getFavourites().length.toString(),
                       style: TextStyle(fontSize: 18),
                     ),
-                    SizedBox(width: 5,),
                     SizedBox(
-                      width: 25,
-                      height: 40,
-                      child: FavouritePublicationButton(publicationId: publication.getId(),favouriteCategoryId: user.getFavouritesPublications(),),
+                      width: 5,
                     ),
-                    SizedBox(
-                      width: 35,
-                      child: PopupMenuButton(
-                        child: Icon(Icons.more_vert),
-                        itemBuilder: (context) {
-                          return [
-                            PopupMenuItem(
-                              child: Row(
-                                children: [
-                                  Icon(Icons.delete),
-                                  Text('Eliminar publicación'),
-                                ],
-                              ),
-                              value: () => deleteOrRemovePublication(publication),
-                            ),
-                            PopupMenuItem(
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                      icon: Icon(Icons.add), onPressed: () {}),
-                                  Text('Añadir a categoria')
-                                ],
-                              ),
-                            )
-                          ];
-                        },
-                        onSelected: (function)=>function(),
-                      ),
-                    )
+                    StreamBuilder(
+                        stream: getUser(configuration.getUserId()),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) print(snapshot.error);
+                          if (!snapshot.hasData)
+                            return CircularProgressIndicator();
+                          User user = snapshot.data;
+                          return Row(
+                            children: [
+                              FavouritePublicationButton(
+                                  publicationId: publication.getId(),
+                                  user: user),
+                              SizedBox(
+                                width: 35,
+                                child: PopupMenuButton(
+                                  child: Icon(Icons.more_vert),
+                                  itemBuilder: (context) {
+                                    return [
+                                      PopupMenuItem(
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.delete),
+                                            Text('Eliminar publicación'),
+                                          ],
+                                        ),
+                                        value: () =>
+                                            deleteOrRemovePublication(
+                                                publication, user),
+                                      ),
+                                      PopupMenuItem(
+                                        child: Row(
+                                          children: [
+                                            IconButton(
+                                                icon: Icon(Icons.add),
+                                                onPressed: () {}),
+                                            Text('Añadir a categoria')
+                                          ],
+                                        ),
+                                      )
+                                    ];
+                                  },
+                                  onSelected: (function) => function(),
+                                ),
+                              )
+                            ],
+                          );
+                        }),
                   ],
                 ),
               ),
@@ -96,4 +113,3 @@ class PublicationHeaderWidget extends StatelessWidget {
         });
   }
 }
-
