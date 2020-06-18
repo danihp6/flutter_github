@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart' as db;
+import 'package:meme/Controller/storage.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Pages/images_gallery_page.dart';
+import 'package:meme/Widgets/slide_left_route.dart';
 
 class EditProfilePage extends StatefulWidget {
   User user;
@@ -15,6 +20,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String _name;
   String _description;
   String _image;
+  String _urlImage;
+  File _file;
   TextEditingController _nameController, _descriptionController;
 
   @override
@@ -26,6 +33,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _description = _user.getDescription();
     _descriptionController = new TextEditingController(text: _description);
     _image = _user.getImage();
+    _urlImage = _user.getUrlImage();
   }
 
   @override
@@ -38,8 +46,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     editUser() {
-      db.editUser(_user.getId(), _name, _description, _image);
+      if(_file != null){
+        deleteImage(_user.getUrlImage());
+        uploadAvatarImage(_file).then((map) => db.editUser(_user.getId(), _name, _description, map['image'],map['url']));
+      }
+      else db.editUser(_user.getId(), _name, _description, _image,_urlImage);
       Navigator.pop(context);
+    }
+
+    editAvatar(File file){
+      setState(() {
+        _file = file;
+      });
     }
 
     return Scaffold(
@@ -52,9 +70,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
           padding: const EdgeInsets.all(40),
           child: Column(
             children: [
-              CircleAvatar(
-                backgroundImage: NetworkImage(_image),
-                radius: 40,
+              GestureDetector(
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(_image),
+                  radius: 40,
+                ),
+                onTap: ()=>Navigator.push(context, SlideLeftRoute(page:ImagesGalleryPage(onTap: null))),
               ),
               SizedBox(
                 height: 10,

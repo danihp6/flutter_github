@@ -5,7 +5,10 @@ import 'package:meme/Controller/storage.dart';
 import 'package:meme/Models/FavouriteCategory.dart';
 import 'package:meme/Models/Publication.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Pages/select_favourite_category.dart';
 import 'package:meme/Widgets/favourite_publication_button.dart';
+import 'package:meme/Widgets/publication_menu.dart';
+import 'package:meme/Widgets/slide_left_route.dart';
 
 class PublicationHeaderWidget extends StatelessWidget {
   Publication publication;
@@ -17,18 +20,6 @@ class PublicationHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     String author = publication.getAuthorId();
     print(publication.getFavourites());
-
-    Future<void> deleteOrRemovePublication(Publication publication, User user) {
-      if (publication.getAuthorId() == configuration.getUserId() &&
-          favouriteCategory.getName() == 'Subidos') {
-        print('borrar');
-        deleteImage(publication.getUrl());
-        deletePublication(publication);
-      } else {
-        print('remover');
-        removePublicationOnFavouriteCategory(publication.getId(), user);
-      }
-    }
 
     return StreamBuilder(
         stream: getUser(author),
@@ -72,35 +63,8 @@ class PublicationHeaderWidget extends StatelessWidget {
                                   user: user),
                               SizedBox(
                                 width: 35,
-                                child: PopupMenuButton(
-                                  child: Icon(Icons.more_vert),
-                                  itemBuilder: (context) {
-                                    return [
-                                      PopupMenuItem(
-                                        child: Row(
-                                          children: [
-                                            Icon(Icons.delete),
-                                            Text('Eliminar publicación'),
-                                          ],
-                                        ),
-                                        value: () =>
-                                            deleteOrRemovePublication(
-                                                publication, user),
-                                      ),
-                                      PopupMenuItem(
-                                        child: Row(
-                                          children: [
-                                            IconButton(
-                                                icon: Icon(Icons.add),
-                                                onPressed: () {}),
-                                            Text('Añadir a categoria')
-                                          ],
-                                        ),
-                                      )
-                                    ];
-                                  },
-                                  onSelected: (function) => function(),
-                                ),
+                                child: PublicationMenu(
+                                    publication: publication, user: user,favouriteCategory: favouriteCategory,),
                               )
                             ],
                           );
@@ -113,3 +77,4 @@ class PublicationHeaderWidget extends StatelessWidget {
         });
   }
 }
+

@@ -17,10 +17,11 @@ class _MainPageState extends State<MainPage> {
     return DefaultTabController(
       length: 1,
       child: Scaffold(
-        body: TabBarView(physics: NeverScrollableScrollPhysics(), children: [
+        body: 
+        TabBarView(physics: NeverScrollableScrollPhysics(), children: [
           FavouritePage(
             userId: configuration.getUserId(),
-          )
+          ),
         ]),
         floatingActionButton: FloatingButtons(
           refresh: () {

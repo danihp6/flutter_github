@@ -5,6 +5,7 @@ class User {
   String _id;
   String _name;
   String _image;
+  String _urlImage;
   int _followers;
   int _followed;
   String _description;
@@ -12,10 +13,11 @@ class User {
   List<String> _favouritesCategories;
   String _favouritesPublications;
 
-  User(id, name, image, followers, followed, description,favouritesPublications) {
+  User(id, name, image,urlImage, followers, followed, description,favouritesPublications) {
     this._id = id;
     this._name = name;
     this._image = image;
+    this._urlImage = urlImage;
     this._followers = followers;
     this._followed = followed;
     this._description = description;
@@ -26,6 +28,7 @@ class User {
       : _id = doc.documentID,
         _name = doc.data['name'],
         _image = doc.data['image'],
+        _urlImage = doc.data['urlImage'],
         _followers = doc.data['followers'].length,
         _followed = doc.data['followed'].length,
         _description = doc.data['description'],
@@ -56,6 +59,14 @@ class User {
 
   setImage(image) {
     this._image = image;
+  }
+
+  getUrlImage() {
+    return this._urlImage;
+  }
+
+  setUrlImage(urlImage) {
+    this._urlImage = urlImage;
   }
 
   getFollowers() {

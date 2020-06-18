@@ -6,36 +6,46 @@ import '../Controller/db.dart';
 class FavouritePublicationButton extends StatefulWidget {
   String publicationId;
   User user;
-  FavouritePublicationButton({@required this.publicationId,@required this.user});
+  FavouritePublicationButton(
+      {@required this.publicationId, @required this.user});
 
   @override
-  _FavouritePublicationButtonState createState() => _FavouritePublicationButtonState();
+  _FavouritePublicationButtonState createState() =>
+      _FavouritePublicationButtonState();
 }
 
-class _FavouritePublicationButtonState extends State<FavouritePublicationButton> {
+class _FavouritePublicationButtonState
+    extends State<FavouritePublicationButton> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: getFavouriteCategory(widget.user.getFavouritesPublications()),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) print(snapshot.error);
+        stream: getFavouriteCategory(widget.user.getFavouritesPublications()),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return CircularProgressIndicator();
           FavouriteCategory favouriteCategory = snapshot.data;
-          if(favouriteCategory.getPublications().contains(widget.publicationId))
-        return Icon(
-Icons.star,size: 30
-        );
-
-        return IconButton(
-            icon: Icon(Icons.star_border),
-            iconSize: 30,
-            padding: EdgeInsets.all(0),
-            onPressed: (){
-              setState(() {
-                addPublicationToFavouriteCategory(widget.publicationId,widget.user);
+          if (favouriteCategory
+              .getPublications()
+              .contains(widget.publicationId))
+            return IconButton(
+              icon: Icon(Icons.star),
+              iconSize: 30,
+              padding: EdgeInsets.all(0),
+              onPressed: () {
+                setState(() {
+                  removePublicationOnFavourites(widget.publicationId, widget.user);
+                });
               });
-            });
-      }
-    );
+
+          return IconButton(
+              icon: Icon(Icons.star_border),
+              iconSize: 30,
+              padding: EdgeInsets.all(0),
+              onPressed: () {
+                setState(() {
+                  addPublicationToFavourites(widget.publicationId, widget.user);
+                });
+              });
+        });
   }
 }

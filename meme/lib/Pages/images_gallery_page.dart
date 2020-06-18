@@ -7,6 +7,8 @@ import 'package:meme/Pages/upload_publication_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
 class ImagesGalleryPage extends StatefulWidget {
+  Function onTap;
+  ImagesGalleryPage({@required this.onTap});
   @override
   _ImagesGalleryPageState createState() => _ImagesGalleryPageState();
 }
@@ -27,13 +29,6 @@ class _ImagesGalleryPageState extends State<ImagesGalleryPage> {
   @override
   Widget build(BuildContext context) {
 
-    onSelectFile(File file) async {
-      File cropedImage = await cropImage(file);
-      if (cropedImage != null)
-        Navigator.push(context,
-            SlideLeftRoute(page: UploadPublicationPage(file: cropedImage)));
-    }
-
     if (images == null) return Container();
     images = List<String>.from(images['URIList']);
 
@@ -50,7 +45,7 @@ class _ImagesGalleryPageState extends State<ImagesGalleryPage> {
               height: 50,
               child: GestureDetector(
                 child: Image.file(file, fit: BoxFit.cover),
-                onTap: () => onSelectFile(file),
+                onTap: ()=>widget.onTap(file),
               )),
         );
       },

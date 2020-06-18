@@ -24,7 +24,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
   Widget build(BuildContext context) {
     _file = widget.file;
     uploadPublication() {
-      uploadImage(_file).then((map) => newPublication(
+      uploadPublicationImage(_file).then((map) => newPublication(
           configuration.getUserId(),
           new Publication(map['image'], configuration.getUserId(), _description,
               <String>[], DateTime.now(), map['url'])));
