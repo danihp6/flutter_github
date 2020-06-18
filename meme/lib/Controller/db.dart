@@ -13,11 +13,12 @@ Stream<User> getUser(String userId) {
       .map((doc) => User.fromFirestore(doc));
 }
 
-Future<void> editUser(String userId, String name, String description,String image){
+Future<void> editUser(String userId, String name, String description,String image,String urlImage){
   firestore.document('Users/$userId').updateData({
     'name' : name,
     'description' : description,
-    'image' : image
+    'image' : image,
+    'urlImage' : urlImage
   });
 }
 
@@ -128,6 +129,24 @@ Future<void> deletePublication(Publication publication) async {
           }))
       .then((_) => publicationDoc.delete());
       //DO IN SERVER DELETE PUBLICATION IN EACH USER
+}
+
+Future<void> addPublicationToFavourites(String publicationId,User user) async {
+  firestore.document('Publications/$publicationId').updateData({
+    'favourites' : FieldValue.arrayUnion([user.getId()])
+  });
+  firestore.document('FavouritesCategories/${user.getFavouritesPublications()}').updateData({
+    'publications' : FieldValue.arrayUnion([publicationId])
+  });
+}
+
+Future<void> removePublicationOnFavourites(String publicationId,User user) async {
+  firestore.document('Publications/$publicationId').updateData({
+    'favourites' : FieldValue.arrayRemove([user.getId()])
+  });
+  firestore.document('FavouritesCategories/${user.getFavouritesPublications()}').updateData({
+    'publications' : FieldValue.arrayRemove([publicationId])
+  });
 }
 
 Future<void> addPublicationToFavouriteCategory(String publicationId,String favouriteCategoryId) async {

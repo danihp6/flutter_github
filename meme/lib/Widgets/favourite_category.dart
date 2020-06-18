@@ -6,8 +6,10 @@ import '../Pages/favourite_category_page.dart';
 
 class FavouriteCategoryWidget extends StatefulWidget {
   FavouriteCategory favouriteCategory;
+  bool activeMoreOptions;
+  Function onTap;
 
-  FavouriteCategoryWidget({this.favouriteCategory});
+  FavouriteCategoryWidget({@required this.favouriteCategory,@required this.onTap,this.activeMoreOptions = true});
 
   @override
   _FavouriteCategoryWidgetState createState() =>
@@ -15,7 +17,6 @@ class FavouriteCategoryWidget extends StatefulWidget {
 }
 
 class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
-  bool _isSelected = false;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +53,7 @@ class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
               ],
             ),
             SizedBox(),
-            _favouriteCategory.getName()!='Subidos' && _favouriteCategory.getName()!= 'Favoritos'?Expanded(
+            widget.activeMoreOptions?Expanded(
               child: Align(
                 alignment: Alignment.centerRight,
                 child: SizedBox(
@@ -81,8 +82,7 @@ class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
           ],
         ),
       ),
-      onTap: () => Navigator.of(context).push(SlideLeftRoute(
-          page: FavouriteCategoryPage(favouriteCategory: _favouriteCategory))),
+      onTap: widget.onTap
     );
   }
 }

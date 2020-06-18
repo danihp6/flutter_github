@@ -48,31 +48,45 @@ class _FavouriteCategoryPageState extends State<FavouriteCategoryPage> {
                   );
                 }),
             actions: [
-              IconButtonComments(refresh: (){setState(() {});},)
+              IconButtonComments(
+                refresh: () {
+                  setState(() {});
+                },
+              )
             ],
           ),
           StreamBuilder(
-            stream: getPublicationsFromFavouriteCategory(_favouriteCategory.getId()),
+            stream: getPublicationsFromFavouriteCategory(
+                _favouriteCategory.getId()),
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
-              if (!snapshot.hasData) return SliverToBoxAdapter(
-                child: CircularProgressIndicator(),
-              );
+              if (!snapshot.hasData)
+                return SliverToBoxAdapter(
+                  child: CircularProgressIndicator(),
+                );
               List<Publication> publications = snapshot.data;
               return SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   return Column(
-                      children: [
-                        if (index != 0 && !configuration.getIsShowedComments())
-                          SizedBox(
-                            height: 10,
-                          ),
-                        PublicationWidget(
-                          publication: publications[index],
-                          favouriteCategory: _favouriteCategory,
-                        )
-                      ],
-                    );
+                    children: [
+                      if (index != 0 && !configuration.getIsShowedComments())
+                        SizedBox(
+                          height: 10,
+                        ),
+                      StreamBuilder(
+                          stream: getPublication(publications[index].getId()),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) print(snapshot.error);
+                            if (!snapshot.hasData)
+                              return CircularProgressIndicator();
+                            Publication publication = snapshot.data;
+                            return PublicationWidget(
+                              publication: publication,
+                              favouriteCategory: _favouriteCategory,
+                            );
+                          })
+                    ],
+                  );
                 }, childCount: publications.length),
               );
             },

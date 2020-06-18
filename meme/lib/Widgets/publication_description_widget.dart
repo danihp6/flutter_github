@@ -62,7 +62,7 @@ class PublicationDescriptionWidget extends StatelessWidget {
                 ],
               );
             }),
-        StreamBuilder<Object>(
+        StreamBuilder(
             stream: getUser(configuration.getUserId()),
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);

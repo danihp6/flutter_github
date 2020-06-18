@@ -2,18 +2,27 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 
-final StorageReference refPublicationImages =
-    FirebaseStorage.instance.ref().child('Publication images');
+final StorageReference ref =
+    FirebaseStorage.instance.ref();
 
-Future<Map<String, dynamic>> uploadImage(File file) async {
+Future<Map<String, dynamic>> uploadPublicationImage(File file) async {
   String name = file.path.split('/').last;
-  final StorageReference ref = refPublicationImages.child(name);
-  final StorageUploadTask uploadTask = ref.putFile(file);
+  final StorageReference refPublicationImages = ref.child('Publication images').child(name);
+  final StorageUploadTask uploadTask = refPublicationImages.putFile(file);
   final StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
   final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-  return {'image': downloadUrl, 'url': name};
+  return {'image': downloadUrl, 'url': 'Publication images/' +name};
+}
+
+Future<Map<String, dynamic>> uploadAvatarImage(File file) async {
+  String name = file.path.split('/').last;
+  final StorageReference refPublicationImages = ref.child('Avatar images').child(name);
+  final StorageUploadTask uploadTask = refPublicationImages.putFile(file);
+  final StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
+  final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+  return {'image': downloadUrl, 'url': 'Avatar images/' +name};
 }
 
 Future<void> deleteImage(String path) {
-  refPublicationImages.child(path).delete();
+  ref.child(path).delete();
 }

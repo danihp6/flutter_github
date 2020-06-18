@@ -34,7 +34,8 @@ class _PublicationWidgetState extends State<PublicationWidget> {
         if(_isShowedComments)
         Padding(
           padding: const EdgeInsets.only(left:8),
-          child: PublicationHeaderWidget(publication: _publication,favouriteCategory: _favouriteCategory,),
+          child: SizedBox(height: 40,
+            child: PublicationHeaderWidget(publication: _publication,favouriteCategory: _favouriteCategory,)),
         ),
         Image.network(
           _publication.getImage(),
