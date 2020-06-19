@@ -17,10 +17,10 @@ class EditProfilePage extends StatefulWidget {
 
 class _EditProfilePageState extends State<EditProfilePage> {
   User _user;
-  String _name;
+  String _userName;
   String _description;
-  String _image;
-  String _urlImage;
+  String _avatar;
+  String _avatarLocation;
   File _file;
   TextEditingController _nameController, _descriptionController;
 
@@ -28,12 +28,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void initState() {
     super.initState();
     _user = widget.user;
-    _name = _user.getName();
-    _nameController = new TextEditingController(text: _name);
+    _userName = _user.getUserName();
+    _nameController = new TextEditingController(text: _userName);
     _description = _user.getDescription();
     _descriptionController = new TextEditingController(text: _description);
-    _image = _user.getImage();
-    _urlImage = _user.getUrlImage();
+    _avatar = _user.getAvatar();
+    _avatarLocation = _user.getAvatarLocation();
   }
 
   @override
@@ -47,10 +47,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     editUser() {
       if(_file != null){
-        deleteImage(_user.getUrlImage());
-        uploadAvatarImage(_file).then((map) => db.editUser(_user.getId(), _name, _description, map['image'],map['url']));
+        deleteFile(_user.getAvatarLocation());
+        uploadAvatar(_file).then((map) => db.editUser(_user.getId(), _userName, _description, map['media'],map['location']));
       }
-      else db.editUser(_user.getId(), _name, _description, _image,_urlImage);
+      else db.editUser(_user.getId(), _userName, _description, _avatar,_avatarLocation);
       Navigator.pop(context);
     }
 
@@ -58,6 +58,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       setState(() {
         _file = file;
       });
+      Navigator.pop(context);
     }
 
     return Scaffold(
@@ -72,10 +73,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
             children: [
               GestureDetector(
                 child: CircleAvatar(
-                  backgroundImage: NetworkImage(_image),
+                  backgroundImage: _file == null?NetworkImage(_avatar):FileImage(_file),
                   radius: 40,
                 ),
-                onTap: ()=>Navigator.push(context, SlideLeftRoute(page:ImagesGalleryPage(onTap: null))),
+                onTap: ()=>Navigator.push(context, SlideLeftRoute(page:ImagesGalleryPage(onTap: editAvatar))),
               ),
               SizedBox(
                 height: 10,
@@ -89,7 +90,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   labelText: 'Nombre',
                 ),
                 controller: _nameController,
-                onChanged: (name) => _name = name,
+                onChanged: (name) => _userName = name,
               ),
               SizedBox(
                 height: 20,

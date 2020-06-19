@@ -1,183 +1,178 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meme/Models/Comment.dart';
-import 'package:meme/Models/FavouriteCategory.dart';
-import 'package:meme/Models/Publication.dart';
+import 'package:meme/Models/Post.dart';
+import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/User.dart';
 
 final firestore = Firestore.instance;
 
-Stream<User> getUser(String userId) {
-  return firestore
-      .document('Users/$userId')
-      .snapshots()
-      .map((doc) => User.fromFirestore(doc));
-}
+//---------------USER----------------//
 
-Future<void> editUser(String userId, String name, String description,String image,String urlImage){
-  firestore.document('Users/$userId').updateData({
-    'name' : name,
-    'description' : description,
-    'image' : image,
-    'urlImage' : urlImage
-  });
-}
+Stream<User> getUser(String userId) => firestore
+    .document('users/$userId')
+    .snapshots()
+    .map((doc) => User.fromFirestore(doc));
 
-// Stream<List<FavouriteCategory>> getFavouritesCategories(String userId) {
-//   return firestore
-//       .collection('Users/$userId/favouritesCategories')
-//       .snapshots()
-//       .map(toFavouriteCategoryList);
-// }
-
-Stream<FavouriteCategory> getFavouriteCategory(String favouriteCategoryId) {
-  return firestore
-      .document('FavouritesCategories/$favouriteCategoryId')
-      .snapshots()
-      .map((doc) => FavouriteCategory.fromFirestore(doc));
-}
-
-Stream<List<FavouriteCategory>> getFavouritesCategoriesFromUser(String userId) {
-  return firestore.document('Users/$userId').snapshots().asyncMap((snap) async {
-    List<String> favouritesCategoriesId = List<String>.from(snap.data['favouritesCategories']);
-    var favouritesCategories = <FavouriteCategory>[];
-    for (var favouriteCategoryId in favouritesCategoriesId) {
-      favouritesCategories.add(FavouriteCategory.fromFirestore(await firestore.document('FavouritesCategories/$favouriteCategoryId').get()));
-    }
-    return favouritesCategories;
-  });
-}
-
-Future<void> newFavouriteCategory(FavouriteCategory favouriteCategory) async {
-  firestore
-      .collection('FavouritesCategories')
-      .add(favouriteCategory.toFirestore())
-      .then((doc) {
-    firestore.document('Users/${favouriteCategory.getAuthorId()}').updateData({
-      'favouritesCategories': FieldValue.arrayUnion([doc.documentID])
+Future editUser(String userId, String name, String description, String avatar,
+        String avatarLocation) =>
+    firestore.document('users/$userId').updateData({
+      'name': name,
+      'description': description,
+      'avatar': avatar,
+      'avatarLocation': avatarLocation
     });
+
+//---------------POST----------------//
+
+Stream<Post> getPost(String postPath) => firestore
+    .document(postPath)
+    .snapshots()
+    .map((doc) => Post.fromFirestore(doc));
+
+Stream<List<Post>> getPosts(String userId) =>
+    firestore.collection('users/$userId/posts').snapshots().map(toPosts);
+
+Future addPostPathInPostList(
+        String userId, String postListId, String postPath) =>
+    firestore.document('users/$userId/postLists/$postListId').updateData({
+      'posts': FieldValue.arrayUnion([postPath])
+    });
+
+Future deletePostPathInPostList(
+        String userId, String postListId, String postPath) =>
+    firestore.document('users/$userId/postLists/$postListId').updateData({
+      'posts': FieldValue.arrayRemove([postPath])
+    });
+
+Stream<List<String>> getPostsPathFromPostList(
+        String userId, String postListId) =>
+    firestore
+        .document('usres/$userId/postLists/$postListId')
+        .snapshots()
+        .map((doc) => List<String>.of(doc.data['posts']));
+
+Stream<List<String>> getPostsPathFromFavourites(
+        String userId, String postListId) =>
+    firestore
+        .document('usres/$userId')
+        .snapshots()
+        .map((doc) => List<String>.of(doc.data['favourites']));
+
+Future addPostPathInFavourites(String userId, String postPath) {
+  firestore.document(postPath).updateData({
+    'favourites': FieldValue.arrayUnion([userId])
+  });
+  firestore.document('users/$userId').updateData({
+    'favourites': FieldValue.arrayUnion([postPath])
   });
 }
 
-// Future<void> addPublicationInFavouriteCategory(
-//     String userId, String favouriteCategoryId, Publication publication) async {
-//   firestore
-//       .document('Users/$userId/favouritesCategories/$favouriteCategoryId')
-//       .updateData({
-//     'publications': FieldValue.arrayUnion([publication])
+Future deletePostPathInFavourites(String userId, String postPath) {
+  firestore.document(postPath).updateData({
+    'favourites': FieldValue.arrayRemove([userId])
+  });
+  firestore.document('users/$userId').updateData({
+    'favourites': FieldValue.arrayRemove([postPath])
+  });
+}
+
+Future newPost(String userId, Post post) =>
+    firestore.collection('users/$userId/posts').add(post.toFirestore());
+
+Future deletePost(String userId, String postId) =>
+    firestore.document('users/$userId/posts/$postId').delete();
+
+Stream<List<String>> getPostFavourites(String userId, String postId) =>
+    firestore
+        .document('users/$userId/posts/$postId')
+        .snapshots()
+        .map((doc) => List<String>.of(doc.data['favourites']));
+
+//---------------POSTLIST----------------//
+
+Stream<List<PostList>> getPostLists(String userId) => firestore
+    .collection('users/$userId/postLists')
+    .snapshots()
+    .map(toPostLists);
+
+Future newPostList(String userId, PostList postList) =>
+    firestore.collection('users/$userId/postLists').add(postList.toFirestore());
+
+Future deletePostList(String userId, String postListId) =>
+    firestore.document('users/$userId/postLists/$postListId').delete();
+
+//---------------COMMENTS----------------//
+
+Stream<List<Comment>> getComments(String userId, String postId) => firestore
+    .collection('users/$userId/posts/$postId/comments')
+    .snapshots()
+    .map(toCommentList);
+
+Stream<Comment> getBestComment(String userId, String postId) => firestore
+    .collection('users/$userId/posts/$postId/comments')
+    .orderBy('likes')
+    .limit(1)
+    .snapshots()
+    .map((snap) => Comment.fromFirestore(snap.documents.first));
+
+Future newComment(String userId, String postId, Comment comment) => firestore
+    .collection('users/$userId/posts/$postId')
+    .add(comment.toFirestore());
+
+// Stream<List<Publication>> getPublicationsFromFollowedAndUser(String userId) {
+//   return firestore
+//       .document('Users/$userId')
+//       .snapshots()
+//       .asyncMap((userSnap) async {
+//     List<Publication> publications = <Publication>[];
+
+//     String userFavouriteCategoryId = userSnap.data['publications'];
+//     DocumentSnapshot userFavouriteCategorySnap = await firestore.document('FavouritesCategories/$userFavouriteCategoryId').get();
+//     List<String> userPublicationsId = List<String>.from(userFavouriteCategorySnap.data['publications']);
+//     for (var publicationId in userPublicationsId) {
+//       publications.add(Publication.fromFirestore(
+//           await firestore.document('Publications/$publicationId').get()));
+//     }
+
+//     List<String> followedId = List<String>.from(userSnap.data['followed']);
+//     List<String> followedPublicationsId = <String>[];
+//     for (var id in followedId) {
+//       DocumentSnapshot followedSnap =
+//           await firestore.document('Users/$id').get();
+//       followedPublicationsId.add(followedSnap.data['publications']);
+//     }
+//     List<String> publicationsId = <String>[];
+//     for (var id in followedPublicationsId) {
+//       DocumentSnapshot followedPublicationsSnap =
+//           await firestore.document('FavouritesCategories/$id').get();
+//       publicationsId.addAll(
+//           List<String>.from(followedPublicationsSnap.data['publications']));
+//     }
+//     for (var publicationId in publicationsId) {
+//       publications.add(Publication.fromFirestore(
+//           await firestore.document('Publications/$publicationId').get()));
+//     }
+//     return publications;
 //   });
+//   // return firestore.document('FavouritesCategories/$favouriteCategoryId').snapshots().asyncMap((snap) async {
+//   //   List<String> publicationsId = List<String>.from(snap.data['publications']);
+//   //   var publications = <Publication>[];
+//   //   for (var publicationId in publicationsId) {
+//   //     publications.add(Publication.fromFirestore(await firestore.document('Publications/$publicationId').get()));
+//   //   }
+//   //   return publications;
+//   // });
 // }
 
-Future<void> deleteFavouriteCategory(
-    FavouriteCategory favouriteCategory) async {
-  DocumentReference favouriteCategoryDoc =
-      firestore.document('FavouritesCategories/${favouriteCategory.getId()}');
-  firestore
-      .collection('Users')
-      .getDocuments()
-      .then((query) => query.documents.forEach((doc) {
-            doc.reference.updateData({
-              'favouritesCategories':
-                  FieldValue.arrayRemove([favouriteCategoryDoc.documentID])
-            }).then((_) => favouriteCategoryDoc.delete());
-          }));
-}
+// // Stream<Comment> getComment(String publicationId, String commentId) {
+// //   return firestore
+// //       .document('Publications/$publicationId/comments/$commentId')
+// //       .snapshots()
+// //       .map((doc) => Comment.fromFirestore(doc));
+// // }
 
-Stream<Publication> getPublication(String publicationId) {
-  return firestore
-      .document('Publications/$publicationId')
-      .snapshots()
-      .map((doc) => Publication.fromFirestore(doc));
-}
-
-Stream<List<Publication>> getPublicationsFromFavouriteCategory(String favouriteCategoryId) {
-  return firestore.document('FavouritesCategories/$favouriteCategoryId').snapshots().asyncMap((snap) async {
-    List<String> publicationsId = List<String>.from(snap.data['publications']);
-    var publications = <Publication>[];
-    for (var publicationId in publicationsId) {
-      publications.add(Publication.fromFirestore(await firestore.document('Publications/$publicationId').get()));
-    }
-    return publications;
-  });
-}
-
-Future<void> newPublication(String userId, Publication publication) async {
-  firestore
-      .collection('Publications')
-      .add(publication.toFirestore())
-      .then((publicationDoc) {
-    firestore.document('Users/$userId').get().then((doc) {
-      firestore
-          .document('FavouritesCategories/${doc.data['publications']}')
-          .updateData({
-        'publications': FieldValue.arrayUnion([publicationDoc.documentID])
-      });
-    });
-  });
-}
-
-Future<void> deletePublication(Publication publication) async {
-  DocumentReference publicationDoc =
-      firestore.document('Publications/${publication.getId()}');
-  firestore
-      .collection('FavouritesCategories')
-      .getDocuments()
-      .then((query) => query.documents.forEach((doc) {
-            doc.reference.updateData({
-              'publications':
-                  FieldValue.arrayRemove([publicationDoc.documentID])
-            });
-          }))
-      .then((_) => publicationDoc.delete());
-      //DO IN SERVER DELETE PUBLICATION IN EACH USER
-}
-
-Future<void> addPublicationToFavourites(String publicationId,User user) async {
-  firestore.document('Publications/$publicationId').updateData({
-    'favourites' : FieldValue.arrayUnion([user.getId()])
-  });
-  firestore.document('FavouritesCategories/${user.getFavouritesPublications()}').updateData({
-    'publications' : FieldValue.arrayUnion([publicationId])
-  });
-}
-
-Future<void> removePublicationOnFavourites(String publicationId,User user) async {
-  firestore.document('Publications/$publicationId').updateData({
-    'favourites' : FieldValue.arrayRemove([user.getId()])
-  });
-  firestore.document('FavouritesCategories/${user.getFavouritesPublications()}').updateData({
-    'publications' : FieldValue.arrayRemove([publicationId])
-  });
-}
-
-Future<void> addPublicationToFavouriteCategory(String publicationId,String favouriteCategoryId) async {
-  firestore.document('FavouritesCategories/$favouriteCategoryId').updateData({
-    'publications' : FieldValue.arrayUnion([publicationId])
-  });
-}
-
-Future<void> removePublicationOnFavouriteCategory(String publicationId,String favouriteCategoryId) async {
-  firestore.document('FavouritesCategories/$favouriteCategoryId').updateData({
-    'publications' : FieldValue.arrayRemove([publicationId])
-  });
-}
-
-Stream<List<Comment>> getComments(String publicationId) {
-  return firestore
-      .collection('Publications/$publicationId/comments')
-      .orderBy('dateTime')
-      .snapshots()
-      .map(toCommentList);
-}
-
-// Stream<Comment> getComment(String publicationId, String commentId) {
+// Future<void> newComment(String publicationId, Comment comment) {
 //   return firestore
-//       .document('Publications/$publicationId/comments/$commentId')
-//       .snapshots()
-//       .map((doc) => Comment.fromFirestore(doc));
+//       .collection('Publications/$publicationId/comments')
+//       .add(comment.toFirestore());
 // }
-
-Future<void> newComment(String publicationId, Comment comment) {
-  return firestore
-      .collection('Publications/$publicationId/comments')
-      .add(comment.toFirestore());
-}

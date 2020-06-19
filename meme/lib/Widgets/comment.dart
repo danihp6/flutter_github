@@ -38,7 +38,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                       children: [
                         CircleAvatar(
                           radius: 10,
-                          backgroundImage: NetworkImage(user.getImage()),
+                          backgroundImage: NetworkImage(user.getAvatar()),
                         ),
                         SizedBox(width: 10),
                         RichText(
@@ -46,10 +46,10 @@ class _CommentWidgetState extends State<CommentWidget> {
                             style: DefaultTextStyle.of(context).style,
                             children: [
                               TextSpan(
-                                  text: user.getName() + ' ',
+                                  text: user.getUserName() + ' ',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(text: _comment.getComment()),
+                              TextSpan(text: _comment.getText()),
                             ],
                           ),
                         ),

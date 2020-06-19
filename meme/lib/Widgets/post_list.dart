@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
-import 'package:meme/Models/FavouriteCategory.dart';
-import 'slide_left_route.dart';
-import '../Pages/favourite_category_page.dart';
 
-class FavouriteCategoryWidget extends StatefulWidget {
-  FavouriteCategory favouriteCategory;
+import '../Models/PostList.dart';
+import 'slide_left_route.dart';
+
+class PostListWidget extends StatefulWidget {
+  PostList postList;
   bool activeMoreOptions;
   Function onTap;
 
-  FavouriteCategoryWidget({@required this.favouriteCategory,@required this.onTap,this.activeMoreOptions = true});
+  PostListWidget({@required this.postList,@required this.onTap,this.activeMoreOptions = true});
 
   @override
-  _FavouriteCategoryWidgetState createState() =>
-      _FavouriteCategoryWidgetState();
+  _PostListWidgetState createState() =>
+      _PostListWidgetState();
 }
 
-class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
+class _PostListWidgetState extends State<PostListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    FavouriteCategory _favouriteCategory = widget.favouriteCategory;
+    PostList _postList = widget.postList;
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       child: Container(
@@ -31,8 +32,8 @@ class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
               height: 60,
               width: 60,
               color: Colors.grey[300],
-              child: _favouriteCategory.getImage() != ''
-                  ? Image.network(_favouriteCategory.getImage())
+              child: _postList.getImage() != ''
+                  ? Image.network(_postList.getImage())
                   : null,
             ),
             SizedBox(
@@ -43,11 +44,11 @@ class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _favouriteCategory.getName(),
+                  _postList.getName(),
                   style: TextStyle(fontSize: 18),
                 ),
                 Text(
-                  _favouriteCategory.getPublications().length.toString(),
+                  _postList.getPosts().length.toString(),
                   style: TextStyle(fontSize: 12,color: Colors.grey[600]),
                 ),
               ],
@@ -70,7 +71,7 @@ class _FavouriteCategoryWidgetState extends State<FavouriteCategoryWidget> {
                               Text('Eliminar categoria')
                             ],
                           ),
-                          value: ()=>deleteFavouriteCategory(_favouriteCategory),
+                          value: ()=>deletePostList(configuration.getUserId(),_postList.getId()),
                         )
                       ];
                     },

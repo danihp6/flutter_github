@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:meme/Pages/new_favourite_category_page.dart';
+import 'package:meme/Pages/new_post_list_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
-class NewFavouriteCategory extends StatelessWidget {
+class NewPostListButton extends StatelessWidget {
   String userId;
-  NewFavouriteCategory({this.userId});
+  NewPostListButton({this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class NewFavouriteCategory extends StatelessWidget {
             ],
           ),
         ),
-        onTap: ()=>Navigator.push(context, SlideLeftRoute(page:NewFavouriteCategoryPage(userId:userId))),
+        onTap: ()=>Navigator.push(context, SlideLeftRoute(page:NewPostListPage())),
       );
   }
 }

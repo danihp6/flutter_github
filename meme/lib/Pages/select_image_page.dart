@@ -21,7 +21,7 @@ class SelectImagePage extends StatelessWidget {
       child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.deepOrange,
-            title: Text('Nueva publicación'),
+            title: Text('Nuevo post'),
           ),
           body: TabBarView(
             children: [

@@ -1,119 +1,107 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:meme/Models/FavouriteCategory.dart';
 
 class User {
   String _id;
-  String _name;
-  String _image;
-  String _urlImage;
-  int _followers;
-  int _followed;
+  String _userName;
+  String _avatar;
+  String _avatarLocation;
+  List<String> _followers;
+  List<String> _followed;
   String _description;
-  String _publications;
-  List<String> _favouritesCategories;
-  String _favouritesPublications;
+  List<String> _favourites;
+  DateTime _dateTime;
 
-  User(id, name, image,urlImage, followers, followed, description,favouritesPublications) {
+  User(id, userName, avatar,avatarLocation, followers, followed, description,dateTime) {
     this._id = id;
-    this._name = name;
-    this._image = image;
-    this._urlImage = urlImage;
+    this._userName = userName;
+    this._avatar = avatar;
+    this._avatarLocation = avatarLocation;
     this._followers = followers;
     this._followed = followed;
     this._description = description;
-    this._favouritesPublications = favouritesPublications;
+    this._dateTime = dateTime;
   }
 
   User.fromFirestore(DocumentSnapshot doc)
       : _id = doc.documentID,
-        _name = doc.data['name'],
-        _image = doc.data['image'],
-        _urlImage = doc.data['urlImage'],
-        _followers = doc.data['followers'].length,
-        _followed = doc.data['followed'].length,
+        _userName = doc.data['userName'],
+        _avatar = doc.data['avatar'],
+        _avatarLocation = doc.data['avatarLocation'],
+        _followers = doc.data['followers'].cast<String>(),
+        _followed = doc.data['followed'].cast<String>(),
         _description = doc.data['description'],
-        _publications = doc.data['publications'],
-        _favouritesCategories =
-            List<String>.from(doc.data['favouritesCategories']),
-            _favouritesPublications = doc.data['favouritesPublications'];
+        _favourites = doc.data['favourites'].cast<String>(),
+        _dateTime = (doc.data['dateTime'] as Timestamp).toDate();
 
-  getId() {
+  String getId() {
     return this._id;
   }
 
-  setId(id) {
+  void setId(id) {
     this._id = id;
   }
 
-  getName() {
-    return this._name;
+  String getUserName() {
+    return this._userName;
   }
 
-  setName(name) {
-    this._name = name;
+  void setUserName(userName) {
+    this._userName = userName;
   }
 
-  getImage() {
-    return this._image;
+  String getAvatar() {
+    return this._avatar;
   }
 
-  setImage(image) {
-    this._image = image;
+  void setAvatar(avatar) {
+    this._avatar = avatar;
   }
 
-  getUrlImage() {
-    return this._urlImage;
+  String getAvatarLocation() {
+    return this._avatarLocation;
   }
 
-  setUrlImage(urlImage) {
-    this._urlImage = urlImage;
+  void setAvatarLocation(avatarLocation) {
+    this._avatarLocation = avatarLocation;
   }
 
-  getFollowers() {
+  List<String> getFollowers() {
     return this._followers;
   }
 
-  setFollowers(followers) {
+  void setFollowers(followers) {
     this._followers = followers;
   }
 
-  getFollowed() {
+  List<String> getFollowed() {
     return this._followed;
   }
 
-  setFollowed(followed) {
+  void setFollowed(followed) {
     this._followed = followed;
   }
 
-  getDescription() {
+  String getDescription() {
     return this._description;
   }
 
-  setDescription(description) {
+  void setDescription(description) {
     this._description = description;
   }
 
-  getPublications() {
-    return this._publications;
+  List<String> getFavourites() {
+    return this._favourites;
   }
 
-  setPublications(publications) {
-    this._publications = publications;
+  void setFavourites(favourites) {
+    this._favourites = favourites;
   }
 
-  getFavouritesCategories() {
-    return this._favouritesCategories;
+  DateTime getDateTime() {
+    return this._dateTime;
   }
 
-  setFavouritesCategories(favouritesCategories) {
-    this._favouritesCategories = favouritesCategories;
-  }
-
-  getFavouritesPublications() {
-    return this._favouritesPublications;
-  }
-
-  setFavouritesPublications(favouritesPublications) {
-    this._favouritesPublications = favouritesPublications;
+  DateTime setDateTime(dateTime) {
+    this._dateTime = dateTime;
   }
 }

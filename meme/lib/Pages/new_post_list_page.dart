@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
-import 'package:meme/Models/FavouriteCategory.dart';
-import 'package:meme/Models/Publication.dart';
+import 'package:meme/Models/PostList.dart';
 
-class NewFavouriteCategoryPage extends StatelessWidget {
-  String userId;
-  NewFavouriteCategoryPage({this.userId});
+class NewPostListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +11,7 @@ class NewFavouriteCategoryPage extends StatelessWidget {
 
     void validateName() {
       if (name != '') {
-        newFavouriteCategory(new FavouriteCategory(name, '', <String>[],userId));
+        newPostList(configuration.getUserId(),new PostList(name, '', <String>[],configuration.getUserId()));
         Navigator.pop(context);
       }
     }

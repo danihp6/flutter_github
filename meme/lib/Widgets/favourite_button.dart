@@ -1,39 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:meme/Models/FavouriteCategory.dart';
+import 'package:meme/Controller/Configuration.dart';
+import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/User.dart';
 import '../Controller/db.dart';
 
-class FavouritePublicationButton extends StatefulWidget {
-  String publicationId;
-  User user;
-  FavouritePublicationButton(
-      {@required this.publicationId, @required this.user});
+class FavouriteButton extends StatefulWidget {
+  String postId;
+  String userId;
+  FavouriteButton(
+      {@required this.postId, @required this.userId});
 
   @override
-  _FavouritePublicationButtonState createState() =>
-      _FavouritePublicationButtonState();
+  _PostListButtonState createState() =>
+      _PostListButtonState();
 }
 
-class _FavouritePublicationButtonState
-    extends State<FavouritePublicationButton> {
+class _PostListButtonState
+    extends State<FavouriteButton> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: getFavouriteCategory(widget.user.getFavouritesPublications()),
+        stream: getPostFavourites(widget.userId,widget.postId),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return CircularProgressIndicator();
-          FavouriteCategory favouriteCategory = snapshot.data;
-          if (favouriteCategory
-              .getPublications()
-              .contains(widget.publicationId))
+          List<String> postList = snapshot.data;
+          if (postList
+              .contains(configuration.getUserId()))
             return IconButton(
               icon: Icon(Icons.star),
               iconSize: 30,
               padding: EdgeInsets.all(0),
               onPressed: () {
                 setState(() {
-                  removePublicationOnFavourites(widget.publicationId, widget.user);
+                  deletePostPathInFavourites(configuration.getUserId(), 'users/${widget.userId}/posts/${widget.postId}');
                 });
               });
 
@@ -43,7 +43,7 @@ class _FavouritePublicationButtonState
               padding: EdgeInsets.all(0),
               onPressed: () {
                 setState(() {
-                  addPublicationToFavourites(widget.publicationId, widget.user);
+                  addPostPathInFavourites(configuration.getUserId(), 'users/${widget.userId}/posts/${widget.postId}');
                 });
               });
         });

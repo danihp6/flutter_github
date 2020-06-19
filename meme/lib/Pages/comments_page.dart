@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
-import 'package:meme/Models/Publication.dart';
+import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/add_comment_field.dart';
-import 'package:meme/Widgets/comment_widget.dart';
+import 'package:meme/Widgets/comment.dart';
 import '../Models/Comment.dart';
 
 class CommentsPage extends StatelessWidget {
-  String publicationId;
-  CommentsPage({@required this.publicationId});
+  Post post;
+  CommentsPage({@required this.post});
 
   @override
   Widget build(BuildContext context) {
@@ -27,14 +27,7 @@ class CommentsPage extends StatelessWidget {
                 child: Column(
                   children: [
                     StreamBuilder(
-                      stream: getPublication(publicationId),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) print(snapshot.error);
-                        if (!snapshot.hasData)
-                          return CircularProgressIndicator();
-                        Publication publication = snapshot.data;
-                        return StreamBuilder(
-                            stream: getUser(publication.getAuthorId()),
+                            stream: getUser(post.getAuthorId()),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) print(snapshot.error);
                               if (!snapshot.hasData)
@@ -45,7 +38,7 @@ class CommentsPage extends StatelessWidget {
                                   CircleAvatar(
                                     radius: 10,
                                     backgroundImage:
-                                        NetworkImage(user.getImage()),
+                                        NetworkImage(user.getAvatar()),
                                   ),
                                   SizedBox(width: 10),
                                   RichText(
@@ -53,28 +46,26 @@ class CommentsPage extends StatelessWidget {
                                       style: DefaultTextStyle.of(context).style,
                                       children: [
                                         TextSpan(
-                                            text: user.getName() + ' ',
+                                            text: user.getUserName() + ' ',
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold)),
                                         TextSpan(
-                                            text: publication.getDescription()),
+                                            text: post.getDescription()),
                                       ],
                                     ),
                                   ),
                                 ],
                               );
-                            });
                       },
                     ),
                     Divider(),
                     StreamBuilder(
-                        stream: getComments(publicationId),
+                        stream: getComments(post.getAuthorId(),post.getId()),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData)
                             return CircularProgressIndicator();
-                          List<Comment> parentComments =
-                              getParentComments(snapshot.data);
+                          List<Comment> parentComments = snapshot.data;
                           return ListView.builder(
                               shrinkWrap: true,
                               physics: NeverScrollableScrollPhysics(),
@@ -102,7 +93,7 @@ class CommentsPage extends StatelessWidget {
                   color: Colors.grey[300],
                   child: AddCommentField(
                     user: user,
-                    publicationId: publicationId,
+                    postId: post.getId(),
                   ),
                 );
               },

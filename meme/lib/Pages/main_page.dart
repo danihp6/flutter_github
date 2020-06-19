@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/web_scrapping.dart';
-import 'package:meme/Models/User.dart';
-import 'package:meme/Pages/favourite_page.dart';
+import 'package:meme/Pages/home_page.dart';
+import 'package:meme/Pages/user_page.dart';
 import 'package:meme/Widgets/floating_buttons.dart';
 
 class MainPage extends StatefulWidget {
@@ -21,13 +21,14 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    String userId = configuration.getUserId();
     return DefaultTabController(
       length: 1,
       child: Scaffold(
-        body: 
-        TabBarView(physics: NeverScrollableScrollPhysics(), children: [
-          FavouritePage(
-            userId: configuration.getUserId(),
+        body: TabBarView(physics: NeverScrollableScrollPhysics(), children: [
+          // HomePage(userId:userId),
+          UserPage(
+            userId: userId,
           ),
         ]),
         floatingActionButton: FloatingButtons(
@@ -37,16 +38,26 @@ class _MainPageState extends State<MainPage> {
         ),
         bottomNavigationBar: _isTabBarVisible
             ? Container(
-                color: Colors.grey[300],
-                child: TabBar(tabs: [
-                  Tab(
-                    icon: Icon(
-                      Icons.star,
-                      color: Colors.black,
-                      size: 30,
-                    ),
-                  )
-                ]),
+                child: TabBar(
+                  tabs: [
+                    // Tab(
+                    //   icon: Icon(
+                    //     Icons.home,
+                    //     size: 30,
+                    //   ),
+                    // ),
+                    Tab(
+                      icon: Icon(
+                        Icons.person,
+                        size: 40,
+                      ),
+                    )
+                  ],
+                  labelColor: Colors.deepOrange,
+                  unselectedLabelColor: Colors.black,
+                  indicator:
+                      UnderlineTabIndicator(borderSide: BorderSide(width: 0)),
+                ),
               )
             : SizedBox(),
       ),

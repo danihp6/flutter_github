@@ -2,27 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/storage.dart';
-import 'package:meme/Models/FavouriteCategory.dart';
-import 'package:meme/Models/Publication.dart';
+import 'package:meme/Models/Post.dart';
+import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/User.dart';
-import 'package:meme/Pages/select_favourite_category.dart';
-import 'package:meme/Widgets/favourite_publication_button.dart';
-import 'package:meme/Widgets/publication_menu.dart';
+import 'package:meme/Widgets/favourite_button.dart';
+import 'package:meme/Widgets/post_menu.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
-class PublicationHeaderWidget extends StatelessWidget {
-  Publication publication;
-  FavouriteCategory favouriteCategory;
-  PublicationHeaderWidget(
-      {@required this.publication, @required this.favouriteCategory});
+class PostHeader extends StatelessWidget {
+  Post post;
+  PostList postList;
+  PostHeader({@required this.post, this.postList});
 
   @override
   Widget build(BuildContext context) {
-    String author = publication.getAuthorId();
-    print(publication.getFavourites());
-
     return StreamBuilder(
-        stream: getUser(author),
+        stream: getUser(post.getAuthorId()),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return CircularProgressIndicator();
@@ -31,11 +26,11 @@ class PublicationHeaderWidget extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 16,
-                backgroundImage: NetworkImage(user.getImage()),
+                backgroundImage: NetworkImage(user.getAvatar()),
               ),
               SizedBox(width: 10),
               Text(
-                user.getName(),
+                user.getUserName(),
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Expanded(
@@ -43,7 +38,7 @@ class PublicationHeaderWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      publication.getFavourites().length.toString(),
+                      post.getFavourites().length.toString(),
                       style: TextStyle(fontSize: 18),
                     ),
                     SizedBox(
@@ -58,13 +53,15 @@ class PublicationHeaderWidget extends StatelessWidget {
                           User user = snapshot.data;
                           return Row(
                             children: [
-                              FavouritePublicationButton(
-                                  publicationId: publication.getId(),
-                                  user: user),
+                              FavouriteButton(
+                                  postId: post.getId(), userId: user.getId()),
                               SizedBox(
                                 width: 35,
-                                child: PublicationMenu(
-                                    publication: publication, user: user,favouriteCategory: favouriteCategory,),
+                                child: PostMenu(
+                                  postId: post.getId(),
+                                  userId: user.getId(),
+                                  postList: postList,
+                                ),
                               )
                             ],
                           );
@@ -77,4 +74,3 @@ class PublicationHeaderWidget extends StatelessWidget {
         });
   }
 }
-

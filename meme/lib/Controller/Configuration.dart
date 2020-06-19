@@ -1,4 +1,4 @@
-import 'dart:async';
+
 
 class Configuration {
   static final Configuration _configuration = Configuration._internal();
@@ -13,7 +13,7 @@ class Configuration {
   Configuration._internal() {
     this._isShowedComments = true;
     this._isShowedTools = true;
-    this._userId = '9bvBOvfIzvMZBmnRzaQL';
+    this._userId = 'jeS78zVBNf5tcHfjAARi';
   }
 
   getIsShowedComments() {

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/storage.dart';
-import 'package:meme/Models/Publication.dart';
+import '../Models/Post.dart';
 
 class UploadPublicationPage extends StatefulWidget {
   File file;
@@ -19,21 +19,20 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
   File _file;
   String _description = '';
 
-
   @override
   Widget build(BuildContext context) {
     _file = widget.file;
     uploadPublication() {
-      uploadPublicationImage(_file).then((map) => newPublication(
+      uploadMedia(_file).then((map) => newPost(
           configuration.getUserId(),
-          new Publication(map['image'], configuration.getUserId(), _description,
-              <String>[], DateTime.now(), map['url'])));
+          new Post(map['image'], _description, <String>[], DateTime.now(),
+              map['url'], configuration.getUserId())));
       Navigator.pop(context);
       Navigator.pop(context);
     }
 
     return SafeArea(
-          child: Scaffold(
+      child: Scaffold(
         body: SingleChildScrollView(
           child: Column(
             children: [

@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Comment.dart';
-import 'package:meme/Models/Publication.dart';
+import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/comments_page.dart';
 import 'package:meme/Widgets/add_comment_field.dart';
-import 'package:meme/Widgets/comment_widget.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
-class PublicationDescriptionWidget extends StatelessWidget {
-  Publication publication;
-  PublicationDescriptionWidget({
-    @required this.publication,
+import 'comment.dart';
+
+class PostDescription extends StatelessWidget {
+  Post post;
+  PostDescription({
+    @required this.post,
   });
 
   @override
@@ -22,23 +23,23 @@ class PublicationDescriptionWidget extends StatelessWidget {
         Align(
           alignment: Alignment.topLeft,
           child: Text(
-            publication.getDescription(),
+            post.getDescription(),
             style: TextStyle(fontSize: 15),
           ),
         ),
         StreamBuilder(
-            stream: getComments(publication.getId()),
+            stream: getBestComment(post.getAuthorId(),post.getId()),
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
               if (!snapshot.hasData) return CircularProgressIndicator();
-              List<Comment> comments = snapshot.data;
-              if (comments.length == 0) return Container();
+              Comment bestComment = snapshot.data;
+              if (bestComment == null) return Container();
               return Column(
                 children: [
                   Padding(
                       padding: const EdgeInsets.only(left: 8.0),
                       child: CommentWidget(
-                        comment: getBestComment(comments),
+                        comment: bestComment,
                         activeInnerComments: false,
                       )),
                   Align(
@@ -52,11 +53,9 @@ class PublicationDescriptionWidget extends StatelessWidget {
                           onPressed: () =>
                               Navigator.of(context).push(SlideLeftRoute(
                                   page: CommentsPage(
-                                publicationId: publication.getId(),
+                                post: post,
                               ))),
-                          child: Text('Ver ' +
-                              comments.length.toString() +
-                              ' comentarios')),
+                          child: Text('Ver todos los comentarios')),
                     ),
                   ),
                 ],
@@ -71,9 +70,9 @@ class PublicationDescriptionWidget extends StatelessWidget {
               return SizedBox(
                   height: 50,
                   child: AddCommentField(
-                      user: user, publicationId: publication.getId()));
+                      user: user, postId: post.getId()));
             }),
-        Align(alignment:Alignment.topLeft,child: Text('Publicada hace ' + publication.getPastTime(),style: TextStyle(
+        Align(alignment:Alignment.topLeft,child: Text('Publicada hace ' + post.getPastTime(),style: TextStyle(
           fontSize: 13
         ),)),
       ],

@@ -3,37 +3,34 @@ import 'package:meme/Models/User.dart';
 
 class Comment {
   String _id;
-  String _comment;
+  String _text;
   List<String> _likes;
   String _authorId;
   DateTime _dateTime;
-  String _publicationId;
   List<String> _comments;
   int _level;
 
   Comment(
-      comment, likes, authorId, dateTime, publicationId, comments, level) {
-    this._comment = comment;
+      text, likes, authorId, dateTime, comments, level) {
+    this._text = text;
     this._likes = likes;
     this._authorId = authorId;
     this._dateTime = dateTime;
-    this._publicationId = publicationId;
     this._comments = comments;
     this._level = level;
   }
 
   Comment.fromFirestore(DocumentSnapshot doc)
       : _id = doc.documentID,
-        _comment = doc.data['comment'],
+        _text = doc.data['text'],
         _likes = List<String>.from(doc.data['likes']),
         _authorId = doc.data['authorId'],
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
         _comments = List<String>.from(doc.data['comments']),
-        _publicationId = doc.reference.parent().parent().documentID,
         _level = doc.data['level'];
 
   Map<String, dynamic> toFirestore() => {
-        'comment': _comment,
+        'text': _text,
         'likes': _likes,
         'authorId': _authorId,
         'dateTime': _dateTime,
@@ -41,67 +38,59 @@ class Comment {
         'comments':_comments
       };
 
-  getId() {
+  String getId() {
     return this._id;
   }
 
-  setId(id) {
+  void setId(id) {
     this._id = id;
   }
 
-  getComment() {
-    return this._comment;
+  String getText() {
+    return this._text;
   }
 
-  setComment(comment) {
-    this._comment = comment;
+  void setText(text) {
+    this._text = text;
   }
 
-  getLikes() {
+  List<String> getLikes() {
     return this._likes;
   }
 
-  setLikes(likes) {
+  void setLikes(likes) {
     this._likes = likes;
   }
 
-  getAuthorId() {
+  String getAuthorId() {
     return this._authorId;
   }
 
-  setAuthorId(authorId) {
+  void setAuthorId(authorId) {
     this._authorId = authorId;
   }
 
-  getDateTime() {
+  DateTime getDateTime() {
     return this._dateTime;
   }
 
-  setDateTime(dateTime) {
+  void setDateTime(dateTime) {
     this._dateTime = dateTime;
   }
 
-  getComments() {
+  List<String> getComments() {
     return this._comments;
   }
 
-  setComments(comments) {
+  void setComments(comments) {
     this._comments = comments;
   }
 
-  getPublicationId() {
-    return this._publicationId;
-  }
-
-  setPublicationId(publicationId) {
-    this._publicationId = publicationId;
-  }
-
-  getLevel() {
+  int getLevel() {
     return this._level;
   }
 
-  setLevel(level) {
+  void setLevel(level) {
     this._level = level;
   }
 
@@ -129,20 +118,4 @@ class Comment {
 
 List<Comment> toCommentList(QuerySnapshot query) {
   return query.documents.map((doc) => Comment.fromFirestore(doc)).toList();
-}
-
-Comment getBestComment(List<Comment> comments) {
-  Comment comment = comments[0];
-  for (var i = 1; i < comments.length; i++) {
-    if (comment.getLikes().length < comments[i].getLikes().length) comment = comments[i];
-  }
-  return comment;
-}
-
-List<Comment> getParentComments(List<Comment> comments) {
-  List<Comment> parentComments = [];
-  for (var comment in comments) {
-    if (comment.getLevel() == 0) parentComments.add(comment);
-  }
-  return parentComments;
 }
