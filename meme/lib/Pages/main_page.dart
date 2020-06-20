@@ -13,11 +13,6 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   bool _isTabBarVisible = true;
 
-  @override
-  void initState() {
-    super.initState();
-    initiate();
-  }
 
   @override
   Widget build(BuildContext context) {

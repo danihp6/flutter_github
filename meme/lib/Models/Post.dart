@@ -27,7 +27,7 @@ class Post {
         _favourites = List<String>.from(doc.data['favourites']),
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
         _mediaLocation = doc.data['mediaLocation'],
-        _authorId = doc.reference.parent().id;
+        _authorId = doc.reference.parent().parent().documentID;
 
   Map<String, dynamic> toFirestore() => {
         'media': _media,

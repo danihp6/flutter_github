@@ -22,6 +22,20 @@ Future editUser(String userId, String name, String description, String avatar,
       'avatarLocation': avatarLocation
     });
 
+Stream<List<String>> getFollowers(
+        String userId) =>
+    firestore
+        .document('users/$userId')
+        .snapshots()
+        .map((doc) => List<String>.of(doc.data['followers'].cast<String>()));
+
+Stream<List<String>> getFollowed(
+        String userId) =>
+    firestore
+        .document('users/$userId')
+        .snapshots()
+        .map((doc) => List<String>.of(doc.data['followed'].cast<String>()));
+
 //---------------POST----------------//
 
 Stream<Post> getPost(String postPath) => firestore
@@ -33,9 +47,9 @@ Stream<List<Post>> getPosts(String userId) =>
     firestore.collection('users/$userId/posts').snapshots().map(toPosts);
 
 Future addPostPathInPostList(
-        String userId, String postListId, String postPath) =>
+        String userId, String postId, String postListId) =>
     firestore.document('users/$userId/postLists/$postListId').updateData({
-      'posts': FieldValue.arrayUnion([postPath])
+      'posts': FieldValue.arrayUnion(['users/$userId/posts/$postId'])
     });
 
 Future deletePostPathInPostList(
@@ -47,16 +61,16 @@ Future deletePostPathInPostList(
 Stream<List<String>> getPostsPathFromPostList(
         String userId, String postListId) =>
     firestore
-        .document('usres/$userId/postLists/$postListId')
+        .document('users/$userId/postLists/$postListId')
         .snapshots()
-        .map((doc) => List<String>.of(doc.data['posts']));
+        .map((doc) => List<String>.of(doc.data['posts'].cast<String>()));
 
 Stream<List<String>> getPostsPathFromFavourites(
         String userId, String postListId) =>
     firestore
-        .document('usres/$userId')
+        .document('users/$userId')
         .snapshots()
-        .map((doc) => List<String>.of(doc.data['favourites']));
+        .map((doc) => List<String>.of(doc.data['favourites'].cast<String>()));
 
 Future addPostPathInFavourites(String userId, String postPath) {
   firestore.document(postPath).updateData({
@@ -86,7 +100,7 @@ Stream<List<String>> getPostFavourites(String userId, String postId) =>
     firestore
         .document('users/$userId/posts/$postId')
         .snapshots()
-        .map((doc) => List<String>.of(doc.data['favourites']));
+        .map((doc) => List<String>.of(doc.data['favourites'].cast<String>()));
 
 //---------------POSTLIST----------------//
 
@@ -116,7 +130,7 @@ Stream<Comment> getBestComment(String userId, String postId) => firestore
     .map((snap) => Comment.fromFirestore(snap.documents.first));
 
 Future newComment(String userId, String postId, Comment comment) => firestore
-    .collection('users/$userId/posts/$postId')
+    .collection('users/$userId/posts/$postId/comments')
     .add(comment.toFirestore());
 
 // Stream<List<Publication>> getPublicationsFromFollowedAndUser(String userId) {

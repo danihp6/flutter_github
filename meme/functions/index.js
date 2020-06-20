@@ -9,10 +9,11 @@ admin.initializeApp(functions.config().firebase);
 //  response.send("Hello from Firebase!");
 // });
 
-exports.deleteComments = functions.firestore.document('Publications/{publicationId}').onDelete((snap,context)=>{
-    var publicationId = context.params.publicationId
+exports.deleteComments = functions.firestore.document('users/{userId}/posts/{postd}').onDelete((snap,context)=>{
+    var userId = context.params.userId
+    var postId = context.params.postId
     var db = admin.firestore()
-    var ref = db.collection('Publications').doc(publicationId).collection('comments')
+    var ref = db.collection('users').doc(userId).collection('posts').doc(postId).collection('comments')
 
     var deleted = deleteCollection(db,ref,500)
     return Promise.all([deleted])

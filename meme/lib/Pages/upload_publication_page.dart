@@ -25,8 +25,8 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
     uploadPublication() {
       uploadMedia(_file).then((map) => newPost(
           configuration.getUserId(),
-          new Post(map['image'], _description, <String>[], DateTime.now(),
-              map['url'], configuration.getUserId())));
+          new Post(map['media'], _description, <String>[], DateTime.now(),
+              map['location'], configuration.getUserId())));
       Navigator.pop(context);
       Navigator.pop(context);
     }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/edit_profile_page.dart';
+import 'package:meme/Pages/user_list_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
 class UserPageHeader extends StatelessWidget {
@@ -45,23 +46,29 @@ class UserPageHeader extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Column(
-                      children: [
-                        Text('Seguidores'),
-                        Text(
-                          user.getFollowers().length.toString(),
-                          style: TextStyle(fontSize: 20),
-                        )
-                      ],
+                    GestureDetector(
+                                          child: Column(
+                        children: [
+                          Text('Seguidores'),
+                          Text(
+                            user.getFollowers().length.toString(),
+                            style: TextStyle(fontSize: 20),
+                          )
+                        ],
+                      ),
+                      onTap: () => Navigator.push(context, SlideLeftRoute(page: UserListPage(title: 'Seguidores', userListId: user.getFollowers()))),
                     ),
-                    Column(
-                      children: [
-                        Text('Seguidos'),
-                        Text(
-                          user.getFollowed().length.toString(),
-                          style: TextStyle(fontSize: 20),
-                        )
-                      ],
+                    GestureDetector(
+                                          child: Column(
+                        children: [
+                          Text('Seguidos'),
+                          Text(
+                            user.getFollowed().length.toString(),
+                            style: TextStyle(fontSize: 20),
+                          )
+                        ],
+                      ),
+                      onTap: () => Navigator.push(context, SlideLeftRoute(page: UserListPage(title: 'Seguidos', userListId: user.getFollowed()))),
                     ),
                     IconButton(
                         icon: Icon(Icons.settings),

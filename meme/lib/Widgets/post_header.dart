@@ -58,7 +58,7 @@ class PostHeader extends StatelessWidget {
                               SizedBox(
                                 width: 35,
                                 child: PostMenu(
-                                  postId: post.getId(),
+                                  post: post,
                                   userId: user.getId(),
                                   postList: postList,
                                 ),

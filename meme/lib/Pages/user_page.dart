@@ -8,28 +8,23 @@ class UserPage extends StatelessWidget {
   String userId;
   UserPage({@required this.userId});
   @override
-
-
-  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Container(
-          child: StreamBuilder(
-              stream: getUser(userId),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) print(snapshot.error);
-                if (!snapshot.hasData) return CircularProgressIndicator();
-                User user = snapshot.data;
-                print(user);
-                return Column(
-                  children: [
-                    UserPageHeader(user: user),
-                    Expanded(child: UserPageBody(user: user)),
-                  ],
-                );
-              }),
-        ),
+        body: StreamBuilder(
+            stream: getUser(userId),
+            builder: (context, snap) {
+              if (snap.hasError) print(snap.error);
+              if (!snap.hasData) return CircularProgressIndicator();
+              User user = snap.data;
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  UserPageHeader(user: user),
+                  Flexible(child: UserPageBody(user: user)),
+                ],
+              );
+            }),
       ),
     );
   }

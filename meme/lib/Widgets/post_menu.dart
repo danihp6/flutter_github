@@ -8,23 +8,22 @@ import 'package:meme/Pages/select_post_list_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
 class PostMenu extends StatelessWidget {
-  String postId;
+  Post post;
   String userId;
   PostList postList;
 
   PostMenu(
-      {@required this.postId,
+      {@required this.post,
       @required this.userId,
       this.postList});
 
   @override
   Widget build(BuildContext context) {
-
     return PopupMenuButton(
       child: Icon(Icons.more_vert),
       itemBuilder: (context) {
         return [
-          if(postList != null  && postList.getAuthorId() == configuration.getUserId())
+          if(postList == null  && post.getAuthorId() == configuration.getUserId())
           PopupMenuItem(
             child: Row(
               children: [
@@ -32,7 +31,7 @@ class PostMenu extends StatelessWidget {
                 Text('Eliminar publicación'),
               ],
             ),
-            value: ()=>deletePost(userId, postId),
+            value: ()=>deletePost(userId, post.getId()),
           ),
           if(postList != null  && postList.getAuthorId() == configuration.getUserId())
           PopupMenuItem(
@@ -42,7 +41,7 @@ class PostMenu extends StatelessWidget {
                 Text('Quitar de la lista'),
               ],
             ),
-            value: () => deletePostPathInPostList(configuration.getUserId(),postList.getId(),'users/$userId/posts/$postId'),
+            value: () => deletePostPathInPostList(configuration.getUserId(),postList.getId(),'users/$userId/posts/${post.getId()}'),
           ),
           PopupMenuItem(
             child: Row(
@@ -52,7 +51,7 @@ class PostMenu extends StatelessWidget {
                 context,
                 SlideLeftRoute(
                     page: SelectPostList(
-                        postId: postId))),
+                        postId: post.getId()))),
           )
         ];
       },

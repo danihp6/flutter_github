@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/new_post_list_button.dart';
+import 'package:meme/Widgets/post.dart';
 import 'package:meme/Widgets/post_list.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import '../Pages/post_list_page.dart';
@@ -66,13 +68,59 @@ class _UserPageBodyState extends State<UserPageBody>
           indicatorColor: Colors.deepOrange,
         ),
         Expanded(
-          child: TabBarView(controller: tabController, children: [
-            Column(children: [
-              NewPostListButton(userId: widget.user.getId()),
+          child: TabBarView(
+              controller: tabController,
+              physics: NeverScrollableScrollPhysics(),
+              children: [
+                StreamBuilder(
+                  stream: getPosts(widget.user.getId()),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) print(snapshot.error);
+                    if (!snapshot.hasData) return CircularProgressIndicator();
+                    List<Post> posts = snapshot.data;
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: posts.length,
+                      itemBuilder: (context, index) {
+                        return PostWidget(post: posts[index]);
+                      },
+                    );
+                  },
+                ),
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8, right: 8),
+                    child: Column(
+                      children: [
+                        NewPostListButton(userId: widget.user.getId()),
+                        StreamBuilder(
+                          stream: getPostLists(widget.user.getId()),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) print(snapshot.error);
+                            if (!snapshot.hasData)
+                              return CircularProgressIndicator();
+                            List<PostList> postlists = snapshot.data;
+                            return ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: postlists.length,
+                              itemBuilder: (context, index) {
+                                return PostListWidget(
+                                  postList: postlists[index],
+                                  onTap: () {
+                                    postList = postlists[index];
+                                    goToPostList();
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+                )
               ]),
-            Container()
-          ]),
-        )
+        ),
       ],
     );
   }

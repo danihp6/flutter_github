@@ -14,7 +14,7 @@ class SelectPostList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     addPublicationAndGoBack() {
-      addPostPathInPostList(configuration.getUserId(), postId, postListId);
+      addPostPathInPostList(configuration.getUserId(), postId,postListId);
       Navigator.pop(context);
     }
 
@@ -28,18 +28,21 @@ class SelectPostList extends StatelessWidget {
             if (snapshot.hasError) print(snapshot.error);
             if (!snapshot.hasData) return CircularProgressIndicator();
             List<PostList> postLists = snapshot.data;
-            return ListView.builder(
-              itemCount: postLists.length,
-              itemBuilder: (context, index) {
-                return PostListWidget(
-                  postList: postLists[index],
-                  activeMoreOptions: false,
-                  onTap: () {
-                    postListId = postLists[index].getId();
-                    addPublicationAndGoBack();
-                  },
-                );
-              },
+            return Padding(
+              padding: const EdgeInsets.only(left:8,right:8),
+              child: ListView.builder(
+                itemCount: postLists.length,
+                itemBuilder: (context, index) {
+                  return PostListWidget(
+                    postList: postLists[index],
+                    activeMoreOptions: false,
+                    onTap: () {
+                      postListId = postLists[index].getId();
+                      addPublicationAndGoBack();
+                    },
+                  );
+                },
+              ),
             );
           }),
     );

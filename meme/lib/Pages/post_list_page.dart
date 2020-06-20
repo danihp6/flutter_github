@@ -57,17 +57,15 @@ class _PostListPageState extends State<PostListPage> {
                   return SliverToBoxAdapter(
                     child: CircularProgressIndicator(),
                   );
-                List<String> postsPath = snapshot.data;
+                List<String> postPaths = snapshot.data;
                 return SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
                   return StreamBuilder(
-                      stream: getPost(postsPath[index]),
+                      stream: getPost(postPaths[index]),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) print(snapshot.error);
                         if (!snapshot.hasData)
-                          return SliverToBoxAdapter(
-                            child: CircularProgressIndicator(),
-                          );
+                          return CircularProgressIndicator();
                         Post post = snapshot.data;
                         return Column(children: [
                           if (index != 0 &&
@@ -81,7 +79,7 @@ class _PostListPageState extends State<PostListPage> {
                           )
                         ]);
                       });
-                }, childCount: postsPath.length));
+                }, childCount: postPaths.length));
               }),
           SliverToBoxAdapter(
             child: SizedBox(

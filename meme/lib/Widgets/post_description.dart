@@ -31,9 +31,8 @@ class PostDescription extends StatelessWidget {
             stream: getBestComment(post.getAuthorId(),post.getId()),
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
-              if (!snapshot.hasData) return CircularProgressIndicator();
+              if (!snapshot.hasData) return Container();
               Comment bestComment = snapshot.data;
-              if (bestComment == null) return Container();
               return Column(
                 children: [
                   Padding(
