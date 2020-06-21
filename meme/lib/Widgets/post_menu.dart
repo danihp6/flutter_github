@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
@@ -13,10 +12,7 @@ class PostMenu extends StatelessWidget {
   String userId;
   PostList postList;
 
-  PostMenu(
-      {@required this.post,
-      @required this.userId,
-      this.postList});
+  PostMenu({@required this.post, @required this.userId, this.postList});
 
   @override
   Widget build(BuildContext context) {
@@ -24,36 +20,51 @@ class PostMenu extends StatelessWidget {
       child: Icon(Icons.more_vert),
       itemBuilder: (context) {
         return [
-          if(postList == null  && post.getAuthorId() == configuration.getUserId())
           PopupMenuItem(
             child: Row(
               children: [
-                Icon(Icons.delete),
-                Text('Eliminar publicación'),
+                Icon(Icons.add),
+                SizedBox(
+                  width: 5,
+                ),
+                Text('Añadir a categoria')
               ],
             ),
-            value: (){deleteFile(post.getMediaLocation());deletePost(userId, post.getId());},
+            value: () => Navigator.push(context,
+                SlideLeftRoute(page: SelectPostList(postId: post.getId()))),
           ),
-          if(postList != null  && postList.getAuthorId() == configuration.getUserId())
-          PopupMenuItem(
-            child: Row(
-              children: [
-                Icon(Icons.remove),
-                Text('Quitar de la lista'),
-              ],
+          if (postList == null &&
+              post.getAuthorId() == configuration.getUserId())
+            PopupMenuItem(
+              child: Row(
+                children: [
+                  Icon(Icons.delete),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text('Eliminar publicación'),
+                ],
+              ),
+              value: () {
+                deleteFile(post.getMediaLocation());
+                deletePost(userId, post.getId());
+              },
             ),
-            value: () => deletePostPathInPostList(configuration.getUserId(),postList.getId(),'users/$userId/posts/${post.getId()}'),
-          ),
-          PopupMenuItem(
-            child: Row(
-              children: [Icon(Icons.add), Text('Añadir a categoria')],
+          if (postList != null &&
+              postList.getAuthorId() == configuration.getUserId())
+            PopupMenuItem(
+              child: Row(
+                children: [
+                  Icon(Icons.remove),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text('Quitar de la lista'),
+                ],
+              ),
+              value: () => deletePostPathInPostList(configuration.getUserId(),
+                  postList.getId(), 'users/$userId/posts/${post.getId()}'),
             ),
-            value: () => Navigator.push(
-                context,
-                SlideLeftRoute(
-                    page: SelectPostList(
-                        postId: post.getId()))),
-          )
         ];
       },
       onSelected: (function) => function(),

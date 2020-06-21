@@ -5,6 +5,7 @@ import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/add_comment_field.dart';
 import 'package:meme/Widgets/comment.dart';
+import 'package:meme/Widgets/loading.dart';
 import '../Models/Comment.dart';
 
 class CommentsPage extends StatelessWidget {
@@ -31,7 +32,7 @@ class CommentsPage extends StatelessWidget {
                             builder: (context, snapshot) {
                               if (snapshot.hasError) print(snapshot.error);
                               if (!snapshot.hasData)
-                                return CircularProgressIndicator();
+                                return Loading();
                               User user = snapshot.data;
                               return Row(
                                 children: [
@@ -64,7 +65,7 @@ class CommentsPage extends StatelessWidget {
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData)
-                            return CircularProgressIndicator();
+                            return Loading();
                           List<Comment> parentComments = snapshot.data;
                           return ListView.builder(
                               shrinkWrap: true,
@@ -87,7 +88,7 @@ class CommentsPage extends StatelessWidget {
               stream: getUser(configuration.getUserId()),
               builder: (context, snapshot) {
                 if (snapshot.hasError) print(snapshot.error);
-                if (!snapshot.hasData) return CircularProgressIndicator();
+                if (!snapshot.hasData) return Loading();
                 User user = snapshot.data;
                 return Container(
                   color: Colors.grey[300],

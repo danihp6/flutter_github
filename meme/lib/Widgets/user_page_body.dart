@@ -3,6 +3,7 @@ import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/new_post_list_button.dart';
 import 'package:meme/Widgets/post.dart';
 import 'package:meme/Widgets/post_list.dart';
@@ -82,7 +83,7 @@ class _UserPageBodyState extends State<UserPageBody>
                   stream: getPosts(widget.user.getId()),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) print(snapshot.error);
-                    if (!snapshot.hasData) return CircularProgressIndicator();
+                    if (!snapshot.hasData) return Loading();
                     List<Post> posts = snapshot.data;
                     return ListView.builder(
                       shrinkWrap: true,
@@ -97,7 +98,7 @@ class _UserPageBodyState extends State<UserPageBody>
                   stream: getPostsPathFromFavourites(widget.user.getId()),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) print(snapshot.error);
-                    if (!snapshot.hasData) return CircularProgressIndicator();
+                    if (!snapshot.hasData) return Loading();
                     List<String> postsId = snapshot.data;
                     return ListView.builder(
                       shrinkWrap: true,
@@ -108,7 +109,7 @@ class _UserPageBodyState extends State<UserPageBody>
                             builder: (context, snapshot) {
                               if (snapshot.hasError) print(snapshot.error);
                               if (!snapshot.hasData)
-                                return CircularProgressIndicator();
+                                return Loading();
                               Post post = snapshot.data;
                               return PostWidget(post: post);
                             });
@@ -129,7 +130,7 @@ class _UserPageBodyState extends State<UserPageBody>
                               builder: (context, snapshot) {
                                 if (snapshot.hasError) print(snapshot.error);
                                 if (!snapshot.hasData)
-                                  return CircularProgressIndicator();
+                                  return Loading();
                                 List<PostList> postlists = snapshot.data;
                                 return ListView.builder(
                                   shrinkWrap: true,

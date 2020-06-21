@@ -9,6 +9,8 @@ import 'package:meme/Widgets/favourite_button.dart';
 import 'package:meme/Widgets/post_menu.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
+import 'loading.dart';
+
 class PostHeader extends StatelessWidget {
   Post post;
   PostList postList;
@@ -20,7 +22,7 @@ class PostHeader extends StatelessWidget {
         stream: getUser(post.getAuthorId()),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
-          if (!snapshot.hasData) return CircularProgressIndicator();
+          if (!snapshot.hasData) return Loading();
           User user = snapshot.data;
           return Row(
             children: [
@@ -49,7 +51,7 @@ class PostHeader extends StatelessWidget {
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData)
-                            return CircularProgressIndicator();
+                            return Loading();
                           User user = snapshot.data;
                           return Row(
                             children: [

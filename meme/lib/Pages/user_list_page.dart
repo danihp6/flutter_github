@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/user_page.dart';
+import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
 class UserListPage extends StatelessWidget {
@@ -25,7 +26,7 @@ class UserListPage extends StatelessWidget {
               stream: getUser(userListId[index]),
               builder: (context, snapshot) {
                 if (snapshot.hasError) print(snapshot.error);
-                if (!snapshot.hasData) return CircularProgressIndicator();
+                if (!snapshot.hasData) return Loading();
                 User user = snapshot.data;
                 return GestureDetector(
                                   child: Row(

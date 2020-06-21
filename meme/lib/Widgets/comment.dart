@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Widgets/loading.dart';
 import '../Controller/db.dart';
 
 class CommentWidget extends StatefulWidget {
@@ -32,7 +33,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                   stream: getUser(_comment.getAuthorId()),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) print(snapshot.error);
-                    if (!snapshot.hasData) return CircularProgressIndicator();
+                    if (!snapshot.hasData) return Loading();
                     User user = snapshot.data;
                     return Row(
                       children: [
@@ -118,7 +119,7 @@ class _CommentWidgetState extends State<CommentWidget> {
           //       stream: getComment(_comment.getPublicationId(), comments[index]),
           //       builder: (context, snapshot) {
           //         if (snapshot.hasError) print(snapshot.error);
-          //           if (!snapshot.hasData) return CircularProgressIndicator();
+          //           if (!snapshot.hasData) return Loading();
           //           Comment comment = snapshot.data;
           //         return CommentWidget(
           //           comment: comment,

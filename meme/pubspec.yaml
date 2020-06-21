@@ -31,6 +31,7 @@ dependencies:
   camera: ^0.5.8+2
   html: ^0.14.0+3
   http: ^0.12.1
+  flappy_search_bar: ^1.7.2
   flutter:
     sdk: flutter
 

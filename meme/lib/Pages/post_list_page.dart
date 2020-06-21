@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Widgets/icon_button_comments.dart';
+import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/post.dart';
-import '../Widgets/floating_buttons.dart';
+import 'package:meme/Widgets/upload_button.dart';
 import '../Models/Post.dart';
 import '../Controller/db.dart';
 
@@ -20,7 +21,7 @@ class _PostListPageState extends State<PostListPage> {
   Widget build(BuildContext context) {
     PostList _postList = widget.postList;
     return Scaffold(
-        floatingActionButton: FloatingButtons(
+        floatingActionButton: UploadButton(
           refresh: () {
             setState(() {});
           },
@@ -55,7 +56,7 @@ class _PostListPageState extends State<PostListPage> {
                 if (snapshot.hasError) print(snapshot.error);
                 if (!snapshot.hasData)
                   return SliverToBoxAdapter(
-                    child: CircularProgressIndicator(),
+                    child: Loading(),
                   );
                 List<String> postPaths = snapshot.data;
                 return SliverList(
@@ -65,7 +66,7 @@ class _PostListPageState extends State<PostListPage> {
                       builder: (context, snapshot) {
                         if (snapshot.hasError) print(snapshot.error);
                         if (!snapshot.hasData)
-                          return CircularProgressIndicator();
+                          return Loading();
                         Post post = snapshot.data;
                         return Column(children: [
                           if (index != 0 &&

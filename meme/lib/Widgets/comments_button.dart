@@ -3,8 +3,7 @@ import 'package:meme/Controller/Configuration.dart';
 
 class CommentsButton extends StatefulWidget {
   Function refresh;
-  Function openTools;
-  CommentsButton({this.refresh,this.openTools});
+  CommentsButton({@required this.refresh});
   @override
   _CommentsButtonState createState() => _CommentsButtonState();
 }
@@ -17,15 +16,12 @@ class _CommentsButtonState extends State<CommentsButton> {
   Widget build(BuildContext context) {
     _isShowedComments = configuration.getIsShowedComments();
     _icon = _isShowedComments?Icons.comment:Icons.mode_comment;
-    return FloatingActionButton(
-      heroTag: 'showComments',
+    return IconButton(
       onPressed: (){
         configuration.setIsShowedComments(!_isShowedComments);
-        widget.openTools();
         widget.refresh();
       },
-      backgroundColor: Colors.deepOrange,
-      child: Icon(_icon),
+      icon: Icon(_icon),
     );
   }
 }

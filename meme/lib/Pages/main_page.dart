@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/web_scrapping.dart';
 import 'package:meme/Pages/home_page.dart';
+import 'package:meme/Pages/search_page.dart';
 import 'package:meme/Pages/user_page.dart';
-import 'package:meme/Widgets/floating_buttons.dart';
+import 'package:meme/Widgets/upload_button.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -22,12 +23,12 @@ class _MainPageState extends State<MainPage> {
       child: Scaffold(
         body: TabBarView(physics: NeverScrollableScrollPhysics(), children: [
           HomePage(userId:userId),
-          Container(),
+          SearchPage(),
           UserPage(
             userId: userId,
           ),
         ]),
-        floatingActionButton: FloatingButtons(
+        floatingActionButton: UploadButton(
           refresh: () {
             setState(() {});
           },

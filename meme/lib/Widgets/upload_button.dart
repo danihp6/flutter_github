@@ -3,14 +3,14 @@ import 'package:meme/Pages/select_image_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import '../Controller/Configuration.dart';
 
-class FloatingButtons extends StatefulWidget {
+class UploadButton extends StatefulWidget {
   Function refresh;
-  FloatingButtons({this.refresh});
+  UploadButton({this.refresh});
   @override
-  _FloatingButtonsState createState() => _FloatingButtonsState();
+  _UploadButtonState createState() => _UploadButtonState();
 }
 
-class _FloatingButtonsState extends State<FloatingButtons> {
+class _UploadButtonState extends State<UploadButton> {
   bool _isShowedTools, _isOpenTools = false, _isOpenPublicationOptions = false;
   List<Widget> widgets;
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/PostList.dart';
+import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/post_list.dart';
 
 class SelectPostList extends StatelessWidget {
@@ -26,7 +27,7 @@ class SelectPostList extends StatelessWidget {
           stream: getPostLists(configuration.getUserId()),
           builder: (context, snapshot) {
             if (snapshot.hasError) print(snapshot.error);
-            if (!snapshot.hasData) return CircularProgressIndicator();
+            if (!snapshot.hasData) return Loading();
             List<PostList> postLists = snapshot.data;
             return Padding(
               padding: const EdgeInsets.only(left:8,right:8),

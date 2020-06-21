@@ -6,6 +6,7 @@ import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/comments_page.dart';
 import 'package:meme/Widgets/add_comment_field.dart';
+import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
 import 'comment.dart';
@@ -64,7 +65,7 @@ class PostDescription extends StatelessWidget {
             stream: getUser(configuration.getUserId()),
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
-              if (!snapshot.hasData) return CircularProgressIndicator();
+              if (!snapshot.hasData) return Loading();
               User user = snapshot.data;
               return SizedBox(
                   height: 50,
