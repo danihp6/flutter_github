@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Pages/user_page.dart';
+import 'package:meme/Widgets/slide_left_route.dart';
 
 class UserListPage extends StatelessWidget {
   String title;
@@ -9,6 +11,7 @@ class UserListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
@@ -24,14 +27,17 @@ class UserListPage extends StatelessWidget {
                 if (snapshot.hasError) print(snapshot.error);
                 if (!snapshot.hasData) return CircularProgressIndicator();
                 User user = snapshot.data;
-                return Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundImage: NetworkImage(user.getAvatar()),
-                    ),
-                    SizedBox(width: 10,),
-                    Text(user.getUserName(),style: TextStyle(fontSize: 15),)
-                  ],
+                return GestureDetector(
+                                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(user.getAvatar()),
+                      ),
+                      SizedBox(width: 10,),
+                      Text(user.getUserName(),style: TextStyle(fontSize: 15),)
+                    ],
+                  ),
+                  onTap: ()=>Navigator.push(context, SlideLeftRoute(page: UserPage(userId: user.getId(),))),
                 );
               },
             );

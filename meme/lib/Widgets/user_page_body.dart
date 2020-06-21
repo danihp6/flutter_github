@@ -27,7 +27,7 @@ class _UserPageBodyState extends State<UserPageBody>
   @override
   void initState() {
     super.initState();
-    tabController = new TabController(length: 2, vsync: this);
+    tabController = new TabController(length: 3, vsync: this);
   }
 
   @override
@@ -53,6 +53,12 @@ class _UserPageBodyState extends State<UserPageBody>
             Tab(
               icon: Icon(
                 Icons.photo_library,
+                size: 30,
+              ),
+            ),
+            Tab(
+              icon: Icon(
+                Icons.star,
                 size: 30,
               ),
             ),
@@ -87,33 +93,60 @@ class _UserPageBodyState extends State<UserPageBody>
                     );
                   },
                 ),
+                StreamBuilder(
+                  stream: getPostsPathFromFavourites(widget.user.getId()),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) print(snapshot.error);
+                    if (!snapshot.hasData) return CircularProgressIndicator();
+                    List<String> postsId = snapshot.data;
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: postsId.length,
+                      itemBuilder: (context, index) {
+                        return StreamBuilder(
+                            stream: getPost(postsId[index]),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasError) print(snapshot.error);
+                              if (!snapshot.hasData)
+                                return CircularProgressIndicator();
+                              Post post = snapshot.data;
+                              return PostWidget(post: post);
+                            });
+                      },
+                    );
+                  },
+                ),
                 Flexible(
                   child: Padding(
                     padding: const EdgeInsets.only(left: 8, right: 8),
                     child: Column(
                       children: [
                         NewPostListButton(userId: widget.user.getId()),
-                        StreamBuilder(
-                          stream: getPostLists(widget.user.getId()),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError) print(snapshot.error);
-                            if (!snapshot.hasData)
-                              return CircularProgressIndicator();
-                            List<PostList> postlists = snapshot.data;
-                            return ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: postlists.length,
-                              itemBuilder: (context, index) {
-                                return PostListWidget(
-                                  postList: postlists[index],
-                                  onTap: () {
-                                    postList = postlists[index];
-                                    goToPostList();
+                        Column(
+                          children: [
+                            StreamBuilder(
+                              stream: getPostLists(widget.user.getId()),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) print(snapshot.error);
+                                if (!snapshot.hasData)
+                                  return CircularProgressIndicator();
+                                List<PostList> postlists = snapshot.data;
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: postlists.length,
+                                  itemBuilder: (context, index) {
+                                    return PostListWidget(
+                                      postList: postlists[index],
+                                      onTap: () {
+                                        postList = postlists[index];
+                                        goToPostList();
+                                      },
+                                    );
                                   },
                                 );
                               },
-                            );
-                          },
+                            ),
+                          ],
                         )
                       ],
                     ),

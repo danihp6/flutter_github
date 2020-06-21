@@ -9,53 +9,151 @@ admin.initializeApp(functions.config().firebase);
 //  response.send("Hello from Firebase!");
 // });
 
-exports.deleteComments = functions.firestore.document('users/{userId}/posts/{postd}').onDelete((snap,context)=>{
-    var userId = context.params.userId
-    var postId = context.params.postId
-    var db = admin.firestore()
-    var ref = db.collection('users').doc(userId).collection('posts').doc(postId).collection('comments')
+exports.onDeletePost = functions.firestore.document('users/{userId}/posts/{postId}').onDelete((snap, context) => {
+  var userId = context.params.userId
+  var postId = context.params.postId
+  var path = 'users/' + userId + '/posts/' + postId
+  var batchSize = 500
+  var db = admin.firestore()
+  var ref = db.collection('users').doc(userId).collection('posts').doc(postId).collection('comments')
 
-    var deleted = deleteCollection(db,ref,500)
-    return Promise.all([deleted])
+  var deleted = deleteCollection(db, ref, batchSize)
+
+  ref = db.collection('users')
+
+  deleteFavourites(path,db,ref,batchSize)
+
+  var query = ref.orderBy('__name__').limit(batchSize)
+  query.get().then((snapshot)=>{
+    console.log(snapshot.size)
+    if (snapshot.size === 0) {
+      return 0
+    }
+    snapshot.docs.forEach(function (doc) {
+      console.log(doc.ref.collection('postLists'))
+      deletePostInPostList(path,db,doc.ref.collection('postLists'),batchSize)
+    })
+  })
+  return Promise.all([deleted])
 })
 
-function deleteCollection (db, collectionRef, batchSize) {
-    var query = collectionRef.orderBy('__name__').limit(batchSize)
+function deletePostInPostList(path, db, collectionRef, batchSize) {
+  var query = collectionRef.orderBy('__name__').limit(batchSize)
 
-    return new Promise(function (resolve, reject) {
-      deleteQueryBatch(db, query, batchSize, resolve, reject)
+  return new Promise(function (resolve, reject) {
+    deletePostInPostListInQuery(path, db, query, batchSize, resolve, reject)
+  })
+}
+
+function deletePostInPostListInQuery(path, db, query, batchSize, resolve, reject) {
+  query.get().then((snapshot) => {
+    if (snapshot.size === 0) {
+      return 0
+    }
+
+    var batch = db.batch()
+    snapshot.docs.forEach(function (doc) {
+      batch.update(doc.ref, {
+        'posts': admin.firestore.FieldValue.arrayRemove(path)
+      })
     })
-  }
-
-  function deleteQueryBatch (db, query, batchSize, resolve, reject) {
-    query.get()
-.then((snapshot) => {
-        // When there are no documents left, we are done
-        if (snapshot.size === 0) {
-          return 0
-        }
-
-      // Delete documents in a batch
-      var batch = db.batch()
-      snapshot.docs.forEach(function (doc) {
-        batch.delete(doc.ref)
-      })
-
-      return batch.commit().then(function () {
-        return snapshot.size
-      })
-    }).then(function (numDeleted) {
-      if (numDeleted <= batchSize) {
-        resolve()
-        return
-      }
-      else {
+    return batch.commit().then(function () {
+      return snapshot.size
+    })
+  }).then(function (numChanged) {
+    if (numChanged <= batchSize) {
+      resolve()
+      return
+    }
+    else {
       // Recurse on the next process tick, to avoid
       // exploding the stack.
       return process.nextTick(function () {
-        deleteQueryBatch(db, query, batchSize, resolve, reject)
+        deletePostInPostListInQuery(path,db, query, batchSize, resolve, reject)
       })
     }
+
   })
-    .catch(reject)
-  }
+  .catch(reject);
+}
+
+function deleteFavourites(path, db, collectionRef, batchSize) {
+  var query = collectionRef.orderBy('__name__').limit(batchSize)
+
+  return new Promise(function (resolve, reject) {
+    deleteFavouritesInQuery(path, db, query, batchSize, resolve, reject)
+  })
+}
+
+function deleteFavouritesInQuery(path, db, query, batchSize, resolve, reject) {
+  query.get().then((snapshot) => {
+    if (snapshot.size === 0) {
+      return 0
+    }
+
+    var batch = db.batch()
+    snapshot.docs.forEach(function (doc) {
+      batch.update(doc.ref, {
+        'favourites': admin.firestore.FieldValue.arrayRemove(path)
+      })
+    })
+    return batch.commit().then(function () {
+      return snapshot.size
+    })
+  }).then(function (numChanged) {
+    if (numChanged <= batchSize) {
+      resolve()
+      return
+    }
+    else {
+      // Recurse on the next process tick, to avoid
+      // exploding the stack.
+      return process.nextTick(function () {
+        deleteFavouritesInQuery(path,db, query, batchSize, resolve, reject)
+      })
+    }
+
+  })
+  .catch(reject);
+}
+
+function deleteCollection(db, collectionRef, batchSize) {
+
+  let query = collectionRef.orderBy('__name__').limit(batchSize);
+
+  return new Promise((resolve, reject) => {
+    deleteQueryBatch(db, query, batchSize, resolve, reject);
+  });
+}
+
+function deleteQueryBatch(db, query, batchSize, resolve, reject) {
+  query.get()
+    .then((snapshot) => {
+      // When there are no documents left, we are done
+      if (snapshot.size == 0) {
+        return 0;
+      }
+
+      // Delete documents in a batch
+      let batch = db.batch();
+      snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      return batch.commit().then(() => {
+        return snapshot.size;
+      });
+    }).then((numDeleted) => {
+      if (numDeleted === 0) {
+        resolve();
+        return;
+      }
+
+      // Recurse on the next process tick, to avoid
+      // exploding the stack.
+      process.nextTick(() => {
+        deleteQueryBatch(db, query, batchSize, resolve, reject);
+      });
+    })
+    .catch(reject);
+}

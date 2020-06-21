@@ -4,12 +4,14 @@ class PostList {
   String _id;
   String _name;
   String _image;
+  String _imageLocation;
   String _authorId;
   List<String> _posts;
 
-  PostList(name, image, posts, authorId) {
+  PostList(name, image, imageLocation,posts, authorId) {
     this._name = name;
     this._image = image;
+    this._imageLocation = imageLocation;
     this._posts = posts;
     this._authorId = authorId;
   }
@@ -18,12 +20,14 @@ class PostList {
       : _id = doc.documentID,
         _name = doc.data['name'],
         _image = doc.data['image'],
+        _imageLocation = doc.data['imageLocation'],
         _authorId = doc.data['authorId'],
         _posts = List<String>.from(doc.data['posts']);
 
   Map<String, dynamic> toFirestore() => {
         'name': _name,
         'image': _image,
+        'imageLocation':_imageLocation,
         'posts': _posts,
         'authorId': _authorId
       };
@@ -50,6 +54,14 @@ class PostList {
 
   void setImage(image) {
     this._image = image;
+  }
+
+  String getImageLocation() {
+    return this._imageLocation;
+  }
+
+  void setImageLocation(imageLocation) {
+    this._imageLocation = imageLocation;
   }
 
   String getAuthorId() {

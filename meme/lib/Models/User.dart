@@ -27,10 +27,10 @@ class User {
         _userName = doc.data['userName'],
         _avatar = doc.data['avatar'],
         _avatarLocation = doc.data['avatarLocation'],
-        _followers = doc.data['followers'].cast<String>(),
-        _followed = doc.data['followed'].cast<String>(),
+        _followers = List<String>.from(doc.data['followers']),
+        _followed = List<String>.from(doc.data['followed']),
         _description = doc.data['description'],
-        _favourites = doc.data['favourites'].cast<String>(),
+        _favourites = List<String>.from(doc.data['favourites']),
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate();
 
   String getId() {

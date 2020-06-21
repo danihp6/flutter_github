@@ -110,3 +110,7 @@ class Post {
 List<Post> toPosts(QuerySnapshot query) {
   return query.documents.map((doc) => Post.fromFirestore(doc)).toList();
 }
+
+void orderListPostByDateTime(List<Post> posts){
+  return posts.sort((a,b)=>b._dateTime.compareTo(a._dateTime));
+}

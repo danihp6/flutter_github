@@ -32,7 +32,6 @@ class _ImagesGalleryPageState extends State<ImagesGalleryPage> {
     return Scaffold(
           body: GridView.builder(
         itemCount: images.length,
-        reverse: true,
         gridDelegate:
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
         itemBuilder: (context, index) {

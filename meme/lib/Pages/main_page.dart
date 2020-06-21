@@ -18,10 +18,11 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     String userId = configuration.getUserId();
     return DefaultTabController(
-      length: 1,
+      length: 3,
       child: Scaffold(
         body: TabBarView(physics: NeverScrollableScrollPhysics(), children: [
-          // HomePage(userId:userId),
+          HomePage(userId:userId),
+          Container(),
           UserPage(
             userId: userId,
           ),
@@ -35,16 +36,22 @@ class _MainPageState extends State<MainPage> {
             ? Container(
                 child: TabBar(
                   tabs: [
-                    // Tab(
-                    //   icon: Icon(
-                    //     Icons.home,
-                    //     size: 30,
-                    //   ),
-                    // ),
+                    Tab(
+                      icon: Icon(
+                        Icons.home,
+                        size: 30,
+                      ),
+                    ),
+                                        Tab(
+                      icon: Icon(
+                        Icons.search,
+                        size: 30,
+                      ),
+                    ),
                     Tab(
                       icon: Icon(
                         Icons.person,
-                        size: 40,
+                        size: 30,
                       ),
                     )
                   ],

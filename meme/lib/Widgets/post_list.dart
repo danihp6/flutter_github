@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/storage.dart';
 
 import '../Models/PostList.dart';
 import 'slide_left_route.dart';
@@ -71,7 +72,7 @@ class _PostListWidgetState extends State<PostListWidget> {
                               Text('Eliminar categoria')
                             ],
                           ),
-                          value: ()=>deletePostList(configuration.getUserId(),_postList.getId()),
+                          value: (){deleteFile(_postList.getImageLocation()); deletePostList(configuration.getUserId(),_postList.getId());},
                         )
                       ];
                     },
