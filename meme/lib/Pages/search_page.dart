@@ -7,6 +7,14 @@ import '../Controller/db.dart';
 class SearchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+
+    Future<List<dynamic>> search(String search){
+      if(search[0]=='@'){
+        search = search.substring(1);
+        return userSearch(search);
+      }
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -15,11 +23,19 @@ class SearchPage extends StatelessWidget {
                 child: Padding(
               padding: const EdgeInsets.only(left: 8, right: 8),
               child: SearchBar(
-                onSearch: userSearch,
+                onSearch: search,
                 onItemFound: (item, index) {
-                  if (item is User) return CircleAvatar(
-                    backgroundImage: NetworkImage(item.getAvatar()),
-                  );
+                  if (item is User)
+                    return Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 16,
+                          backgroundImage: NetworkImage(item.getAvatar()),
+                        ),
+                        SizedBox(width: 8,),
+                        Text(item.getUserName())
+                      ],
+                    );
                 },
               ),
             )),

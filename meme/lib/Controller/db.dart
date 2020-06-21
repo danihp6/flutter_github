@@ -37,7 +37,7 @@ Future<List<User>> userSearch(String search) async {
       .collection('users')
       .where('userName', isGreaterThan: search)
       .getDocuments();
-  return query.documents.map((doc) => User.fromFirestore(doc));
+  return query.documents.map((doc) => User.fromFirestore(doc)).toList();
 }
 
 //---------------POST----------------//
