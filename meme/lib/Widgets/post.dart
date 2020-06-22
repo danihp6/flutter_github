@@ -19,7 +19,7 @@ class PostWidget extends StatelessWidget {
         if(_isShowedComments)
         Padding(
           padding: const EdgeInsets.only(left:8),
-          child: SizedBox(height: 40,
+          child: SizedBox(height: 50,
             child: PostHeader(post: post,postList: postList,)),
         ),
         Image.network(

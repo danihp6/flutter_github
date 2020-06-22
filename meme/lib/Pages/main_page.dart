@@ -26,6 +26,7 @@ class _MainPageState extends State<MainPage> {
           SearchPage(),
           UserPage(
             userId: userId,
+            activeAppBar: false,
           ),
         ]),
         floatingActionButton: UploadButton(

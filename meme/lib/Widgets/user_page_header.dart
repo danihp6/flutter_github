@@ -79,13 +79,7 @@ class UserPageHeader extends StatelessWidget {
                 SizedBox(
                   height: 10,
                 ),
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    user.getUserName(),
-                    style: TextStyle(fontSize: 15, color: Colors.blue),
-                  ),
-                ),
+              
                 SizedBox(
                   height: 10,
                 ),

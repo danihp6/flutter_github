@@ -10,7 +10,7 @@ import '../Controller/db.dart';
 
 class PostListPage extends StatefulWidget {
   PostList postList;
-  PostListPage({this.postList});
+  PostListPage({@required this.postList});
 
   @override
   _PostListPageState createState() => _PostListPageState();

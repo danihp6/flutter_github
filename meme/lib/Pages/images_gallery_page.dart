@@ -27,7 +27,7 @@ class _ImagesGalleryPageState extends State<ImagesGalleryPage> {
   Widget build(BuildContext context) {
 
     if (images == null) return Container();
-    images = List<String>.from(images['URIList']);
+    images = List<String>.from(images['URIList']).reversed;
 
     return Scaffold(
           body: GridView.builder(

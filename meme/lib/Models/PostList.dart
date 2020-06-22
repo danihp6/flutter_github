@@ -8,14 +8,16 @@ class PostList {
   String _authorId;
   List<String> _posts;
   List<String> _keyWords;
+  DateTime _dateTime;
 
-  PostList(name, image, imageLocation, posts, authorId, keyWords) {
+  PostList(name, image, imageLocation, posts, authorId, keyWords,dateTime) {
     this._name = name;
     this._image = image;
     this._imageLocation = imageLocation;
     this._posts = posts;
     this._authorId = authorId;
     this._keyWords = keyWords;
+    this._dateTime = dateTime;
   }
 
   PostList.fromFirestore(DocumentSnapshot doc)
@@ -25,7 +27,8 @@ class PostList {
         _imageLocation = doc.data['imageLocation'],
         _authorId = doc.data['authorId'],
         _posts = List<String>.from(doc.data['posts']),
-        _keyWords = List<String>.from(doc.data['keyWords']);
+        _keyWords = List<String>.from(doc.data['keyWords']),
+        _dateTime = (doc.data['dateTime'] as Timestamp).toDate();
 
   Map<String, dynamic> toFirestore() => {
         'name': _name,
@@ -33,7 +36,8 @@ class PostList {
         'imageLocation': _imageLocation,
         'posts': _posts,
         'authorId': _authorId,
-        'keyWords': _keyWords
+        'keyWords': _keyWords,
+        'dateTime': _dateTime,
       };
 
   String getId() {
@@ -90,6 +94,14 @@ class PostList {
 
   void setKeyWords(keyWords) {
     this._keyWords = keyWords;
+  }
+
+    DateTime getDateTime() {
+    return this._dateTime;
+  }
+
+  void setDateTime(dateTime) {
+    this._dateTime = dateTime;
   }
 }
 

@@ -3,8 +3,6 @@ import 'package:meme/Pages/new_post_list_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
 class NewPostListButton extends StatelessWidget {
-  String userId;
-  NewPostListButton({this.userId});
 
   @override
   Widget build(BuildContext context) {

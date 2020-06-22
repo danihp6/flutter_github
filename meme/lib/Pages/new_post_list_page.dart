@@ -33,7 +33,7 @@ class _NewPostListPageState extends State<NewPostListPage> {
         newPostList(
             configuration.getUserId(),
             new PostList(_name, _image, _imageLocation, <String>[],
-                configuration.getUserId(), _keyWords));
+                configuration.getUserId(), _keyWords,DateTime.now()));
         Navigator.pop(context);
       }
     }

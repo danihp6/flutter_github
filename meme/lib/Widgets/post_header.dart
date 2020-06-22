@@ -27,7 +27,7 @@ class PostHeader extends StatelessWidget {
           return Row(
             children: [
               CircleAvatar(
-                radius: 16,
+                radius: 20,
                 backgroundImage: NetworkImage(user.getAvatar()),
               ),
               SizedBox(width: 10),
@@ -41,7 +41,7 @@ class PostHeader extends StatelessWidget {
                   children: [
                     Text(
                       post.getFavourites().length.toString(),
-                      style: TextStyle(fontSize: 18),
+                      style: TextStyle(fontSize: 20),
                     ),
                     SizedBox(
                       width: 5,

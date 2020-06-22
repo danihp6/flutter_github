@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meme/Pages/select_image_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import '../Controller/Configuration.dart';
+import 'fading_dismissible.dart';
 
 class UploadButton extends StatefulWidget {
   Function refresh;
@@ -19,9 +20,8 @@ class _UploadButtonState extends State<UploadButton> {
     _isShowedTools = configuration.getIsShowedTools();
 
     return _isShowedTools
-        ? Dismissible(
-            key: Key('hideTool'),
-            direction: DismissDirection.startToEnd,
+        ? FadingDismissible(
+          key: Key('uploadButton'),
             confirmDismiss: (direction) async {
               configuration.setIsShowedTools(false);
               setState(() {});
@@ -38,7 +38,7 @@ class _UploadButtonState extends State<UploadButton> {
             ),
           )
         : Dismissible(
-            key: Key('showTool'),
+          key: Key('showUploadButton'),
             direction: DismissDirection.endToStart,
             confirmDismiss: (direction) async {
               configuration.setIsShowedTools(true);
@@ -46,7 +46,7 @@ class _UploadButtonState extends State<UploadButton> {
               return false;
             },
             child: Opacity(
-              opacity: 0.5,
+              opacity: 0.4,
               child: Icon(
                   Icons.arrow_back_ios,
                   size: 30,

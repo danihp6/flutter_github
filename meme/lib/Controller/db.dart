@@ -48,7 +48,7 @@ Stream<Post> getPost(String postPath) => firestore
     .map((doc) => Post.fromFirestore(doc));
 
 Stream<List<Post>> getPosts(String userId) =>
-    firestore.collection('users/$userId/posts').snapshots().map(toPosts);
+    firestore.collection('users/$userId/posts').orderBy('dateTime',descending: true).snapshots().map(toPosts);
 
 Stream<List<Post>> getLastlyPosts(String userId) => firestore
     .collection('users/$userId/posts')
@@ -136,6 +136,7 @@ Stream<PostList> getPostList(String postListPath) => firestore
 
 Stream<List<PostList>> getPostLists(String userId) => firestore
     .collection('users/$userId/postLists')
+    .orderBy('dateTime',descending: true)
     .snapshots()
     .map(toPostLists);
 
