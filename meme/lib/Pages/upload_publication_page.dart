@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import '../Widgets/tag_selector.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/storage.dart';
@@ -19,14 +19,7 @@ class UploadPublicationPage extends StatefulWidget {
 class _UploadPublicationPageState extends State<UploadPublicationPage> {
   File _file;
   String _description = '';
-  List<String> keyWords = [];
-  TextEditingController keyWordsController;
-
-  @override
-  void initState() {
-    super.initState();
-    keyWordsController = TextEditingController();
-  }
+  List<String> keyWords = <String>[];
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +31,18 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
               map['location'], configuration.getUserId(), keyWords)));
       Navigator.pop(context);
       Navigator.pop(context);
+    }
+
+    void addKeyWord(String value) {
+       setState(() {
+        keyWords.add(value.toLowerCase());
+      });
+    }
+
+    void removeKeyWord(int index) {
+       setState(() {
+        keyWords.removeAt(index);
+      });
     }
 
     return SafeArea(
@@ -65,69 +70,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
               SizedBox(
                 height: 20,
               ),
-              SizedBox(
-                width: 300,
-                height: 50,
-                child: TextFormField(
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Tags',
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.clear), 
-                        onPressed: (){
-                          setState(() {
-                            keyWordsController.clear();
-                          });
-                        }
-                        )),
-                  onFieldSubmitted: (value) {
-                    setState(() {
-                      keyWords.add(value.toLowerCase());
-                      keyWordsController.clear();
-                    });
-                  },
-                  controller: keyWordsController,
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                  height: 25,
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    itemCount: keyWords.length,
-                    separatorBuilder: (context, index) => SizedBox(
-                      width: 6,
-                    ),
-                    itemBuilder: (context, index) => Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.all(Radius.circular(3)),
-                          color: Colors.grey[300],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: Row(
-                            children: [
-                              Text(keyWords[index]),
-                              SizedBox(
-                                width: 20,
-                                child: IconButton(
-                                  padding: EdgeInsets.all(0),
-                                  iconSize: 20,
-                                  icon: Icon(Icons.clear),
-                                  onPressed: () {
-                                    setState(() {
-                                      keyWords.removeAt(index);
-                                    });
-                                  },
-                                ),
-                              )
-                            ],
-                          ),
-                        )),
-                  )),
+              TagSelector( tags: keyWords,onFieldSubmitted: addKeyWord,onClearTag: removeKeyWord,),
               SizedBox(
                 height: 20,
               ),
@@ -147,3 +90,4 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
     );
   }
 }
+

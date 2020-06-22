@@ -129,6 +129,11 @@ Future<List<String>> postSearch(String search) async {
 
 //---------------POSTLIST----------------//
 
+Stream<PostList> getPostList(String postListPath) => firestore
+    .document(postListPath)
+    .snapshots()
+    .map((doc) => PostList.fromFirestore(doc));
+
 Stream<List<PostList>> getPostLists(String userId) => firestore
     .collection('users/$userId/postLists')
     .snapshots()
@@ -139,6 +144,24 @@ Future newPostList(String userId, PostList postList) =>
 
 Future deletePostList(String userId, String postListId) =>
     firestore.document('users/$userId/postLists/$postListId').delete();
+
+    Future<List<String>> postListSearch(String search) async {
+  List<String> keyWordsSearched = search.split(' ');
+  QuerySnapshot userQuery = await firestore.collection('users').getDocuments();
+  List<String> postListsId = [];
+
+  for (var userSnap in userQuery.documents) {
+    var postQuery = await userSnap.reference
+        .collection('postLists')
+        .where('keyWords', arrayContainsAny: keyWordsSearched)
+        .getDocuments();
+        for (var postSnap in postQuery.documents) {
+          postListsId.add('users/${userSnap.documentID}/postLists/${postSnap.documentID}');
+        }
+  }
+  //ORDENAR POR IMPORTANCIA
+  return postListsId;
+}
 
 //---------------COMMENTS----------------//
 
