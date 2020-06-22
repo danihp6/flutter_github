@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:meme/Controller/string_functions.dart';
 
 class User {
   String _id;
@@ -11,7 +12,8 @@ class User {
   List<String> _favourites;
   DateTime _dateTime;
 
-  User(id, userName, avatar,avatarLocation, followers, followed, description,dateTime) {
+  User(id, userName, avatar, avatarLocation, followers, followed, description,
+      dateTime) {
     this._id = id;
     this._userName = userName;
     this._avatar = avatar;
@@ -32,6 +34,18 @@ class User {
         _description = doc.data['description'],
         _favourites = List<String>.from(doc.data['favourites']),
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate();
+
+  Map<String, dynamic> toFirestore() => {
+        'userName': _userName,
+        'avatar': _avatar,
+        'avatarLocation': _avatarLocation,
+        'followers': _followers,
+        'followed': _followed,
+        'description': _description,
+        'favourites': _favourites,
+        'dateTime': _dateTime,
+        'keyWords': generateKeyWords(_userName)
+      };
 
   String getId() {
     return this._id;

@@ -10,14 +10,17 @@ class Post {
   DateTime _dateTime;
   String _mediaLocation;
   String _authorId;
+  List<String> _keyWords;
 
-  Post(media, description, favourites, dateTime, mediaLocation, authorId) {
+  Post(media, description, favourites, dateTime, mediaLocation, authorId,
+      keyWords) {
     this._media = media;
     this._description = description;
     this._favourites = favourites;
     this._dateTime = dateTime;
     this._mediaLocation = mediaLocation;
     this._authorId = authorId;
+    this._keyWords = keyWords;
   }
 
   Post.fromFirestore(DocumentSnapshot doc)
@@ -27,14 +30,16 @@ class Post {
         _favourites = List<String>.from(doc.data['favourites']),
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
         _mediaLocation = doc.data['mediaLocation'],
-        _authorId = doc.reference.parent().parent().documentID;
+        _authorId = doc.reference.parent().parent().documentID,
+        _keyWords = List<String>.from(doc.data['keyWords']);
 
   Map<String, dynamic> toFirestore() => {
         'media': _media,
         'description': _description,
         'favourites': _favourites,
         'dateTime': _dateTime,
-        'mediaLocation': _mediaLocation
+        'mediaLocation': _mediaLocation,
+        'keyWords': _keyWords
       };
 
   String getId() {
@@ -85,25 +90,20 @@ class Post {
     this._authorId = authorId;
   }
 
-  String getPastTime() {
-    DateTime dateTime = this._dateTime;
-    DateTime now = DateTime.now();
-    String pastTime;
-    if (dateTime.year < now.year)
-      pastTime = (now.year - dateTime.year).toString() + ' años';
-    else if (dateTime.month < now.month)
-      pastTime = (now.month - dateTime.month).toString() + ' meses';
-    else if (dateTime.day < now.day)
-      pastTime = (now.day - dateTime.day).toString() + ' d';
-    else if (dateTime.hour < now.hour)
-      pastTime = (now.hour - dateTime.hour).toString() + ' h';
-    else if (dateTime.minute < now.minute)
-      pastTime = (now.minute - dateTime.minute).toString() + ' m';
-    else if (dateTime.second < now.second)
-      pastTime = (now.second - dateTime.second).toString() + ' s';
-    else
-      pastTime = 0.toString() + ' s';
-    return pastTime;
+  List<String> getKeyWords() {
+    return this._keyWords;
+  }
+
+  void setKeyWords(keyWords) {
+    this._keyWords = keyWords;
+  }
+
+  DateTime getDateTime() {
+    return this._dateTime;
+  }
+
+  void setDateTime(dateTime) {
+    this._dateTime = dateTime;
   }
 }
 
@@ -111,6 +111,6 @@ List<Post> toPosts(QuerySnapshot query) {
   return query.documents.map((doc) => Post.fromFirestore(doc)).toList();
 }
 
-void orderListPostByDateTime(List<Post> posts){
-  return posts.sort((a,b)=>b._dateTime.compareTo(a._dateTime));
+void orderListPostByDateTime(List<Post> posts) {
+  return posts.sort((a, b) => b._dateTime.compareTo(a._dateTime));
 }

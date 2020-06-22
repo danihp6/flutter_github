@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
+import 'package:meme/Controller/datetime_functions.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/Post.dart';
@@ -72,7 +73,7 @@ class PostDescription extends StatelessWidget {
                   child: AddCommentField(
                       user: user, postId: post.getId()));
             }),
-        Align(alignment:Alignment.topLeft,child: Text('Publicada hace ' + post.getPastTime(),style: TextStyle(
+        Align(alignment:Alignment.topLeft,child: Text('Publicada hace ' + getPastTime(post.getDateTime()),style: TextStyle(
           fontSize: 13
         ),)),
       ],

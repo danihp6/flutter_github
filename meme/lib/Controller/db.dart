@@ -35,7 +35,7 @@ Stream<List<String>> getFollowed(String userId) => firestore
 Future<List<User>> userSearch(String search) async {
   var query = await firestore
       .collection('users')
-      .where('userName', isGreaterThan: search)
+      .where('keyWords', arrayContains: search)
       .getDocuments();
   return query.documents.map((doc) => User.fromFirestore(doc)).toList();
 }
@@ -108,6 +108,24 @@ Stream<List<String>> getPostFavourites(String userId, String postId) =>
         .document('users/$userId/posts/$postId')
         .snapshots()
         .map((doc) => List<String>.from(doc.data['favourites']));
+
+Future<List<String>> postSearch(String search) async {
+  List<String> keyWordsSearched = search.split(' ');
+  QuerySnapshot userQuery = await firestore.collection('users').getDocuments();
+  List<String> postsId = [];
+
+  for (var userSnap in userQuery.documents) {
+    var postQuery = await userSnap.reference
+        .collection('posts')
+        .where('keyWords', arrayContainsAny: keyWordsSearched)
+        .getDocuments();
+        for (var postSnap in postQuery.documents) {
+          postsId.add('users/${userSnap.documentID}/posts/${postSnap.documentID}');
+        }
+  }
+  //ORDENAR POR IMPORTANCIA
+  return postsId;
+}
 
 //---------------POSTLIST----------------//
 

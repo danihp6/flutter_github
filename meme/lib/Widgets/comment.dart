@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/datetime_functions.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/User.dart';
@@ -67,7 +68,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                         iconSize: 15,
                         onPressed: () {}),
                   ),
-                  Text(_comment.getPastTime())
+                  Text(getPastTime(_comment.getDateTime()))
                 ]),
               )
             ],
