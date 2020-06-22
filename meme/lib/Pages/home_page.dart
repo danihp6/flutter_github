@@ -18,42 +18,44 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(40),
-              child: AppBar(
-          backgroundColor: Colors.deepOrange,
-          title: Text('Meme'),
-          actions: [
-            CommentsButton(refresh: (){setState(() {});},)
-          ],
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(40),
+          child: AppBar(
+            backgroundColor: Colors.deepOrange,
+            title: Text('Meme'),
+            actions: [
+              CommentsButton(
+                refresh: () {
+                  setState(() {});
+                },
+              )
+            ],
+          ),
         ),
-      ),
         body: StreamBuilder(
-      stream: getFollowed(widget.userId),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) print(snapshot.error);
-        if (!snapshot.hasData) return Loading();
-        List<String> usersId = snapshot.data;
-        return ListView.builder(
-          itemCount: usersId.length,
-          itemBuilder: (context, index) => StreamBuilder(
-              stream: getLastlyPosts(usersId[index]),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) print(snapshot.error);
-                if (!snapshot.hasData) return Loading();
-                List<Post> posts = snapshot.data;
-                orderListPostByDateTime(posts);
-                print(posts);
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                    itemCount: posts.length,
-                    itemBuilder: (context, j) => PostWidget(post: posts[j]));
-              }),
-        );
-      },
-    ));
+          stream: getFollowed(widget.userId),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) print(snapshot.error);
+            if (!snapshot.hasData) return Loading();
+            List<String> usersId = snapshot.data;
+            return ListView.builder(
+              itemCount: usersId.length,
+              itemBuilder: (context, index) => StreamBuilder(
+                  stream: getLastlyPosts(usersId[index]),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) print(snapshot.error);
+                    if (!snapshot.hasData) return Loading();
+                    List<Post> posts = snapshot.data;
+                    orderListPostByDateTime(posts);
+                    return ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: posts.length,
+                        itemBuilder: (context, j) =>
+                            PostWidget(post: posts[j]));
+                  }),
+            );
+          },
+        ));
   }
 }
-
-
