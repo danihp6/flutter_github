@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/web_scrapping.dart';
 import 'package:meme/Pages/home_page.dart';
+import 'package:meme/Pages/notifications_page.dart';
 import 'package:meme/Pages/search_page.dart';
 import 'package:meme/Pages/user_page.dart';
 import 'package:meme/Widgets/upload_button.dart';
@@ -19,11 +20,12 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     String userId = configuration.getUserId();
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         body: TabBarView(physics: NeverScrollableScrollPhysics(), children: [
           HomePage(userId:userId),
           SearchPage(),
+          NotificationsPage(),
           UserPage(
             userId: userId,
             activeAppBar: false,
@@ -47,6 +49,12 @@ class _MainPageState extends State<MainPage> {
                                         Tab(
                       icon: Icon(
                         Icons.search,
+                        size: 30,
+                      ),
+                    ),
+                    Tab(
+                      icon: Icon(
+                        Icons.notifications,
                         size: 30,
                       ),
                     ),

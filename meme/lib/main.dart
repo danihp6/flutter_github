@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/local_storage.dart';
 import 'package:meme/Controller/push_notification_provider.dart';
+import 'package:meme/Pages/camera_page.dart';
 import 'package:meme/Pages/main_page.dart';
+import 'package:meme/Widgets/slide_left_route.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,18 +15,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  PushNotificationProvider pushProvider;
 
   @override
   void initState() {
     super.initState();
-    pushProvider = PushNotificationProvider();
+    storage.initStorage();
     pushProvider.initNotifications();
-
-    pushProvider.message.listen((arg) {
-      print('ARGUMENTO DEL PUSH');
-
-    });
+    
   }
 
   @override

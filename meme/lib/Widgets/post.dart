@@ -8,7 +8,8 @@ import 'package:meme/Widgets/post_header.dart';
 class PostWidget extends StatelessWidget {
   Post post;
   PostList postList;
-  PostWidget({@required this.post,this.postList});
+  bool activeAlwaysShowedComments;
+  PostWidget({@required this.post,this.postList,this.activeAlwaysShowedComments=false});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class PostWidget extends StatelessWidget {
 
     return Container(
       child: Column(children: [
-        if(_isShowedComments)
+        if(_isShowedComments || activeAlwaysShowedComments)
         Padding(
           padding: const EdgeInsets.only(left:8),
           child: SizedBox(height: 50,
@@ -26,7 +27,7 @@ class PostWidget extends StatelessWidget {
           post.getMedia(),
           fit: BoxFit.contain,
         ),
-        if (_isShowedComments)
+        if (_isShowedComments || activeAlwaysShowedComments)
           Padding(
             padding: const EdgeInsets.only(right: 15,left:15,top: 10),
             child: PostDescription(post: post),

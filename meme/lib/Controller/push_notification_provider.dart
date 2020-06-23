@@ -1,33 +1,38 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:meme/Models/Notification.dart';
+import 'local_storage.dart';
 
 class PushNotificationProvider {
   FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  List<Notification> _notifications;
 
-  final _messagingStreamController = StreamController<String>.broadcast();
-  Stream<String> get message => _messagingStreamController.stream;
+  final _messagingStreamController = StreamController<List<Notification>>.broadcast();
+  Stream<List<Notification>> get notification => _messagingStreamController.stream;
   initNotifications() {
+    _notifications = storage.notifications ?? <Notification>[];
     _firebaseMessaging.requestNotificationPermissions();
     _firebaseMessaging.getToken().then((token) {
       print('==== FCM TOKEN ====');
       print(token);
       //====PHONE====
-      //eTt6XOoUTv6Jx1kA0YketU:APA91bEMEvrd3VBiO4Uqt3Pw96KTQKDDs2rC_A0Xjg_r6qRexKBV0s9S9stADXlP7woEPN6rWo2VhAr7-Q47AwXpt5J6_LPm9L58nkSzyhVOU5ZX3YkO7ROjzXAQgcOIhAE810rxOMVA
+      //dhCZIN-TR6WZ7PsCNNgXwn:APA91bEhQ5iclG3-Y2u53nvvjBUisZXNe4O32bDFLhQSSZMzcodUt6bjGDVqWAh5bYE5cCXQIxMkzsQyYUApBCbXk7yM4Z9xpHiS-N77TxApJ-0rzAJh9q5yHmHemyttBEHQMIXOXZFj
       //====PORTATIL====
       //cGBH_XE4ZXc:APA91bHiR-Nre-R5-J0duWFLn1eSHT0kBvCXX1LlJ_ItNhHxlXqYUxK45V24X9sMQINjFqh5B9UeJxlg-ZYPMAo7lFF03eB3heGiC4-Y22eQX9So5OkLmOminaULglPFM2WXPQjVF6k1
+      //====PC====
+      //cyLsHHyglmk:APA91bFqwweq9d6q5qPlkYx94e-Qvm6x9NwNuwnxIfsCJRH_KXDpeD1dzOip_KhRdKqT7agOfYXUcZjVHCohsQ3XfiysiK3iekvyWtixml0Ky9P2rlXxzSBSfWK2xSd9_pUftccxluy0
     });
 
     _firebaseMessaging.configure(
-      onMessage: (info) {
+      onMessage: (info) async {
+        
         print('==== ON MESSAGE ====');
         print(info);
-        String argumento = 'no-data';
-        if (Platform.isAndroid) {
-          argumento = info['data']['comida'] ?? 'no-data';
-        }
-        _messagingStreamController.sink.add(argumento);
+        Notification notification = Notification.fromMap(info);
+        _notifications.add(notification);
+        storage.notifications = _notifications;
+        _messagingStreamController.sink.add(_notifications);
       },
       onLaunch: (info) {
         print('==== ON LAUNCH ====');
@@ -36,8 +41,6 @@ class PushNotificationProvider {
       onResume: (info) {
         print('==== ON RESUME ====');
         print(info);
-        // final notification = info["data"]['comida'];
-        // print(notification);
       },
     );
   }
@@ -45,4 +48,8 @@ class PushNotificationProvider {
   dispose() {
     _messagingStreamController?.close();
   }
+
+  get notifications => this._notifications;
 }
+
+PushNotificationProvider pushProvider = PushNotificationProvider();
