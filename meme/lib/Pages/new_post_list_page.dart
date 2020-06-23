@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
-import 'package:meme/Controller/storage.dart';
+import 'package:meme/Controller/media_storage.dart';
 import 'package:meme/Models/PostList.dart';
 import '../Widgets/tag_selector.dart';
 import 'package:meme/Widgets/slide_left_route.dart';

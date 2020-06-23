@@ -1,47 +1,56 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Notification {
   String _title;
   String _body;
   String _sender;
-  String _receiver;
+  // String _receiver;
   String _post;
 
-  Notification(title, body, sender, receiver, post) {
+  Notification(title, body, sender, post) {
     this._title = title;
     this._body = body;
     this._sender = sender;
-    this._receiver = receiver;
+    // this._receiver = receiver;
     this._post = post;
   }
 
-  Notification.fromMap(Map<String, dynamic> info)
-      : _title = info['notification']['title'],
-        _body = info['notification']['body'],
-        _sender = info['data']['sender'],
-        _receiver = info['data']['receiver'],
-        _post = info['data']['post'];
+  Notification.fromFirestore(DocumentSnapshot doc)
+      : _title = doc.data['notification']['title'],
+        _body = doc.data['notification']['body'],
+        _sender = doc.data['data']['sender'],
+        // _receiver = doc.data['receiver'],
+        _post = doc.data['data']['post'];
 
-  Map<String, dynamic> toMap() => {
-        'notification': {'title': _title, 'body': _body},
-        'data': {'sender': _sender, 'receiver': _receiver, 'post': _post}
+  Map<String, dynamic> toFirestore() => {
+        'title': _title,
+        'body': _body,
+        'sender': _sender,
+        // 'receiver': _receiver,
+        'post': _post
       };
 
-  get title => this._title;
+  String get title => this._title;
 
   set title(title) => this._title = title;
 
-  get body => this._body;
+  String get body => this._body;
 
   set body(body) => this._body = body;
 
-  get sender => this._sender;
+  String get sender => this._sender;
 
   set sender(sender) => this._sender = sender;
 
-  get receiver => this._receiver;
+  // String get receiver => this._receiver;
 
-  set receiver(receiver) => this._receiver = receiver;
+  // set receiver(receiver) => this._receiver = receiver;
 
-  get post => this._post;
+  String get post => this._post;
 
   set post(post) => this._post = post;
+}
+
+List<Notification> toNotificationList(QuerySnapshot query) {
+  return query.documents.map((doc) => Notification.fromFirestore(doc)).toList();
 }

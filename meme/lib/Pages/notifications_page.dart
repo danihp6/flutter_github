@@ -7,12 +7,14 @@ import 'package:meme/Widgets/notification.dart';
 import '../Models/Notification.dart' as mynotification;
 
 class NotificationsPage extends StatelessWidget {
+  String userId;
+  NotificationsPage({this.userId});
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder(
-          stream: pushProvider.notification,
-          initialData: pushProvider.notifications,
+          stream: getNotifications(userId),
           builder: (context, snapshot) {
             if (snapshot.hasError) print(snapshot.error);
             if (!snapshot.hasData) return Loading();

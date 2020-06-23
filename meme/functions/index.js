@@ -157,3 +157,33 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
     })
     .catch(reject);
 }
+
+exports.onNewPost = functions.firestore.document('users/{userId}/posts/{postId}').onCreate(async (snap, context) => {
+  var userId = context.params.userId
+  var postId = context.params.postId
+
+  var userName = snap.data()['userName']
+
+  const payload = {
+    notification: {
+      title: 'Nueva publicación',
+      body: `${userName} ha subido una nueva publicación`,
+    },
+    data:{
+      post:postId,
+      sender:userId
+    }
+  };
+
+  var db = admin.firestore()
+  var ref = db.collection('users').doc(userId)
+
+  ref.collection('notifications').add(payload)
+
+  // var query = ref.orderBy('__name__')
+  // var tokens
+
+  // var token = 'fKpAghNZSPuyTSsXNlp3Ex:APA91bF4cIS2EsUlVIbBngRLeFyFzF4cnPwBN861SBazN3XbP4Hz2lLEkaZT3MGZh7e4QR751D_ieUTJTG-9w3xXgMmn2rhoihWC5tShcLF9IBy-ZFQEUsmnTjjWQT1qbF0gsERA5kfi'
+
+  // const response = await admin.messaging().sendToDevice(token, payload);
+})

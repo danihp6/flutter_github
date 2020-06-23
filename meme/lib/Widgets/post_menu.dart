@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
-import 'package:meme/Controller/storage.dart';
+import 'package:meme/Controller/media_storage.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Pages/select_post_list_page.dart';

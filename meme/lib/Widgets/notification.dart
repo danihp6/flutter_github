@@ -25,13 +25,18 @@ class NotificationWidget extends StatelessWidget {
               if (!snapshot.hasData) return Loading();
               User user = snapshot.data;
               return Expanded(
-                              child: Row(children: [
+                child: Row(children: [
                   GestureDetector(
-                                      child: CircleAvatar(
+                    child: CircleAvatar(
                       radius: 25,
                       backgroundImage: NetworkImage(user.getAvatar()),
                     ),
-                    onTap: ()=>Navigator.push(context, SlideLeftRoute(page: UserPage(userId: user.getId(),))),
+                    onTap: () => Navigator.push(
+                        context,
+                        SlideLeftRoute(
+                            page: UserPage(
+                          userId: user.getId(),
+                        ))),
                   ),
                   SizedBox(
                     width: 12,
@@ -39,14 +44,8 @@ class NotificationWidget extends StatelessWidget {
                   Expanded(
                     child: RichText(
                       text: TextSpan(
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black
-                        ),
+                        style: TextStyle(fontSize: 16, color: Colors.black),
                         children: [
-                          TextSpan(
-                              text: user.getUserName() + ' ',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
                           TextSpan(text: notification.body),
                         ],
                       ),
@@ -62,8 +61,16 @@ class NotificationWidget extends StatelessWidget {
               if (snapshot.hasError) print(snapshot.error);
               if (!snapshot.hasData) return Loading();
               Post post = snapshot.data;
-              return GestureDetector(child: Image.network(post.getMedia()),
-              onTap: ()=>Navigator.push(context, SlideLeftRoute(page: PostPage(userId: notification.sender,postId: notification.post,))),);
+              return GestureDetector(
+                child: Image.network(post.getMedia()),
+                onTap: () => Navigator.push(
+                    context,
+                    SlideLeftRoute(
+                        page: PostPage(
+                      userId: notification.sender,
+                      postId: notification.post,
+                    ))),
+              );
             }),
       ],
     );

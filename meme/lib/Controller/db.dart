@@ -3,6 +3,7 @@ import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/User.dart';
+import '../Models/Notification.dart';
 
 final firestore = Firestore.instance;
 
@@ -47,8 +48,11 @@ Stream<Post> getPost(String postPath) => firestore
     .snapshots()
     .map((doc) => Post.fromFirestore(doc));
 
-Stream<List<Post>> getPosts(String userId) =>
-    firestore.collection('users/$userId/posts').orderBy('dateTime',descending: true).snapshots().map(toPosts);
+Stream<List<Post>> getPosts(String userId) => firestore
+    .collection('users/$userId/posts')
+    .orderBy('dateTime', descending: true)
+    .snapshots()
+    .map(toPosts);
 
 Stream<List<Post>> getLastlyPosts(String userId) => firestore
     .collection('users/$userId/posts')
@@ -119,9 +123,9 @@ Future<List<String>> postSearch(String search) async {
         .collection('posts')
         .where('keyWords', arrayContainsAny: keyWordsSearched)
         .getDocuments();
-        for (var postSnap in postQuery.documents) {
-          postsId.add('users/${userSnap.documentID}/posts/${postSnap.documentID}');
-        }
+    for (var postSnap in postQuery.documents) {
+      postsId.add('users/${userSnap.documentID}/posts/${postSnap.documentID}');
+    }
   }
   //ORDENAR POR IMPORTANCIA
   return postsId;
@@ -136,7 +140,7 @@ Stream<PostList> getPostList(String postListPath) => firestore
 
 Stream<List<PostList>> getPostLists(String userId) => firestore
     .collection('users/$userId/postLists')
-    .orderBy('dateTime',descending: true)
+    .orderBy('dateTime', descending: true)
     .snapshots()
     .map(toPostLists);
 
@@ -146,7 +150,7 @@ Future newPostList(String userId, PostList postList) =>
 Future deletePostList(String userId, String postListId) =>
     firestore.document('users/$userId/postLists/$postListId').delete();
 
-    Future<List<String>> postListSearch(String search) async {
+Future<List<String>> postListSearch(String search) async {
   List<String> keyWordsSearched = search.split(' ');
   QuerySnapshot userQuery = await firestore.collection('users').getDocuments();
   List<String> postListsId = [];
@@ -156,9 +160,10 @@ Future deletePostList(String userId, String postListId) =>
         .collection('postLists')
         .where('keyWords', arrayContainsAny: keyWordsSearched)
         .getDocuments();
-        for (var postSnap in postQuery.documents) {
-          postListsId.add('users/${userSnap.documentID}/postLists/${postSnap.documentID}');
-        }
+    for (var postSnap in postQuery.documents) {
+      postListsId
+          .add('users/${userSnap.documentID}/postLists/${postSnap.documentID}');
+    }
   }
   //ORDENAR POR IMPORTANCIA
   return postListsId;
@@ -182,60 +187,13 @@ Future newComment(String userId, String postId, Comment comment) => firestore
     .collection('users/$userId/posts/$postId/comments')
     .add(comment.toFirestore());
 
-// Stream<List<Publication>> getPublicationsFromFollowedAndUser(String userId) {
-//   return firestore
-//       .document('Users/$userId')
-//       .snapshots()
-//       .asyncMap((userSnap) async {
-//     List<Publication> publications = <Publication>[];
+//---------------NOTIFICATIONS----------------//
 
-//     String userFavouriteCategoryId = userSnap.data['publications'];
-//     DocumentSnapshot userFavouriteCategorySnap = await firestore.document('FavouritesCategories/$userFavouriteCategoryId').get();
-//     List<String> userPublicationsId = List<String>.from(userFavouriteCategorySnap.data['publications']);
-//     for (var publicationId in userPublicationsId) {
-//       publications.add(Publication.fromFirestore(
-//           await firestore.document('Publications/$publicationId').get()));
-//     }
+Stream<List<Notification>> getNotifications(String userId) => firestore
+    .collection('users/$userId/notifications')
+    .snapshots()
+    .map((toNotificationList));
 
-//     List<String> followedId = List<String>.from(userSnap.data['followed']);
-//     List<String> followedPublicationsId = <String>[];
-//     for (var id in followedId) {
-//       DocumentSnapshot followedSnap =
-//           await firestore.document('Users/$id').get();
-//       followedPublicationsId.add(followedSnap.data['publications']);
-//     }
-//     List<String> publicationsId = <String>[];
-//     for (var id in followedPublicationsId) {
-//       DocumentSnapshot followedPublicationsSnap =
-//           await firestore.document('FavouritesCategories/$id').get();
-//       publicationsId.addAll(
-//           List<String>.from(followedPublicationsSnap.data['publications']));
-//     }
-//     for (var publicationId in publicationsId) {
-//       publications.add(Publication.fromFirestore(
-//           await firestore.document('Publications/$publicationId').get()));
-//     }
-//     return publications;
-//   });
-//   // return firestore.document('FavouritesCategories/$favouriteCategoryId').snapshots().asyncMap((snap) async {
-//   //   List<String> publicationsId = List<String>.from(snap.data['publications']);
-//   //   var publications = <Publication>[];
-//   //   for (var publicationId in publicationsId) {
-//   //     publications.add(Publication.fromFirestore(await firestore.document('Publications/$publicationId').get()));
-//   //   }
-//   //   return publications;
-//   // });
-// }
-
-// // Stream<Comment> getComment(String publicationId, String commentId) {
-// //   return firestore
-// //       .document('Publications/$publicationId/comments/$commentId')
-// //       .snapshots()
-// //       .map((doc) => Comment.fromFirestore(doc));
-// // }
-
-// Future<void> newComment(String publicationId, Comment comment) {
-//   return firestore
-//       .collection('Publications/$publicationId/comments')
-//       .add(comment.toFirestore());
-// }
+Future newNotification(String userId, Notification notification) => firestore
+    .collection('users/$userId/notifications')
+    .add(notification.toFirestore());

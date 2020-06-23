@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
-import 'package:meme/Controller/storage.dart';
+import 'package:meme/Controller/media_storage.dart';
 
 import '../Models/PostList.dart';
 import 'slide_left_route.dart';

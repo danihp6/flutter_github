@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart' as db;
-import 'package:meme/Controller/storage.dart';
+import 'package:meme/Controller/media_storage.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/images_gallery_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
