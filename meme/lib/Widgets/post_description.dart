@@ -30,7 +30,7 @@ class PostDescription extends StatelessWidget {
           ),
         ),
         StreamBuilder(
-            stream: getBestComment(post.getAuthorId(),post.getId()),
+            stream: db.getBestComment(post.getAuthorId(), post.getId()),
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
               if (!snapshot.hasData) return Container();
@@ -63,19 +63,21 @@ class PostDescription extends StatelessWidget {
               );
             }),
         StreamBuilder(
-            stream: getUser(configuration.getUserId()),
+            stream: db.getUser(db.userId),
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
               if (!snapshot.hasData) return Loading();
               User user = snapshot.data;
               return SizedBox(
                   height: 50,
-                  child: AddCommentField(
-                      user: user, postId: post.getId()));
+                  child: AddCommentField(user: user, postId: post.getId()));
             }),
-        Align(alignment:Alignment.topLeft,child: Text('Publicada hace ' + getPastTime(post.getDateTime()),style: TextStyle(
-          fontSize: 13
-        ),)),
+        Align(
+            alignment: Alignment.topLeft,
+            child: Text(
+              'Publicada hace ' + getPastTime(post.getDateTime()),
+              style: TextStyle(fontSize: 13),
+            )),
       ],
     );
   }

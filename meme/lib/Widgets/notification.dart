@@ -20,11 +20,11 @@ class NotificationWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return FadingDismissible(
       key: UniqueKey(),
-      onDismissed: (direction) => deleteNotification(configuration.getUserId(),notification.id),
+      onDismissed: (direction) => db.deleteNotification(db.userId,notification.id),
       child: Row(
         children: [
           StreamBuilder(
-              stream: getUser(notification.sender),
+              stream: db.getUser(notification.sender),
               builder: (context, snapshot) {
                 if (snapshot.hasError) print(snapshot.error);
                 if (!snapshot.hasData) return Loading();
@@ -60,7 +60,7 @@ class NotificationWidget extends StatelessWidget {
                 );
               }),
           StreamBuilder(
-              stream: getPost(
+              stream: db.getPost(
                   'users/${notification.sender}/posts/${notification.post}'),
               builder: (context, snapshot) {
                 if (snapshot.hasError) print(snapshot.error);

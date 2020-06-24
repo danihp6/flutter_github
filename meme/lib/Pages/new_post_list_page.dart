@@ -26,14 +26,14 @@ class _NewPostListPageState extends State<NewPostListPage> {
     Future createPostList() async {
       if (_name != '') {
         if (_file != null) {
-          var map = await uploadMedia(_file);
+          var map = await mediaStorage.uploadMedia(_file);
           _image = map['media'];
           _imageLocation = map['location'];
         }
-        newPostList(
-            configuration.getUserId(),
+        db.newPostList(
+            db.userId,
             new PostList(_name, _image, _imageLocation, <String>[],
-                configuration.getUserId(), _keyWords,DateTime.now()));
+                db.userId, _keyWords,DateTime.now()));
         Navigator.pop(context);
       }
     }

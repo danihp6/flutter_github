@@ -41,26 +41,26 @@ class _SearchPageState extends State<SearchPage>
       search = search.toLowerCase();
       if (search[0] == '@') {
         typeSearched = 'users';
-        return userSearch(search.substring(1));
+        return db.userSearch(search.substring(1));
       }
       if (search[0] == '#') {
         typeSearched = 'posts';
-        return postSearch(search.substring(1));
+        return db.postSearch(search.substring(1));
       }
       if (search[0] == '&') {
         typeSearched = 'postLists';
-        return postListSearch(search.substring(1));
+        return db.postListSearch(search.substring(1));
       }
-      if (tabController.index == 0) return userSearch(search);
+      if (tabController.index == 0) return db.userSearch(search);
 
-      if (tabController.index == 1) return postSearch(search);
+      if (tabController.index == 1) return db.postSearch(search);
 
-      if (tabController.index == 2) return postListSearch(search);
+      if (tabController.index == 2) return db.postListSearch(search);
     }
 
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
+    return SafeArea(
+          child: Scaffold(
+        body: Column(
           children: [
             Expanded(
                 child: SearchBar(
@@ -95,7 +95,7 @@ class _SearchPageState extends State<SearchPage>
                         );
                       if (typeSearched == 'posts')
                         return StreamBuilder(
-                            stream: getPost(item),
+                            stream: db.getPost(item),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) print(snapshot.error);
                               if (!snapshot.hasData) return Loading();
@@ -104,7 +104,7 @@ class _SearchPageState extends State<SearchPage>
                             });
                       if (typeSearched == 'postLists')
                         return StreamBuilder(
-                            stream: getPostList(item),
+                            stream: db.getPostList(item),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) print(snapshot.error);
                               if (!snapshot.hasData) return Loading();

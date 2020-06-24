@@ -16,7 +16,7 @@ class SelectPostList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     addPublicationAndGoBack() {
-      addPostPathInPostList(configuration.getUserId(), postId, postListId);
+      db.addPostPathInPostList(db.userId, postId, postListId);
       Navigator.pop(context);
     }
 
@@ -29,7 +29,7 @@ class SelectPostList extends StatelessWidget {
           children: [
             NewPostListButton(),
             StreamBuilder(
-                stream: getPostLists(configuration.getUserId()),
+                stream: db.getPostLists(db.userId),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) print(snapshot.error);
                   if (!snapshot.hasData) return Loading();

@@ -28,7 +28,7 @@ class CommentsPage extends StatelessWidget {
                 child: Column(
                   children: [
                     StreamBuilder(
-                            stream: getUser(post.getAuthorId()),
+                            stream: db.getUser(post.getAuthorId()),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) print(snapshot.error);
                               if (!snapshot.hasData)
@@ -61,7 +61,7 @@ class CommentsPage extends StatelessWidget {
                     ),
                     Divider(),
                     StreamBuilder(
-                        stream: getComments(post.getAuthorId(),post.getId()),
+                        stream: db.getComments(post.getAuthorId(),post.getId()),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData)
@@ -85,7 +85,7 @@ class CommentsPage extends StatelessWidget {
           Align(
             alignment: Alignment.bottomCenter,
             child: StreamBuilder(
-              stream: getUser(configuration.getUserId()),
+              stream: db.getUser(db.userId),
               builder: (context, snapshot) {
                 if (snapshot.hasError) print(snapshot.error);
                 if (!snapshot.hasData) return Loading();

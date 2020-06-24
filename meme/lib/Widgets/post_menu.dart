@@ -34,7 +34,7 @@ class PostMenu extends StatelessWidget {
                 SlideLeftRoute(page: SelectPostList(postId: post.getId()))),
           ),
           if (postList == null &&
-              post.getAuthorId() == configuration.getUserId())
+              post.getAuthorId() == db.userId)
             PopupMenuItem(
               child: Row(
                 children: [
@@ -46,12 +46,12 @@ class PostMenu extends StatelessWidget {
                 ],
               ),
               value: () {
-                deleteFile(post.getMediaLocation());
-                deletePost(userId, post.getId());
+                mediaStorage.deleteFile(post.getMediaLocation());
+                db.deletePost(userId, post.getId());
               },
             ),
           if (postList != null &&
-              postList.getAuthorId() == configuration.getUserId())
+              postList.getAuthorId() == db.userId)
             PopupMenuItem(
               child: Row(
                 children: [
@@ -62,7 +62,7 @@ class PostMenu extends StatelessWidget {
                   Text('Quitar de la lista'),
                 ],
               ),
-              value: () => deletePostPathInPostList(configuration.getUserId(),
+              value: () => db.deletePostPathInPostList(db.userId,
                   postList.getId(), 'users/$userId/posts/${post.getId()}'),
             ),
         ];

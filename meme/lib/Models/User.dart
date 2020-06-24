@@ -11,17 +11,19 @@ class User {
   String _description;
   List<String> _favourites;
   DateTime _dateTime;
+  String _email;
 
-  User(id, userName, avatar, avatarLocation, followers, followed, description,
-      dateTime) {
-    this._id = id;
+  User(userName, avatar, avatarLocation, followers, followed,favourites, description,
+      dateTime, email) {
     this._userName = userName;
     this._avatar = avatar;
     this._avatarLocation = avatarLocation;
     this._followers = followers;
     this._followed = followed;
+    this._favourites = favourites;
     this._description = description;
     this._dateTime = dateTime;
+    this._email = email;
   }
 
   User.fromFirestore(DocumentSnapshot doc)
@@ -33,7 +35,8 @@ class User {
         _followed = List<String>.from(doc.data['followed']),
         _description = doc.data['description'],
         _favourites = List<String>.from(doc.data['favourites']),
-        _dateTime = (doc.data['dateTime'] as Timestamp).toDate();
+        _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
+        _email = doc.data['email'];
 
   Map<String, dynamic> toFirestore() => {
         'userName': _userName,
@@ -44,7 +47,8 @@ class User {
         'description': _description,
         'favourites': _favourites,
         'dateTime': _dateTime,
-        'keyWords': generateKeyWords(_userName)
+        'keyWords': generateKeyWords(_userName),
+        'email': _email
       };
 
   String getId() {
@@ -118,4 +122,8 @@ class User {
   DateTime setDateTime(dateTime) {
     this._dateTime = dateTime;
   }
+
+  get email => this._email;
+
+  set email(email) => this._email = email;
 }

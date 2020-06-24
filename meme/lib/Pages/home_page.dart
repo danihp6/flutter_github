@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         body: StreamBuilder(
-          stream: getFollowed(widget.userId),
+          stream: db.getFollowed(widget.userId),
           builder: (context, snapshot) {
             if (snapshot.hasError) print(snapshot.error);
             if (!snapshot.hasData) return Loading();
@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
             return ListView.builder(
               itemCount: usersId.length,
               itemBuilder: (context, index) => StreamBuilder(
-                  stream: getLastlyPosts(usersId[index]),
+                  stream: db.getLastlyPosts(usersId[index]),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) print(snapshot.error);
                     if (!snapshot.hasData) return Loading();

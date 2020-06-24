@@ -21,20 +21,20 @@ class _PostListButtonState
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: getPostFavourites(widget.userId,widget.postId),
+        stream: db.getPostFavourites(widget.userId,widget.postId),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return Loading();
           List<String> postList = snapshot.data;
           if (postList
-              .contains(configuration.getUserId()))
+              .contains(db.userId))
             return IconButton(
               icon: Icon(Icons.star),
               iconSize: 30,
               padding: EdgeInsets.all(0),
               onPressed: () {
                 setState(() {
-                  deletePostPathInFavourites(configuration.getUserId(), 'users/${widget.userId}/posts/${widget.postId}');
+                  db.deletePostPathInFavourites(db.userId, 'users/${widget.userId}/posts/${widget.postId}');
                 });
               });
 
@@ -44,7 +44,7 @@ class _PostListButtonState
               padding: EdgeInsets.all(0),
               onPressed: () {
                 setState(() {
-                  addPostPathInFavourites(configuration.getUserId(), 'users/${widget.userId}/posts/${widget.postId}');
+                  db.addPostPathInFavourites(db.userId, 'users/${widget.userId}/posts/${widget.postId}');
                 });
               });
         });

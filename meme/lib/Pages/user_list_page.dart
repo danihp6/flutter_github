@@ -24,7 +24,7 @@ class UserListPage extends StatelessWidget {
           itemCount: userListId.length,
           itemBuilder: (context, index) {
             return StreamBuilder(
-              stream: getUser(userListId[index]),
+              stream: db.getUser(userListId[index]),
               builder: (context, snapshot) {
                 if (snapshot.hasError) print(snapshot.error);
                 if (!snapshot.hasData) return Loading();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/auth.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/edit_profile_page.dart';
 import 'package:meme/Pages/user_list_page.dart';
@@ -6,9 +7,8 @@ import 'package:meme/Widgets/slide_left_route.dart';
 
 class UserPageHeader extends StatelessWidget {
   User user;
-  UserPageHeader({
-    @required this.user,
-  });
+  Function refresh;
+  UserPageHeader({@required this.user, this.refresh});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class UserPageHeader extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 40,
-                backgroundImage: NetworkImage(user.getAvatar()),
+                backgroundImage: user.getAvatar()!=''?NetworkImage(user.getAvatar()):null,
               ),
               SizedBox(
                 width: 10,
@@ -28,7 +28,8 @@ class UserPageHeader extends StatelessWidget {
               SizedBox(
                 width: 70,
                 child: RaisedButton(
-                  onPressed: () =>Navigator.push(context, SlideLeftRoute(page:EditProfilePage(user:user))),
+                  onPressed: () => Navigator.push(context,
+                      SlideLeftRoute(page: EditProfilePage(user: user))),
                   color: Colors.deepOrange,
                   textColor: Colors.white,
                   child: Text('Editar'),
@@ -47,7 +48,7 @@ class UserPageHeader extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     GestureDetector(
-                                          child: Column(
+                      child: Column(
                         children: [
                           Text('Seguidores'),
                           Text(
@@ -56,10 +57,15 @@ class UserPageHeader extends StatelessWidget {
                           )
                         ],
                       ),
-                      onTap: () => Navigator.push(context, SlideLeftRoute(page: UserListPage(title: 'Seguidores', userListId: user.getFollowers()))),
+                      onTap: () => Navigator.push(
+                          context,
+                          SlideLeftRoute(
+                              page: UserListPage(
+                                  title: 'Seguidores',
+                                  userListId: user.getFollowers()))),
                     ),
                     GestureDetector(
-                                          child: Column(
+                      child: Column(
                         children: [
                           Text('Seguidos'),
                           Text(
@@ -68,18 +74,24 @@ class UserPageHeader extends StatelessWidget {
                           )
                         ],
                       ),
-                      onTap: () => Navigator.push(context, SlideLeftRoute(page: UserListPage(title: 'Seguidos', userListId: user.getFollowed()))),
+                      onTap: () => Navigator.push(
+                          context,
+                          SlideLeftRoute(
+                              page: UserListPage(
+                                  title: 'Seguidos',
+                                  userListId: user.getFollowed()))),
                     ),
                     IconButton(
                         icon: Icon(Icons.settings),
                         iconSize: 30,
-                        onPressed: () {})
+                        onPressed: () {
+                          auth.signOut().then((_) => refresh());
+                        })
                   ],
                 ),
                 SizedBox(
                   height: 10,
                 ),
-              
                 SizedBox(
                   height: 10,
                 ),

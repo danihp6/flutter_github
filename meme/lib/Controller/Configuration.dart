@@ -1,20 +1,8 @@
 
 
 class Configuration {
-  static final Configuration _configuration = Configuration._internal();
-  bool _isShowedComments;
-  bool _isShowedTools;
-  String _userId;
-
-  factory Configuration() {
-    return _configuration;
-  }
-
-  Configuration._internal() {
-    this._isShowedComments = true;
-    this._isShowedTools = true;
-    this._userId = 'jeS78zVBNf5tcHfjAARi';
-  }
+  bool _isShowedComments = true;
+  bool _isShowedTools = true;
 
   getIsShowedComments() {
     return this._isShowedComments;
@@ -30,14 +18,6 @@ class Configuration {
 
   setIsShowedTools(isShowedTools) {
     this._isShowedTools = isShowedTools;
-  }
-
-  getUserId() {
-    return this._userId;
-  }
-
-  setUserId(userId) {
-    this._userId = userId;
   }
 }
 

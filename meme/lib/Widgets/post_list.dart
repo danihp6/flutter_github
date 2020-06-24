@@ -72,7 +72,7 @@ class _PostListWidgetState extends State<PostListWidget> {
                               Text('Eliminar categoria')
                             ],
                           ),
-                          value: (){if(_postList.getImageLocation()!='')deleteFile(_postList.getImageLocation()); deletePostList(configuration.getUserId(),_postList.getId());},
+                          value: (){if(_postList.getImageLocation()!='')mediaStorage.deleteFile(_postList.getImageLocation()); db.deletePostList(db.userId,_postList.getId());},
                         )
                       ];
                     },

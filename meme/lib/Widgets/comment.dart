@@ -31,7 +31,7 @@ class _CommentWidgetState extends State<CommentWidget> {
           child: Row(
             children: [
               StreamBuilder(
-                  stream: getUser(_comment.getAuthorId()),
+                  stream: db.getUser(_comment.getAuthorId()),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) print(snapshot.error);
                     if (!snapshot.hasData) return Loading();
@@ -40,7 +40,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                       children: [
                         CircleAvatar(
                           radius: 10,
-                          backgroundImage: NetworkImage(user.getAvatar()),
+                          backgroundImage: user.getAvatar()!=''?NetworkImage(user.getAvatar()):null,
                         ),
                         SizedBox(width: 10),
                         RichText(

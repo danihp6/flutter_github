@@ -6,8 +6,11 @@ import 'package:meme/Pages/notifications_page.dart';
 import 'package:meme/Pages/search_page.dart';
 import 'package:meme/Pages/user_page.dart';
 import 'package:meme/Widgets/upload_button.dart';
+import '../Controller/db.dart';
 
 class MainPage extends StatefulWidget {
+  Function refresh;
+  MainPage({this.refresh});
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -18,7 +21,7 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    String userId = configuration.getUserId();
+    String userId = db.userId;
     return DefaultTabController(
       length: 4,
       child: Scaffold(
@@ -29,6 +32,7 @@ class _MainPageState extends State<MainPage> {
           UserPage(
             userId: userId,
             activeAppBar: false,
+            refresh:widget.refresh
           ),
         ]),
         floatingActionButton: UploadButton(

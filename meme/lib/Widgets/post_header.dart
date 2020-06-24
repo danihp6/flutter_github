@@ -19,7 +19,7 @@ class PostHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: getUser(post.getAuthorId()),
+        stream: db.getUser(post.getAuthorId()),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return Loading();
@@ -28,7 +28,7 @@ class PostHeader extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundImage: NetworkImage(user.getAvatar()),
+                backgroundImage: user.getAvatar()!=''?NetworkImage(user.getAvatar()):null,
               ),
               SizedBox(width: 10),
               Text(
@@ -47,7 +47,7 @@ class PostHeader extends StatelessWidget {
                       width: 5,
                     ),
                     StreamBuilder(
-                        stream: getUser(configuration.getUserId()),
+                        stream: db.getUser(db.userId),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData)

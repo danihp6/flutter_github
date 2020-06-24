@@ -4,6 +4,7 @@ import 'package:meme/Controller/local_storage.dart';
 import 'package:meme/Controller/push_notification_provider.dart';
 import 'package:meme/Pages/camera_page.dart';
 import 'package:meme/Pages/main_page.dart';
+import 'package:meme/Pages/root_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
 void main() {
@@ -35,7 +36,7 @@ class _MyAppState extends State<MyApp> {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MainPage(),
+      home: RootPage(),
     );
   }
 }

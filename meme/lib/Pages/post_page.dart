@@ -22,7 +22,7 @@ class PostPage extends StatelessWidget {
         ),
         body: SingleChildScrollView(
                   child: StreamBuilder(
-              stream: getPost('users/$userId/posts/$postId'),
+              stream: db.getPost('users/$userId/posts/$postId'),
               builder: (context, snapshot) {
                 if (snapshot.hasError) print(snapshot.error);
                 if (!snapshot.hasData) return Loading();

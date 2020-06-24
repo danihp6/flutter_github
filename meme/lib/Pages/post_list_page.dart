@@ -50,7 +50,7 @@ class _PostListPageState extends State<PostListPage> {
             ],
           ),
           StreamBuilder(
-              stream: getPostsPathFromPostList(
+              stream: db.getPostsPathFromPostList(
                   _postList.getAuthorId(), _postList.getId()),
               builder: (context, snapshot) {
                 if (snapshot.hasError) print(snapshot.error);
@@ -62,7 +62,7 @@ class _PostListPageState extends State<PostListPage> {
                 return SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
                   return StreamBuilder(
-                      stream: getPost(postPaths[index]),
+                      stream: db.getPost(postPaths[index]),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) print(snapshot.error);
                         if (!snapshot.hasData)

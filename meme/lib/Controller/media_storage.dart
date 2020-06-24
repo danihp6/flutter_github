@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
 
+class MediaStorage{
+  
 final StorageReference ref =
     FirebaseStorage.instance.ref();
 
@@ -26,3 +28,8 @@ Future<Map<String, dynamic>> uploadAvatar(File file) async {
 Future<void> deleteFile(String path) {
   if(path!=null)ref.child(path).delete();
 }
+
+
+}
+
+MediaStorage mediaStorage = MediaStorage();

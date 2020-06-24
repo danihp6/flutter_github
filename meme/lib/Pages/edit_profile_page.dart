@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:meme/Controller/db.dart' as db;
+import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/media_storage.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/images_gallery_page.dart';
@@ -47,8 +47,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     editUser() {
       if(_file != null){
-        deleteFile(_user.getAvatarLocation());
-        uploadAvatar(_file).then((map) => db.editUser(_user.getId(), _userName, _description, map['media'],map['location']));
+        mediaStorage.deleteFile(_user.getAvatarLocation());
+        mediaStorage.uploadAvatar(_file).then((map) => db.editUser(_user.getId(), _userName, _description, map['media'],map['location']));
       }
       else db.editUser(_user.getId(), _userName, _description, _avatar,_avatarLocation);
       Navigator.pop(context);

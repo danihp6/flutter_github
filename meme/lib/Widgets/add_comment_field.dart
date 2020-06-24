@@ -28,10 +28,10 @@ class _AddCommentFieldState extends State<AddCommentField> {
   @override
   Widget build(BuildContext context) {
     void sendComment() {
-      newComment(
-          configuration.getUserId(),
+      db.newComment(
+          db.userId,
           widget.postId,
-          new Comment(text, <String>[], configuration.getUserId(),
+          new Comment(text, <String>[], db.userId,
               DateTime.now(), <String>[], 0));
       controller.clear();
       text = '';

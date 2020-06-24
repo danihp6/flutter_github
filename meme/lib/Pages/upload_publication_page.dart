@@ -25,10 +25,10 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
   Widget build(BuildContext context) {
     _file = widget.file;
     uploadPublication() {
-      uploadMedia(_file).then((map) => newPost(
-          configuration.getUserId(),
+      mediaStorage.uploadMedia(_file).then((map) => db.newPost(
+          db.userId,
           new Post(map['media'], _description, <String>[], DateTime.now(),
-              map['location'], configuration.getUserId(), keyWords)));
+              map['location'], db.userId, keyWords)));
       Navigator.pop(context);
       Navigator.pop(context);
     }

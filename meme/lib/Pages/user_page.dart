@@ -14,7 +14,8 @@ import 'package:meme/Widgets/user_page_header.dart';
 class UserPage extends StatefulWidget {
   String userId;
   bool activeAppBar;
-  UserPage({@required this.userId,this.activeAppBar=true});
+  Function refresh;
+  UserPage({@required this.userId,this.activeAppBar=true,this.refresh});
 
   @override
   _UserPageState createState() => _UserPageState();
@@ -45,8 +46,8 @@ class _UserPageState extends State<UserPage>
     }
 
     return SafeArea(
-      child: StreamBuilder(
-          stream: getUser(widget.userId),
+          child: StreamBuilder(
+          stream: db.getUser(widget.userId),
           builder: (context, snap) {
             if (snap.hasError) print(snap.error);
             if (!snap.hasData) return Loading();
@@ -61,7 +62,7 @@ class _UserPageState extends State<UserPage>
               ):null,
               body: NestedScrollView(
                 headerSliverBuilder: (context, _) => [
-                  SliverToBoxAdapter(child: UserPageHeader(user: user)),
+                  SliverToBoxAdapter(child: UserPageHeader(user: user,refresh:widget.refresh)),
                   SliverToBoxAdapter(
                     child: TabBar(
                       controller: tabController,
@@ -96,7 +97,7 @@ class _UserPageState extends State<UserPage>
                     physics: NeverScrollableScrollPhysics(),
                     children: [
                       StreamBuilder(
-                        stream: getPosts(user.getId()),
+                        stream: db.getPosts(user.getId()),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData) return Loading();
@@ -112,7 +113,7 @@ class _UserPageState extends State<UserPage>
                         },
                       ),
                       StreamBuilder(
-                        stream: getPostsPathFromFavourites(user.getId()),
+                        stream: db.getPostsPathFromFavourites(user.getId()),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData) return Loading();
@@ -123,7 +124,7 @@ class _UserPageState extends State<UserPage>
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
                               return StreamBuilder(
-                                  stream: getPost(postsId[index]),
+                                  stream: db.getPost(postsId[index]),
                                   builder: (context, snapshot) {
                                     if (snapshot.hasError)
                                       print(snapshot.error);
@@ -143,7 +144,7 @@ class _UserPageState extends State<UserPage>
                             Column(
                               children: [
                                 StreamBuilder(
-                                  stream: getPostLists(user.getId()),
+                                  stream: db.getPostLists(user.getId()),
                                   builder: (context, snapshot) {
                                     if (snapshot.hasError)
                                       print(snapshot.error);
