@@ -15,6 +15,7 @@ class UserListPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.deepOrange,
         title: Text(title),
       ),
       body: Padding(

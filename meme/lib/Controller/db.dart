@@ -197,3 +197,6 @@ Stream<List<Notification>> getNotifications(String userId) => firestore
 Future newNotification(String userId, Notification notification) => firestore
     .collection('users/$userId/notifications')
     .add(notification.toFirestore());
+
+Future deleteNotification(String userId, String notificationId) =>
+    firestore.document('users/$userId/notifications/$notificationId').delete();

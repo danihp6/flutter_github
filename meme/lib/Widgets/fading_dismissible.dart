@@ -5,12 +5,14 @@ import 'package:flutter/material.dart';
 class FadingDismissible extends StatefulWidget {
   Widget child;
   Function confirmDismiss;
+  Function onDismissed;
   DismissDirection direction;
   Key key;
   FadingDismissible(
       {@required this.key,
       @required this.child,
-      @required this.confirmDismiss,
+      this.confirmDismiss,
+      this.onDismissed,
       this.direction = DismissDirection.horizontal});
 
   @override
@@ -39,6 +41,7 @@ class _FadingDismissibleState extends State<FadingDismissible> {
   Widget build(BuildContext context) {
     return Dismissible(
       key: widget.key,
+      onDismissed: widget.onDismissed,
       confirmDismiss: widget.confirmDismiss,
       direction: widget.direction,
       child: StreamBuilder(
@@ -60,6 +63,15 @@ class _FadingDismissibleState extends State<FadingDismissible> {
             onPointerMove: (details) {
               if (details.position.dx < startPosition) {
                 var move = startPosition - details.position.dx;
+                move = 2 * move / MediaQuery.of(context).size.width;
+
+                opacity = 1 - move;
+                if(opacity<0)opacity=0;
+
+                controller.add(opacity);
+              }
+              if (details.position.dx > startPosition) {
+                var move = details.position.dx - startPosition;
                 move = 2 * move / MediaQuery.of(context).size.width;
 
                 opacity = 1 - move;

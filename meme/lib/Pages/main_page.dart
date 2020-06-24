@@ -25,7 +25,7 @@ class _MainPageState extends State<MainPage> {
         body: TabBarView(physics: NeverScrollableScrollPhysics(), children: [
           HomePage(userId:userId),
           SearchPage(),
-          NotificationsPage(),
+          NotificationsPage(userId: userId,),
           UserPage(
             userId: userId,
             activeAppBar: false,

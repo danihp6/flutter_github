@@ -1,13 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Notification {
+  String _id;
   String _title;
   String _body;
   String _sender;
   // String _receiver;
   String _post;
 
-  Notification(title, body, sender, post) {
+  Notification(id,title, body, sender, post) {
+    this._id = id;
     this._title = title;
     this._body = body;
     this._sender = sender;
@@ -16,11 +18,12 @@ class Notification {
   }
 
   Notification.fromFirestore(DocumentSnapshot doc)
-      : _title = doc.data['notification']['title'],
-        _body = doc.data['notification']['body'],
-        _sender = doc.data['data']['sender'],
+      : _id = doc.documentID,
+       _title = doc.data['title'],
+        _body = doc.data['body'],
+        _sender = doc.data['sender'],
         // _receiver = doc.data['receiver'],
-        _post = doc.data['data']['post'];
+        _post = doc.data['post'];
 
   Map<String, dynamic> toFirestore() => {
         'title': _title,
@@ -29,6 +32,10 @@ class Notification {
         // 'receiver': _receiver,
         'post': _post
       };
+
+String get id => this._id;
+
+  set id(id) => this._id = id;
 
   String get title => this._title;
 

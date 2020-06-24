@@ -20,14 +20,16 @@ class PostPage extends StatelessWidget {
             title: Text('Publicacion'),
           ),
         ),
-        body: StreamBuilder(
-            stream: getPost('users/$userId/posts/$postId'),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) print(snapshot.error);
-              if (!snapshot.hasData) return Loading();
-              Post post = snapshot.data;
-              return PostWidget(post: post,activeAlwaysShowedComments: true,);
-            }),
+        body: SingleChildScrollView(
+                  child: StreamBuilder(
+              stream: getPost('users/$userId/posts/$postId'),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) print(snapshot.error);
+                if (!snapshot.hasData) return Loading();
+                Post post = snapshot.data;
+                return PostWidget(post: post,activeAlwaysShowedComments: true,);
+              }),
+        ),
       ),
     );
   }

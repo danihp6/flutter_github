@@ -22,6 +22,7 @@ class _UploadButtonState extends State<UploadButton> {
     return _isShowedTools
         ? FadingDismissible(
           key: Key('uploadButton'),
+          direction: DismissDirection.endToStart,
             confirmDismiss: (direction) async {
               configuration.setIsShowedTools(false);
               setState(() {});

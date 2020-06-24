@@ -9,7 +9,7 @@ admin.initializeApp(functions.config().firebase);
 //  response.send("Hello from Firebase!");
 // });
 
-exports.onDeletePost = functions.firestore.document('users/{userId}/posts/{postId}').onDelete((snap, context) => {
+exports.onDeletePost = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onDelete((snap, context) => {
   var userId = context.params.userId
   var postId = context.params.postId
   var path = 'users/' + userId + '/posts/' + postId
@@ -158,32 +158,62 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
     .catch(reject);
 }
 
-exports.onNewPost = functions.firestore.document('users/{userId}/posts/{postId}').onCreate(async (snap, context) => {
+exports.onNewPost = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onCreate(async (snap, context) => {
   var userId = context.params.userId
   var postId = context.params.postId
 
-  var userName = snap.data()['userName']
+  var db = admin.firestore()
+  var ref = db.collection('users').doc(userId)
 
+  var userData = (await ref.get()).data()
+
+  var userName = userData['userName']
+
+  const notification = {
+      title: 'Nueva publicación',
+      body: `${userName} ha subido una nueva publicación`,
+      post:postId,
+      sender:userId
+  };
+
+  var followers = userData['followers']
+
+  followers.forEach(id => {
+    ref = db.collection('users').doc(id)
+    ref.collection('notifications').add(notification)
+  });
+  
+})
+
+exports.onCreateNotification = functions.region('europe-west2').firestore.document('users/{userId}/notifications/{notificationId}').onCreate(async (snap, context) => {
+  var notification = snap.data()
+
+  var sender = notification['sender']
+  var post = notification['post']
+
+  var db = admin.firestore()
+  var ref = db.collection('users').doc(sender)
+
+  var userName = (await ref.get()).data()['userName']
+  
   const payload = {
     notification: {
       title: 'Nueva publicación',
       body: `${userName} ha subido una nueva publicación`,
     },
     data:{
-      post:postId,
-      sender:userId
+      post:post,
+      sender:sender
     }
   };
 
-  var db = admin.firestore()
-  var ref = db.collection('users').doc(userId)
+  var userId = context.params.userId
 
-  ref.collection('notifications').add(payload)
+  ref = db.collection('users').doc(userId)
 
-  // var query = ref.orderBy('__name__')
-  // var tokens
+  var tokens = (await ref.get()).data()['tokens']
 
-  // var token = 'fKpAghNZSPuyTSsXNlp3Ex:APA91bF4cIS2EsUlVIbBngRLeFyFzF4cnPwBN861SBazN3XbP4Hz2lLEkaZT3MGZh7e4QR751D_ieUTJTG-9w3xXgMmn2rhoihWC5tShcLF9IBy-ZFQEUsmnTjjWQT1qbF0gsERA5kfi'
-
-  // const response = await admin.messaging().sendToDevice(token, payload);
+  tokens.forEach(async token =>  {
+    await admin.messaging().sendToDevice(token, payload);
+  });
 })

@@ -24,5 +24,5 @@ Future<Map<String, dynamic>> uploadAvatar(File file) async {
 }
 
 Future<void> deleteFile(String path) {
-  ref.child(path).delete();
+  if(path!=null)ref.child(path).delete();
 }

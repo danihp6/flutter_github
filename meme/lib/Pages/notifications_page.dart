@@ -8,10 +8,11 @@ import '../Models/Notification.dart' as mynotification;
 
 class NotificationsPage extends StatelessWidget {
   String userId;
-  NotificationsPage({this.userId});
+  NotificationsPage({@required this.userId});
   
   @override
   Widget build(BuildContext context) {
+                print(userId);
     return Scaffold(
       body: StreamBuilder(
           stream: getNotifications(userId),
