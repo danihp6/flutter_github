@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/media_storage.dart';
 import 'package:meme/Models/User.dart';
-import 'package:meme/Pages/images_gallery_page.dart';
+import 'gallery_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
+import 'package:meme/Widgets/user_avatar.dart';
 
 class EditProfilePage extends StatefulWidget {
   User user;
@@ -72,11 +73,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
           child: Column(
             children: [
               GestureDetector(
-                child: CircleAvatar(
-                  backgroundImage: _file == null?NetworkImage(_avatar):FileImage(_file),
-                  radius: 40,
-                ),
-                onTap: ()=>Navigator.push(context, SlideLeftRoute(page:ImagesGalleryPage(onTap: editAvatar))),
+                child: SizedBox(width: 90,height:90,child: UserAvatar(url: _avatar,file: _file,)),
+                onTap: ()=>Navigator.push(context, SlideLeftRoute(page:GalleryPage(onTap: editAvatar))),
               ),
               SizedBox(
                 height: 10,

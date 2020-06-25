@@ -12,13 +12,10 @@ class ThumbnailVideoWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Future<File> genThumbnailFile() async {
       final thumbnail = await VideoThumbnail.thumbnailFile(
-          video: video.path,
-          // thumbnailPath: _tempDir,
-          imageFormat: ImageFormat.JPEG,
-          //maxHeightOrWidth: 0,
-          maxHeight: 3,
-          maxWidth: 2,
-          quality: 10);
+        video: video.path,
+        imageFormat: ImageFormat.WEBP,
+        quality: 25,
+      );
       return File(thumbnail);
     }
 
@@ -28,7 +25,7 @@ class ThumbnailVideoWidget extends StatelessWidget {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return Loading();
           File file = snapshot.data;
-          return Image.file(file);
+          return Image.file(file, fit: BoxFit.cover);
         });
   }
 }

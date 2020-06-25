@@ -8,7 +8,7 @@ import 'package:meme/Models/PostList.dart';
 import '../Widgets/tag_selector.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
-import 'images_gallery_page.dart';
+import 'gallery_page.dart';
 
 class NewPostListPage extends StatefulWidget {
   @override
@@ -92,7 +92,7 @@ class _NewPostListPageState extends State<NewPostListPage> {
                 onTap: () => Navigator.push(
                     context,
                     SlideLeftRoute(
-                        page: ImagesGalleryPage(onTap: selectImage))),
+                        page: GalleryPage(onTap: selectImage))),
               ),
               Text('Selecciona una imagen'),
               SizedBox(height: 30),

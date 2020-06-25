@@ -6,16 +6,23 @@ import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/thumbnail_video.dart';
 import 'package:meme/Widgets/video_player.dart';
 
-class ImagesGalleryPage extends StatelessWidget {
+class GalleryPage extends StatelessWidget {
   Function onTap;
-  ImagesGalleryPage({@required this.onTap});
+  GalleryPage({@required this.onTap});
+
+   MediaPage imagePage;
+   MediaPage videoPage;
 
   Future<List<Media>> getMediaGalerry() async {
-    final List collections = await MediaGallery.listMediaCollections(
+    final List<MediaCollection> collections = await MediaGallery.listMediaCollections(
       mediaTypes: [MediaType.image, MediaType.video],
     );
-    final MediaPage imagePage = await collections.first.getMedias(
+    imagePage = await collections.first.getMedias(
       mediaType: MediaType.image,
+      take: 50,
+    );
+    videoPage = await collections.first.getMedias(
+      mediaType: MediaType.video,
       take: 50,
     );
     return imagePage.items;

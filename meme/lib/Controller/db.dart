@@ -26,7 +26,7 @@ class DataBase {
         .collection('users')
         .where('email', isEqualTo: email)
         .getDocuments();
-    return query.documents[0].documentID;
+    return query.documents.first.documentID;
   }
 
   Future editUser(String userId, String name, String description, String avatar,
