@@ -112,7 +112,7 @@ class _LogInPageState extends State<LogInPage> {
                                 },
                                 validator: (value) {
                                   if (value.isEmpty)
-                                    return 'Este campo no puede estar vacio';
+                                    return 'El email no puede estar vacio';
                                   return null;
                                 },
                                 controller: _emailController,
@@ -154,7 +154,7 @@ class _LogInPageState extends State<LogInPage> {
                                     },
                                     validator: (value) {
                                       if (value.isEmpty)
-                                        return 'El email no puede estar vacio';
+                                        return 'La contraseña no puede estar vacia';
                                       return null;
                                     },
                                   ),

@@ -5,6 +5,7 @@ import 'package:meme/Models/User.dart';
 class Post {
   String _id;
   String _media;
+  String _mediaType;
   String _description;
   List<String> _favourites;
   DateTime _dateTime;
@@ -12,9 +13,10 @@ class Post {
   String _authorId;
   List<String> _keyWords;
 
-  Post(media, description, favourites, dateTime, mediaLocation, authorId,
+  Post(media, description,mediaType, favourites, dateTime, mediaLocation, authorId,
       keyWords) {
     this._media = media;
+    this._mediaType = mediaType;
     this._description = description;
     this._favourites = favourites;
     this._dateTime = dateTime;
@@ -26,6 +28,7 @@ class Post {
   Post.fromFirestore(DocumentSnapshot doc)
       : _id = doc.documentID,
         _media = doc.data['media'],
+        _mediaType = doc.data['mediaType'],
         _description = doc.data['description'],
         _favourites = List<String>.from(doc.data['favourites']),
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
@@ -35,6 +38,7 @@ class Post {
 
   Map<String, dynamic> toFirestore() => {
         'media': _media,
+        'mediaType':_mediaType,
         'description': _description,
         'favourites': _favourites,
         'dateTime': _dateTime,
@@ -56,6 +60,14 @@ class Post {
 
   void setMedia(media) {
     this._media = media;
+  }
+
+  String getMediaType() {
+    return this._mediaType;
+  }
+
+  void setMediaType(mediaType) {
+    this._mediaType = mediaType;
   }
 
   String getDescription() {

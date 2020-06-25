@@ -8,6 +8,7 @@ import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/favourite_button.dart';
 import 'package:meme/Widgets/post_menu.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
+import 'package:meme/Widgets/user_avatar.dart';
 
 import 'loading.dart';
 
@@ -26,10 +27,7 @@ class PostHeader extends StatelessWidget {
           User user = snapshot.data;
           return Row(
             children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundImage: user.getAvatar()!=''?NetworkImage(user.getAvatar()):null,
-              ),
+              UserAvatar(url: user.getAvatar()),
               SizedBox(width: 10),
               Text(
                 user.getUserName(),

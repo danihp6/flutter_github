@@ -3,6 +3,7 @@ import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Widgets/user_avatar.dart';
 
 class AddCommentField extends StatefulWidget {
   User user;
@@ -43,10 +44,7 @@ class _AddCommentFieldState extends State<AddCommentField> {
         SizedBox(
           width: 10,
         ),
-        CircleAvatar(
-          radius: 15,
-          backgroundImage: NetworkImage(widget.user.getAvatar()),
-        ),
+        SizedBox(height:30,width:30,child: UserAvatar(url: widget.user.getAvatar())),
         SizedBox(width: 10),
         Expanded(
           child: TextField(

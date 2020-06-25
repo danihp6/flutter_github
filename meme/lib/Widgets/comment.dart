@@ -4,13 +4,17 @@ import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/loading.dart';
+import 'package:meme/Widgets/user_avatar.dart';
 import '../Controller/db.dart';
 
 class CommentWidget extends StatefulWidget {
   Comment comment;
   bool activeInnerComments;
   bool activeLikesAndTime;
-  CommentWidget({@required this.comment,  this.activeInnerComments = true , this.activeLikesAndTime = true});
+  CommentWidget(
+      {@required this.comment,
+      this.activeInnerComments = true,
+      this.activeLikesAndTime = true});
 
   bool isShowedInnedComments = false;
 
@@ -19,7 +23,6 @@ class CommentWidget extends StatefulWidget {
 }
 
 class _CommentWidgetState extends State<CommentWidget> {
-  
   @override
   Widget build(BuildContext context) {
     Comment _comment = widget.comment;
@@ -38,10 +41,10 @@ class _CommentWidgetState extends State<CommentWidget> {
                     User user = snapshot.data;
                     return Row(
                       children: [
-                        CircleAvatar(
-                          radius: 10,
-                          backgroundImage: user.getAvatar()!=''?NetworkImage(user.getAvatar()):null,
-                        ),
+                        SizedBox(
+                            width: 30,
+                            height: 30,
+                            child: UserAvatar(url: user.getAvatar())),
                         SizedBox(width: 10),
                         RichText(
                           text: TextSpan(
@@ -130,13 +133,13 @@ class _CommentWidgetState extends State<CommentWidget> {
           //     );
           //   },
           // ),
-        if (_isShowedInnedComments && _comment.getLevel() == 0)
-          Divider(
-            thickness: 1,
-            indent: 50,
-            endIndent: 50,
-            height: 8,
-          )
+          if (_isShowedInnedComments && _comment.getLevel() == 0)
+            Divider(
+              thickness: 1,
+              indent: 50,
+              endIndent: 50,
+              height: 8,
+            )
       ],
     );
   }

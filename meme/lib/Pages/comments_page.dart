@@ -6,6 +6,7 @@ import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/add_comment_field.dart';
 import 'package:meme/Widgets/comment.dart';
 import 'package:meme/Widgets/loading.dart';
+import 'package:meme/Widgets/user_avatar.dart';
 import '../Models/Comment.dart';
 
 class CommentsPage extends StatelessWidget {
@@ -28,44 +29,41 @@ class CommentsPage extends StatelessWidget {
                 child: Column(
                   children: [
                     StreamBuilder(
-                            stream: db.getUser(post.getAuthorId()),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasError) print(snapshot.error);
-                              if (!snapshot.hasData)
-                                return Loading();
-                              User user = snapshot.data;
-                              return Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 10,
-                                    backgroundImage:
-                                        NetworkImage(user.getAvatar()),
-                                  ),
-                                  SizedBox(width: 10),
-                                  RichText(
-                                    text: TextSpan(
-                                      style: DefaultTextStyle.of(context).style,
-                                      children: [
-                                        TextSpan(
-                                            text: user.getUserName() + ' ',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold)),
-                                        TextSpan(
-                                            text: post.getDescription()),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              );
+                      stream: db.getUser(post.getAuthorId()),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) print(snapshot.error);
+                        if (!snapshot.hasData) return Loading();
+                        User user = snapshot.data;
+                        return Row(
+                      children: [
+                        SizedBox(
+                            width: 30,
+                            height: 30,
+                            child: UserAvatar(url: user.getAvatar())),
+                        SizedBox(width: 10),
+                        RichText(
+                          text: TextSpan(
+                            style: DefaultTextStyle.of(context).style,
+                            children: [
+                              TextSpan(
+                                  text: user.getUserName() + ' ',
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(text: post.getDescription()),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
                       },
                     ),
                     Divider(),
                     StreamBuilder(
-                        stream: db.getComments(post.getAuthorId(),post.getId()),
+                        stream:
+                            db.getComments(post.getAuthorId(), post.getId()),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
-                          if (!snapshot.hasData)
-                            return Loading();
+                          if (!snapshot.hasData) return Loading();
                           List<Comment> parentComments = snapshot.data;
                           return ListView.builder(
                               shrinkWrap: true,

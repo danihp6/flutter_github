@@ -4,12 +4,16 @@ import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Widgets/post_description.dart';
 import 'package:meme/Widgets/post_header.dart';
+import 'package:meme/Widgets/video_player.dart';
 
 class PostWidget extends StatelessWidget {
   Post post;
   PostList postList;
   bool activeAlwaysShowedComments;
-  PostWidget({@required this.post,this.postList,this.activeAlwaysShowedComments=false});
+  PostWidget(
+      {@required this.post,
+      this.postList,
+      this.activeAlwaysShowedComments = false});
 
   @override
   Widget build(BuildContext context) {
@@ -17,23 +21,28 @@ class PostWidget extends StatelessWidget {
 
     return Container(
       child: Column(children: [
-        if(_isShowedComments || activeAlwaysShowedComments)
-        Padding(
-          padding: const EdgeInsets.only(left:8),
-          child: SizedBox(height: 50,
-            child: PostHeader(post: post,postList: postList,)),
-        ),
-        Image.network(
-          post.getMedia(),
-          fit: BoxFit.contain,
-        ),
         if (_isShowedComments || activeAlwaysShowedComments)
           Padding(
-            padding: const EdgeInsets.only(right: 15,left:15,top: 10),
+            padding: const EdgeInsets.only(left: 8),
+            child: SizedBox(
+                height: 50,
+                child: PostHeader(
+                  post: post,
+                  postList: postList,
+                )),
+          ),
+        post.getMediaType() == 'image'
+            ? Image.network(
+                post.getMedia(),
+                fit: BoxFit.contain,
+              )
+            : VideoPlayerWidget(url: post.getMedia()),
+        if (_isShowedComments || activeAlwaysShowedComments)
+          Padding(
+            padding: const EdgeInsets.only(right: 15, left: 15, top: 10),
             child: PostDescription(post: post),
           )
       ]),
     );
   }
 }
-

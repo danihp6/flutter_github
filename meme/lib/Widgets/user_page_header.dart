@@ -8,6 +8,7 @@ import 'package:meme/Pages/followers_list_page.dart';
 import 'package:meme/Widgets/edit_profile_button.dart';
 import 'package:meme/Widgets/follow_button.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
+import 'package:meme/Widgets/user_avatar.dart';
 
 class UserPageHeader extends StatelessWidget {
   User user;
@@ -22,17 +23,15 @@ class UserPageHeader extends StatelessWidget {
         children: [
           Column(
             children: [
-              CircleAvatar(
-                radius: 40,
-                backgroundImage: user.getAvatar() != ''
-                    ? NetworkImage(user.getAvatar())
-                    : null,
-              ),
+              SizedBox(
+                height: 65,
+                width: 65,
+                child: UserAvatar(url: user.getAvatar())),
               SizedBox(
                 width: 10,
               ),
               SizedBox(
-                width: 70,
+                width: 100,
                 child: user.getId()==db.userId? EditProfileButton(user: user,):FollowButton(userId: user.getId()),
               )
             ],

@@ -42,7 +42,7 @@ class FollowersListPage extends StatelessWidget {
                           GestureDetector(
                             child: Row(
                               children: [
-                                UserAvatar(url: followerUser.getId()),
+                                UserAvatar(url: followerUser.getAvatar()),
                                 SizedBox(
                                   width: 10,
                                 ),

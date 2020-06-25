@@ -15,7 +15,7 @@ class UserPage extends StatefulWidget {
   String userId;
   bool activeAppBar;
   Function refresh;
-  UserPage({@required this.userId,this.activeAppBar=true,this.refresh});
+  UserPage({@required this.userId, this.activeAppBar = true, this.refresh});
 
   @override
   _UserPageState createState() => _UserPageState();
@@ -46,23 +46,27 @@ class _UserPageState extends State<UserPage>
     }
 
     return SafeArea(
-          child: StreamBuilder(
+      child: StreamBuilder(
           stream: db.getUser(widget.userId),
           builder: (context, snap) {
             if (snap.hasError) print(snap.error);
             if (!snap.hasData) return Loading();
             User user = snap.data;
             return Scaffold(
-              appBar:widget.activeAppBar? PreferredSize(
-                preferredSize: Size.fromHeight(40),
-                child: AppBar(
-                  backgroundColor: Colors.deepOrange,
-                  title: Text(user.getUserName()),
-                ),
-              ):null,
+              appBar: widget.activeAppBar
+                  ? PreferredSize(
+                      preferredSize: Size.fromHeight(40),
+                      child: AppBar(
+                        backgroundColor: Colors.deepOrange,
+                        title: Text(user.getUserName()),
+                      ),
+                    )
+                  : null,
               body: NestedScrollView(
                 headerSliverBuilder: (context, _) => [
-                  SliverToBoxAdapter(child: UserPageHeader(user: user,refresh:widget.refresh)),
+                  SliverToBoxAdapter(
+                      child:
+                          UserPageHeader(user: user, refresh: widget.refresh)),
                   SliverToBoxAdapter(
                     child: TabBar(
                       controller: tabController,
@@ -102,6 +106,8 @@ class _UserPageState extends State<UserPage>
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData) return Loading();
                           List<Post> posts = snapshot.data;
+                          if (posts.length == 0)
+                            return Center(child: Text('Usuario sin publicaciones'));
                           return ListView.builder(
                             shrinkWrap: true,
                             itemCount: posts.length,
@@ -118,6 +124,8 @@ class _UserPageState extends State<UserPage>
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData) return Loading();
                           List<String> postsId = snapshot.data;
+                          if (postsId.length == 0)
+                            return Center(child: Text('Usuario sin favoritos'));
                           return ListView.builder(
                             itemCount: postsId.length,
                             shrinkWrap: true,
@@ -140,33 +148,36 @@ class _UserPageState extends State<UserPage>
                         padding: const EdgeInsets.only(left: 8, right: 8),
                         child: Column(
                           children: [
-                            NewPostListButton(),
-                            Column(
-                              children: [
-                                StreamBuilder(
-                                  stream: db.getPostLists(user.getId()),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasError)
-                                      print(snapshot.error);
-                                    if (!snapshot.hasData) return Loading();
-                                    List<PostList> postlists = snapshot.data;
-                                    return ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount: postlists.length,
-                                      physics: NeverScrollableScrollPhysics(),
-                                      itemBuilder: (context, index) {
-                                        return PostListWidget(
-                                          postList: postlists[index],
-                                          onTap: () {
-                                            postList = postlists[index];
-                                            goToPostList();
-                                          },
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                              ],
+                            user.getId() == db.userId
+                                ? NewPostListButton()
+                                : Container(),
+                            Expanded(
+                              child: StreamBuilder(
+                                stream: db.getPostLists(user.getId()),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasError)
+                                    print(snapshot.error);
+                                  if (!snapshot.hasData) return Loading();
+                                  List<PostList> postlists = snapshot.data;
+                                  if (postlists.length == 0)
+                                    return Center(
+                                        child: Text('Usuario sin listas'));
+                                  return ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: postlists.length,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      return PostListWidget(
+                                        postList: postlists[index],
+                                        onTap: () {
+                                          postList = postlists[index];
+                                          goToPostList();
+                                        },
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                             )
                           ],
                         ),
