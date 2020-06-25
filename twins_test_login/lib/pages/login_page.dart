@@ -37,9 +37,7 @@ class _LoginPageState extends State<LoginPage> {
     if (validateAndSave()) {
       print(_formType.toString());
       try {
-        String userId = _formType == FormType.login
-            ? await widget.auth.signIn(_email, _password)
-            : await widget.auth.createUser(_email, _password);
+        String userId = await widget.auth.signIn(_email, _password);
         setState(() {
           _authHint = 'Signed In\n\nUser id: $userId';
         });

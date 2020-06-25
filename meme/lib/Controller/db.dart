@@ -64,6 +64,14 @@ class DataBase {
     return query.documents.length > 0;
   }
 
+  Future follow(String userId,String followedId)=> _firestore.document('users/$userId').updateData({
+    'followed': FieldValue.arrayUnion([followedId])
+  });
+
+  Future unfollow(String userId,String unfollowedId)=> _firestore.document('users/$userId').updateData({
+    'followed': FieldValue.arrayRemove([unfollowedId])
+  });
+
 //---------------POST----------------//
 
   Stream<Post> getPost(String postPath) => _firestore

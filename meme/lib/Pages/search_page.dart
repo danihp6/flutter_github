@@ -4,10 +4,12 @@ import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/post_list_page.dart';
+import 'package:meme/Widgets/follow_button.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/post.dart';
 import 'package:meme/Widgets/post_list.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
+import 'package:meme/Widgets/user_avatar.dart';
 import '../Controller/db.dart';
 
 class SearchPage extends StatefulWidget {
@@ -59,7 +61,7 @@ class _SearchPageState extends State<SearchPage>
     }
 
     return SafeArea(
-          child: Scaffold(
+      child: Scaffold(
         body: Column(
           children: [
             Expanded(
@@ -76,20 +78,25 @@ class _SearchPageState extends State<SearchPage>
                     onItemFound: (item, index) {
                       if (typeSearched == 'users')
                         return Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
+                          padding: const EdgeInsets.only(left: 8.0,right:8),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundImage: NetworkImage(item.getAvatar()),
+                              Row(
+                                children: [
+                                  UserAvatar(
+                                    url: item.getAvatar(),
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    item.getUserName(),
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ],
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Text(
-                                item.getUserName(),
-                                style: TextStyle(fontSize: 16),
-                              )
+                              FollowButton(userId: item.getId())
                             ],
                           ),
                         );

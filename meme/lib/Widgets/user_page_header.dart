@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/auth.dart';
+import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/edit_profile_page.dart';
-import 'package:meme/Pages/user_list_page.dart';
+import 'package:meme/Pages/followed_list_page.dart';
+import 'package:meme/Pages/followers_list_page.dart';
+import 'package:meme/Widgets/edit_profile_button.dart';
+import 'package:meme/Widgets/follow_button.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
 class UserPageHeader extends StatelessWidget {
@@ -20,23 +24,16 @@ class UserPageHeader extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 40,
-                backgroundImage: user.getAvatar()!=''?NetworkImage(user.getAvatar()):null,
+                backgroundImage: user.getAvatar() != ''
+                    ? NetworkImage(user.getAvatar())
+                    : null,
               ),
               SizedBox(
                 width: 10,
               ),
               SizedBox(
                 width: 70,
-                child: RaisedButton(
-                  onPressed: () => Navigator.push(context,
-                      SlideLeftRoute(page: EditProfilePage(user: user))),
-                  color: Colors.deepOrange,
-                  textColor: Colors.white,
-                  child: Text('Editar'),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                  ),
-                ),
+                child: user.getId()==db.userId? EditProfileButton(user: user,):FollowButton(userId: user.getId()),
               )
             ],
           ),
@@ -60,9 +57,7 @@ class UserPageHeader extends StatelessWidget {
                       onTap: () => Navigator.push(
                           context,
                           SlideLeftRoute(
-                              page: UserListPage(
-                                  title: 'Seguidores',
-                                  userListId: user.getFollowers()))),
+                              page: FollowersListPage(userId: user.getId()))),
                     ),
                     GestureDetector(
                       child: Column(
@@ -77,9 +72,7 @@ class UserPageHeader extends StatelessWidget {
                       onTap: () => Navigator.push(
                           context,
                           SlideLeftRoute(
-                              page: UserListPage(
-                                  title: 'Seguidos',
-                                  userListId: user.getFollowed()))),
+                              page: FollowedListPage(userId: user.getId()))),
                     ),
                     IconButton(
                         icon: Icon(Icons.settings),
@@ -113,3 +106,4 @@ class UserPageHeader extends StatelessWidget {
     );
   }
 }
+
