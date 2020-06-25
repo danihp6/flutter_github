@@ -23,10 +23,11 @@ class Auth implements BaseAuth {
 
   Future<AuthStatus> initAuth() async {
     FirebaseUser user = await _firebaseAuth.currentUser();
-    if(user != null){
+    if (user != null) {
       this._authStatus = AuthStatus.signedIn;
       db.userId = await db.getUserByEmail(user.email);
-    } else this._authStatus = AuthStatus.notSignedIn;
+    } else
+      this._authStatus = AuthStatus.notSignedIn;
     return this._authStatus;
   }
 

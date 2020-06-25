@@ -59,6 +59,11 @@ class DataBase {
   Future newUser(User user) =>
       _firestore.collection('users').add(user.toFirestore());
 
+  Future<bool> userNameExists(String userName) async{
+    QuerySnapshot query = await _firestore.collection('users').where('userName',isEqualTo: userName).getDocuments();
+    return query.documents.length > 0;
+  }
+
 //---------------POST----------------//
 
   Stream<Post> getPost(String postPath) => _firestore

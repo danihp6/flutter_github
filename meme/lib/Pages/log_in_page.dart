@@ -15,6 +15,25 @@ class LogInPage extends StatefulWidget {
 class _LogInPageState extends State<LogInPage> {
   String _email = '';
   String _password = '';
+  final _formKey = GlobalKey<FormState>();
+  String _emailError = '';
+  String _passwordError = '';
+  TextEditingController _emailController;
+  TextEditingController _passwordController;
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,98 +75,172 @@ class _LogInPageState extends State<LogInPage> {
               ),
               Expanded(
                 flex: 2,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 60, right: 60),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(20)),
-                                  labelText: 'email',
-                                  prefixIcon: Icon(Icons.email)),
-                              onChanged: (value) => _email = value,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 50, right: 50),
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    labelText: 'email',
+                                    prefixIcon: Icon(Icons.email),
+                                    suffixIcon: _emailController.text.length > 0
+                                        ? IconButton(
+                                            icon: Icon(Icons.clear),
+                                            onPressed: () {
+                                              setState(() {
+                                                _emailError = '';
+                                                _emailController.clear();
+                                              });
+                                            })
+                                        : null,
+                                    errorText:
+                                        _emailError != '' ? _emailError : null),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _email = value;
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty)
+                                    return 'Este campo no puede estar vacio';
+                                  return null;
+                                },
+                                controller: _emailController,
+                              ),
                             ),
-                          ),
-                          Column(
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 60, right: 60),
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      labelText: 'contraseña',
-                                      prefixIcon: Icon(Icons.lock)),
-                                  obscureText: true,
-                                  onChanged: (value) => _password = value,
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 50, right: 50),
+                                  child: TextFormField(
+                                    controller: _passwordController,
+                                    decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20)),
+                                        labelText: 'contraseña',
+                                        prefixIcon: Icon(Icons.lock),
+                                        suffixIcon:
+                                            _passwordController.text.length > 0
+                                                ? IconButton(
+                                                    icon: Icon(Icons.clear),
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        _passwordError = '';
+                                                        _passwordController
+                                                            .clear();
+                                                      });
+                                                    })
+                                                : null,
+                                        errorText: _passwordError != ''
+                                            ? _passwordError
+                                            : null),
+                                    obscureText: true,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _password = value;
+                                      });
+                                    },
+                                    validator: (value) {
+                                      if (value.isEmpty)
+                                        return 'El email no puede estar vacio';
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                FlatButton(
+                                    onPressed: () {},
+                                    child: Text(
+                                      'Has olvidado tu contraseña?',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.blue[600]),
+                                    ))
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            RaisedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState.validate()) {
+                                  try {
+                                    String userId =
+                                        await auth.signIn(_email, _password);
+                                    if (userId != null) {
+                                      
+                                      setState(() {
+                                        _emailError = '';
+                                        _passwordError = '';
+                                      });
+                                      widget.refresh();
+                                    }
+                                  } catch (error) {
+                                    showError(error);
+                                  }
+                                }
+                              },
+                              color: Colors.deepOrange,
+                              textColor: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Text(
+                                  'Iniciar sesion',
+                                  style: TextStyle(fontSize: 30),
                                 ),
                               ),
-                              FlatButton(
-                                  onPressed: () {},
-                                  child: Text(
-                                    'Has olvidado tu contraseña?',
-                                    style: TextStyle(
-                                        fontSize: 16, color: Colors.blue[600]),
-                                  ))
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          RaisedButton(
-                            onPressed: () { auth.signIn(_email, _password).then((_) => widget.refresh());},
-                            color: Colors.deepOrange,
-                            textColor: Colors.white,
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'o iniciar sesion con',
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                GestureDetector(
+                                  child: SizedBox(
+                                      height: 40,
+                                      child: Image.asset(
+                                          'assets/images/google.png')),
+                                  onTap: () {},
+                                )
+                              ],
+                            ),
+                            FlatButton(
+                              onPressed: () => Navigator.push(
+                                  context,
+                                  SlideLeftRoute(
+                                      page:
+                                          SignInPage(refresh: widget.refresh))),
                               child: Text(
-                                'Iniciar sesion',
-                                style: TextStyle(fontSize: 30),
+                                'Registrarse',
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.blue[600]),
                               ),
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'o iniciar sesion con',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              GestureDetector(
-                                child: SizedBox(
-                                    height: 40,
-                                    child: Image.asset(
-                                        'assets/images/google.png')),
-                                onTap: () {},
-                              )
-                            ],
-                          ),
-                          FlatButton(
-                            onPressed: ()=>Navigator.push(context, SlideLeftRoute(page: SignInPage(refresh:widget.refresh))),
-                            child: Text(
-                              'Registrarse',
-                              style: TextStyle(
-                                  fontSize: 16, color: Colors.blue[600]),
-                            ),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               )
             ],
@@ -155,5 +248,33 @@ class _LogInPageState extends State<LogInPage> {
         ),
       ),
     );
+  }
+
+
+  void showError(error) {
+    return setState(() {
+      _emailError = '';
+      _passwordError = '';
+      switch (error.code) {
+        case 'ERROR_INVALID_EMAIL':
+          _emailError = 'Email incorrecto';
+          break;
+        case 'ERROR_WRONG_PASSWORD':
+          _passwordError = 'Contraseña incorrecta';
+          break;
+        case 'ERROR_USER_NOT_FOUND':
+          _emailError = 'Email no registrado, porfavor registrate';
+          break;
+        case 'ERROR_USER_DISABLED':
+          _emailError = 'Usuario deshabilitado, consulte con ...';
+          break;
+        case 'ERROR_TOO_MANY_REQUESTS':
+          _emailError = 'Demasiados intentos, intentelo más tarde';
+          break;
+        case 'ERROR_OPERATION_NOT_ALLOWED':
+          _email = 'Email no permitido';
+          break;
+      }
+    });
   }
 }
