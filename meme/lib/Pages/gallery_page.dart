@@ -2,19 +2,29 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:media_gallery/media_gallery.dart';
+import 'package:meme/Controller/image_functions.dart';
+import 'package:meme/Pages/upload_publication_page.dart';
 import 'package:meme/Widgets/loading.dart';
+import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/thumbnail_video.dart';
 import 'package:meme/Widgets/video_player.dart';
 
-class GalleryPage extends StatelessWidget {
+class GalleryPage extends StatefulWidget {
   Function onTap;
-  GalleryPage({@required this.onTap});
+  String mediaType;
+  GalleryPage({@required this.onTap,this.mediaType = 'image'});
 
-   MediaPage imagePage;
-   MediaPage videoPage;
+  @override
+  _GalleryPageState createState() => _GalleryPageState();
+}
 
-  Future<List<Media>> getMediaGalerry() async {
-    final List<MediaCollection> collections = await MediaGallery.listMediaCollections(
+class _GalleryPageState extends State<GalleryPage> {
+  MediaPage imagePage;
+  MediaPage videoPage;
+
+  Future getMediaGallery() async {
+    final List<MediaCollection> collections =
+        await MediaGallery.listMediaCollections(
       mediaTypes: [MediaType.image, MediaType.video],
     );
     imagePage = await collections.first.getMedias(
@@ -25,43 +35,50 @@ class GalleryPage extends StatelessWidget {
       mediaType: MediaType.video,
       take: 50,
     );
-    return imagePage.items;
+  }
+
+  @override
+  void initState() {
+    getMediaGallery().then((_) {setState(() {
+      
+    });});
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    List<Media> medias = widget.mediaType=='image'? imagePage.items:videoPage.items;
     return Scaffold(
-      body: FutureBuilder(
-          future: getMediaGalerry(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) print(snapshot.error);
-            if (!snapshot.hasData) return Loading();
-            List<Media> mediaList = snapshot.data;
-            return GridView.builder(
-              itemCount: mediaList.length,
-              gridDelegate:
-                  SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
-              itemBuilder: (context, index) {
-                return FutureBuilder(
-                    future: mediaList[index].getFile(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) print(snapshot.error);
-                      if (!snapshot.hasData) return Loading();
-                      File file = snapshot.data;
-                      return Padding(
-                        padding: const EdgeInsets.all(1),
-                        child: SizedBox(
-                            width: 50,
-                            height: 50,
-                            child: GestureDetector(
-                              child: mediaList[index].mediaType==MediaType.image?Image.file(file, fit: BoxFit.cover):ThumbnailVideoWidget(video: file,),
-                              onTap: () => onTap(file),
-                            )),
-                      );
-                    });
-              },
-            );
-          }),
-    );
+        body: GridView.builder(
+      itemCount: medias.length,
+      gridDelegate:
+          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
+      itemBuilder: (context, index) {
+        return FutureBuilder(
+            future: medias[index].getFile(),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) print(snapshot.error);
+              if (!snapshot.hasData) return Loading();
+              File file = snapshot.data;
+              String mediaType = medias[index].mediaType == MediaType.image
+                  ? 'image'
+                  : 'video';
+              return Padding(
+                padding: const EdgeInsets.all(1),
+                child: SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: GestureDetector(
+                      child: mediaType == 'image'
+                          ? Image.file(file, fit: BoxFit.cover)
+                          : ThumbnailVideoWidget(
+                              video: file,
+                            ),
+                      onTap: () => widget.onTap(file, mediaType),
+                    )),
+              );
+            });
+      },
+    ));
   }
 }

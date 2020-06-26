@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class VideoPlayerWidget extends StatefulWidget {
   String url;
-  VideoPlayerWidget({@required this.url});
+  File file;
+  VideoPlayerWidget({this.url, this.file});
   @override
   _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
 }
@@ -14,8 +17,11 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(
-        widget.url)
+    print(widget.file);
+    _controller = widget.file == null
+        ? VideoPlayerController.network(widget.url)
+        : VideoPlayerController.file(widget.file);
+    _controller
       ..initialize().then((_) {
         // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
         _controller.addListener(() {
@@ -25,6 +31,12 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         _controller.play();
         setState(() {});
       });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override

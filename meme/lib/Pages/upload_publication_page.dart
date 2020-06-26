@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:meme/Widgets/video_player.dart';
 import '../Widgets/tag_selector.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
@@ -9,8 +10,9 @@ import '../Models/Post.dart';
 
 class UploadPublicationPage extends StatefulWidget {
   File file;
+  String mediaType;
 
-  UploadPublicationPage({@required this.file});
+  UploadPublicationPage({@required this.file, @required this.mediaType});
 
   @override
   _UploadPublicationPageState createState() => _UploadPublicationPageState();
@@ -27,20 +29,20 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
     uploadPublication() {
       mediaStorage.uploadMedia(_file).then((map) => db.newPost(
           db.userId,
-          new Post(map['media'],_description,'image', <String>[], DateTime.now(),
-              map['location'], db.userId, keyWords)));
+          new Post(map['media'], _description, widget.mediaType, <String>[],
+              DateTime.now(), map['location'], db.userId, keyWords)));
       Navigator.pop(context);
       Navigator.pop(context);
     }
 
     void addKeyWord(String value) {
-       setState(() {
+      setState(() {
         keyWords.add(value.toLowerCase());
       });
     }
 
     void removeKeyWord(int index) {
-       setState(() {
+      setState(() {
         keyWords.removeAt(index);
       });
     }
@@ -50,7 +52,9 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              Image.file(_file),
+              widget.mediaType == 'image'
+                  ? Image.file(_file)
+                  : VideoPlayerWidget(file: _file),
               SizedBox(height: 20),
               SizedBox(
                 width: 300,
@@ -70,7 +74,11 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
               SizedBox(
                 height: 20,
               ),
-              TagSelector( tags: keyWords,onFieldSubmitted: addKeyWord,onClearTag: removeKeyWord,),
+              TagSelector(
+                tags: keyWords,
+                onFieldSubmitted: addKeyWord,
+                onClearTag: removeKeyWord,
+              ),
               SizedBox(
                 height: 20,
               ),
@@ -90,4 +98,3 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
     );
   }
 }
-
