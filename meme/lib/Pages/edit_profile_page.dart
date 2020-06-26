@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/media_storage.dart';
 import 'package:meme/Models/User.dart';
 import 'gallery_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/user_avatar.dart';
+import '../Controller/gallery.dart';
 
 class EditProfilePage extends StatefulWidget {
   User user;
@@ -47,18 +49,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     editUser() {
-      if(_file != null){
+      if (_file != null) {
         mediaStorage.deleteFile(_user.getAvatarLocation());
-        mediaStorage.uploadAvatar(_file).then((map) => db.editUser(_user.getId(), _userName, _description, map['media'],map['location']));
-      }
-      else db.editUser(_user.getId(), _userName, _description, _avatar,_avatarLocation);
+        mediaStorage.uploadAvatar(_file).then((map) => db.editUser(
+            _user.getId(),
+            _userName,
+            _description,
+            map['media'],
+            map['location']));
+      } else
+        db.editUser(
+            _user.getId(), _userName, _description, _avatar, _avatarLocation);
       Navigator.pop(context);
     }
 
-    editAvatar(File file){
-      setState(() {
-        _file = file;
-      });
+    editAvatar(Media media) async {
+      _file = await media.getFile();
+      setState(() {});
       Navigator.pop(context);
     }
 
@@ -73,8 +80,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
           child: Column(
             children: [
               GestureDetector(
-                child: SizedBox(width: 90,height:90,child: UserAvatar(url: _avatar,file: _file,)),
-                onTap: ()=>Navigator.push(context, SlideLeftRoute(page:GalleryPage(onTap: editAvatar))),
+                child: SizedBox(
+                    width: 90,
+                    height: 90,
+                    child: UserAvatar(
+                      url: _avatar,
+                      file: _file,
+                    )),
+                onTap: () => Navigator.push(
+                    context,
+                    SlideLeftRoute(
+                        page: GalleryPage(
+                      onTap: editAvatar,
+                      page: gallery.imagePage,
+                    ))),
               ),
               SizedBox(
                 height: 10,

@@ -47,6 +47,8 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
       });
     }
 
+    print(widget.mediaType);
+
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(

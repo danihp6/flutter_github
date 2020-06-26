@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:meme/Controller/local_storage.dart';
 import 'package:meme/Controller/push_notification_provider.dart';
-import 'package:meme/Pages/camera_page.dart';
-import 'package:meme/Pages/main_page.dart';
 import 'package:meme/Pages/root_page.dart';
-import 'package:meme/Widgets/slide_left_route.dart';
+
+import 'Controller/gallery.dart';
 
 void main() {
   runApp(MyApp());
@@ -22,6 +20,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     pushProvider.initNotifications();
+    gallery.getMediaGallery();
   }
 
   @override

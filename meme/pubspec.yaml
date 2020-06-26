@@ -36,7 +36,8 @@ dependencies:
   firebase_auth: ^0.16.1
   video_player: ^0.10.11+1
   media_gallery: ^0.1.3
-  video_thumbnail: ^0.2.2
+  flutter_video_compress: ^0.3.7+8
+  transparent_image: ^1.0.0
   flutter:
     sdk: flutter
 
