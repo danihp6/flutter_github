@@ -1,52 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
+import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/loading.dart';
 import '../Controller/db.dart';
 
 class FavouriteButton extends StatefulWidget {
-  String postId;
+  Post post;
   String userId;
-  FavouriteButton(
-      {@required this.postId, @required this.userId});
+  FavouriteButton({@required this.post, @required this.userId});
 
   @override
-  _PostListButtonState createState() =>
-      _PostListButtonState();
+  _FavouriteButtonState createState() => _FavouriteButtonState();
 }
 
-class _PostListButtonState
-    extends State<FavouriteButton> {
+class _FavouriteButtonState extends State<FavouriteButton> {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-        stream: db.getPostFavourites(widget.userId,widget.postId),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) print(snapshot.error);
-          if (!snapshot.hasData) return Loading();
-          List<String> postList = snapshot.data;
-          if (postList
-              .contains(db.userId))
-            return IconButton(
-              icon: Icon(Icons.star),
-              iconSize: 30,
-              padding: EdgeInsets.all(0),
-              onPressed: () {
-                setState(() {
-                  db.deletePostPathInFavourites(db.userId, 'users/${widget.userId}/posts/${widget.postId}');
-                });
-              });
+    List<String> favourites = widget.post.favourites;
+    if (favourites.contains(db.userId))
+      return IconButton(
+          icon: Icon(Icons.star),
+          iconSize: 30,
+          padding: EdgeInsets.all(0),
+          onPressed: () {
+            setState(() {
+              db.deletePostPathInFavourites(
+                  db.userId, 'users/${widget.userId}/posts/${widget.post.id}');
+            });
+          });
 
-          return IconButton(
-              icon: Icon(Icons.star_border),
-              iconSize: 30,
-              padding: EdgeInsets.all(0),
-              onPressed: () {
-                setState(() {
-                  db.addPostPathInFavourites(db.userId, 'users/${widget.userId}/posts/${widget.postId}');
-                });
-              });
+    return IconButton(
+        icon: Icon(Icons.star_border),
+        iconSize: 30,
+        padding: EdgeInsets.all(0),
+        onPressed: () {
+          setState(() {
+            db.addPostPathInFavourites(
+                db.userId, 'users/${widget.userId}/posts/${widget.post.id}');
+          });
         });
   }
 }

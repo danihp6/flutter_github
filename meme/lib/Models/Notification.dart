@@ -5,35 +5,35 @@ class Notification {
   String _title;
   String _body;
   String _sender;
-  // String _receiver;
   String _post;
+  DateTime _dateTime;
 
-  Notification(id,title, body, sender, post) {
+  Notification(id, title, body, sender, post,dateTime) {
     this._id = id;
     this._title = title;
     this._body = body;
     this._sender = sender;
-    // this._receiver = receiver;
     this._post = post;
+    this._dateTime  = dateTime;
   }
 
   Notification.fromFirestore(DocumentSnapshot doc)
       : _id = doc.documentID,
-       _title = doc.data['title'],
+        _title = doc.data['title'],
         _body = doc.data['body'],
         _sender = doc.data['sender'],
-        // _receiver = doc.data['receiver'],
-        _post = doc.data['post'];
+        _post = doc.data['post'] ?? null,
+        _dateTime = (doc.data['dateTime'] as Timestamp).toDate();
 
   Map<String, dynamic> toFirestore() => {
         'title': _title,
         'body': _body,
         'sender': _sender,
-        // 'receiver': _receiver,
-        'post': _post
+        'post': _post,
+        'dateTime':_dateTime
       };
 
-String get id => this._id;
+  String get id => this._id;
 
   set id(id) => this._id = id;
 
@@ -49,13 +49,13 @@ String get id => this._id;
 
   set sender(sender) => this._sender = sender;
 
-  // String get receiver => this._receiver;
-
-  // set receiver(receiver) => this._receiver = receiver;
-
   String get post => this._post;
 
   set post(post) => this._post = post;
+
+  get dateTime => this._dateTime;
+
+  set dateTime(dateTime) => this._dateTime = dateTime;
 }
 
 List<Notification> toNotificationList(QuerySnapshot query) {

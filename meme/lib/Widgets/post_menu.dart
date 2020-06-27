@@ -31,10 +31,10 @@ class PostMenu extends StatelessWidget {
               ],
             ),
             value: () => Navigator.push(context,
-                SlideLeftRoute(page: SelectPostList(postId: post.getId()))),
+                SlideLeftRoute(page: SelectPostList(postId: post.id))),
           ),
           if (postList == null &&
-              post.getAuthorId() == db.userId)
+              post.authorId == db.userId)
             PopupMenuItem(
               child: Row(
                 children: [
@@ -46,12 +46,12 @@ class PostMenu extends StatelessWidget {
                 ],
               ),
               value: () {
-                mediaStorage.deleteFile(post.getMediaLocation());
-                db.deletePost(userId, post.getId());
+                mediaStorage.deleteFile(post.mediaLocation);
+                db.deletePost(userId, post.id);
               },
             ),
           if (postList != null &&
-              postList.getAuthorId() == db.userId)
+              postList.authorId == db.userId)
             PopupMenuItem(
               child: Row(
                 children: [
@@ -63,7 +63,7 @@ class PostMenu extends StatelessWidget {
                 ],
               ),
               value: () => db.deletePostPathInPostList(db.userId,
-                  postList.getId(), 'users/$userId/posts/${post.getId()}'),
+                  postList.id, 'users/$userId/posts/${post.id}'),
             ),
         ];
       },

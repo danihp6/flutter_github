@@ -3,6 +3,7 @@ import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/scroll_column_expandable.dart';
 import '../Controller/auth.dart';
 import '../Controller/db.dart';
+import '../Controller/push_notification_provider.dart';
 
 class SignInPage extends StatefulWidget {
   Function refresh;
@@ -204,6 +205,8 @@ class _SignInPageState extends State<SignInPage> {
                                 if (_formKey.currentState.validate() &&
                                     await validateUserName()) {
                                   try {
+                                    String token =
+                                        await pushProvider.getToken();
                                     String userId = await auth.registerUser(
                                         new User(
                                             _userName,
@@ -214,7 +217,8 @@ class _SignInPageState extends State<SignInPage> {
                                             <String>[],
                                             '',
                                             DateTime.now(),
-                                            _email),
+                                            _email,
+                                            [token]),
                                         _password);
                                     if (userId != null) {
                                       setState(() {

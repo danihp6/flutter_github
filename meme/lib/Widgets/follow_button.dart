@@ -21,11 +21,11 @@ class _FollowButtonState extends State<FollowButton> {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return Loading();
           User user = snapshot.data;
-          bool userFollowed = user.getFollowed().contains(_lookedUserId);
+          bool userFollowed = user.followed.contains(_lookedUserId);
           return RaisedButton(
             onPressed: () => userFollowed
-                ? db.unfollow(user.getId(), _lookedUserId)
-                : db.follow(user.getId(), _lookedUserId),
+                ? db.unfollow(user.id, _lookedUserId)
+                : db.follow(user.id, _lookedUserId),
             child: Text(userFollowed ? 'Siguiendo' : 'Seguir'),
             color: userFollowed?Colors.orange:Colors.blue,
             textColor: Colors.white,

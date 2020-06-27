@@ -33,8 +33,8 @@ class _PostListWidgetState extends State<PostListWidget> {
               height: 60,
               width: 60,
               color: Colors.grey[300],
-              child: _postList.getImage() != ''
-                  ? Image.network(_postList.getImage())
+              child: _postList.image != ''
+                  ? Image.network(_postList.image)
                   : null,
             ),
             SizedBox(
@@ -45,11 +45,11 @@ class _PostListWidgetState extends State<PostListWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _postList.getName(),
+                  _postList.name,
                   style: TextStyle(fontSize: 18),
                 ),
                 Text(
-                  _postList.getPosts().length.toString(),
+                  _postList.posts.length.toString(),
                   style: TextStyle(fontSize: 12,color: Colors.grey[600]),
                 ),
               ],
@@ -72,7 +72,7 @@ class _PostListWidgetState extends State<PostListWidget> {
                               Text('Eliminar categoria')
                             ],
                           ),
-                          value: (){if(_postList.getImageLocation()!='')mediaStorage.deleteFile(_postList.getImageLocation()); db.deletePostList(db.userId,_postList.getId());},
+                          value: (){if(_postList.imageLocation!='')mediaStorage.deleteFile(_postList.imageLocation); db.deletePostList(db.userId,_postList.id);},
                         )
                       ];
                     },

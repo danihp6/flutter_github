@@ -20,17 +20,17 @@ class PostHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: db.getUser(post.getAuthorId()),
+        stream: db.getUser(post.authorId),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return Loading();
           User user = snapshot.data;
           return Row(
             children: [
-              UserAvatar(url: user.getAvatar()),
+              UserAvatar(url: user.avatar),
               SizedBox(width: 10),
               Text(
-                user.getUserName(),
+                user.userName,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Expanded(
@@ -38,34 +38,22 @@ class PostHeader extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      post.getFavourites().length.toString(),
+                      post.favourites.length.toString(),
                       style: TextStyle(fontSize: 20),
                     ),
                     SizedBox(
                       width: 5,
                     ),
-                    StreamBuilder(
-                        stream: db.getUser(db.userId),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) print(snapshot.error);
-                          if (!snapshot.hasData)
-                            return Loading();
-                          User user = snapshot.data;
-                          return Row(
-                            children: [
-                              FavouriteButton(
-                                  postId: post.getId(), userId: user.getId()),
-                              SizedBox(
-                                width: 35,
-                                child: PostMenu(
-                                  post: post,
-                                  userId: user.getId(),
-                                  postList: postList,
-                                ),
-                              )
-                            ],
-                          );
-                        }),
+                    FavouriteButton(
+                        post: post, userId: post.authorId),
+                    SizedBox(
+                      width: 35,
+                      child: PostMenu(
+                        post: post,
+                        userId: post.authorId,
+                        postList: postList,
+                      ),
+                    )
                   ],
                 ),
               ),

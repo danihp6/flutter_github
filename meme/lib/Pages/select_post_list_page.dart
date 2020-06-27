@@ -45,7 +45,7 @@ class SelectPostList extends StatelessWidget {
                           postList: postLists[index],
                           activeMoreOptions: false,
                           onTap: () {
-                            postListId = postLists[index].getId();
+                            postListId = postLists[index].id;
                             addPublicationAndGoBack();
                           },
                         );

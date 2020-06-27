@@ -64,13 +64,24 @@ class DataBase {
     return query.documents.length > 0;
   }
 
-  Future follow(String userId,String followedId)=> _firestore.document('users/$userId').updateData({
+  Future follow(String userId,String followedId){ _firestore.document('users/$userId').updateData({
     'followed': FieldValue.arrayUnion([followedId])
   });
+  _firestore.document('users/$followedId').updateData({
+    'followers': FieldValue.arrayUnion([userId])
+  });
+  }
 
-  Future unfollow(String userId,String unfollowedId)=> _firestore.document('users/$userId').updateData({
+  Future unfollow(String userId,String unfollowedId){
+    _firestore.document('users/$userId').updateData({
     'followed': FieldValue.arrayRemove([unfollowedId])
   });
+
+  _firestore.document('users/$unfollowedId').updateData({
+    'followers': FieldValue.arrayRemove([userId])
+  });
+
+  } 
 
 //---------------POST----------------//
 
@@ -139,11 +150,14 @@ class DataBase {
   Future deletePost(String userId, String postId) =>
       _firestore.document('users/$userId/posts/$postId').delete();
 
-  Stream<List<String>> getPostFavourites(String userId, String postId) =>
-      _firestore
+  Stream<List<String>> getPostFavourites(String userId, String postId) {
+    //print(userId + '                          ' + postId);
+      return _firestore
           .document('users/$userId/posts/$postId')
           .snapshots()
           .map((doc) => List<String>.from(doc.data['favourites']));
+  }
+
 
   Future<List<String>> postSearch(String search) async {
     List<String> keyWordsSearched = search.split(' ');

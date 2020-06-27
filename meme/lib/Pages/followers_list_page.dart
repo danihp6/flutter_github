@@ -26,7 +26,7 @@ class FollowersListPage extends StatelessWidget {
               if (snapshot.hasError) print(snapshot.error);
               if (!snapshot.hasData) return Loading();
               User user = snapshot.data;
-              List<String> followers = user.getFollowers();
+              List<String> followers = user.followers;
               return ListView.builder(
                 itemCount: followers.length,
                 itemBuilder: (context, index) {
@@ -42,12 +42,12 @@ class FollowersListPage extends StatelessWidget {
                           GestureDetector(
                             child: Row(
                               children: [
-                                UserAvatar(url: followerUser.getAvatar()),
+                                UserAvatar(url: followerUser.avatar),
                                 SizedBox(
                                   width: 10,
                                 ),
                                 Text(
-                                  followerUser.getUserName(),
+                                  followerUser.userName,
                                   style: TextStyle(fontSize: 15),
                                 )
                               ],
@@ -56,10 +56,10 @@ class FollowersListPage extends StatelessWidget {
                                 context,
                                 SlideLeftRoute(
                                     page: UserPage(
-                                  userId: followerUser.getId(),
+                                  userId: followerUser.id,
                                 ))),
                           ),
-                          FollowButton(userId: followerUser.getId())
+                          FollowButton(userId: followerUser.id)
                         ],
                       );
                     },

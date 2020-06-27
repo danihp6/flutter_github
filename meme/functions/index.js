@@ -158,31 +158,62 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
     .catch(reject);
 }
 
-exports.onNewPost = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onCreate(async (snap, context) => {
+// exports.onNewPost = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onCreate(async (snap, context) => {
+//   var userId = context.params.userId
+//   var postId = context.params.postId
+
+//   var db = admin.firestore()
+//   var ref = db.collection('users').doc(userId)
+
+//   var userData = (await ref.get()).data()
+
+//   var userName = userData['userName']
+
+//   const notification = {
+//       title: 'Nueva publicación',
+//       body: `${userName} ha subido una nueva publicación`,
+//       post:postId,
+//       sender:userId
+//   };
+
+//   var followers = userData['followers']
+
+//   followers.forEach(id => {
+//     ref = db.collection('users').doc(id)
+//     ref.collection('notifications').add(notification)
+//   });
+  
+// })
+
+exports.newFollower = functions.region('europe-west2').firestore.document('users/{userId}').onUpdate(async(change,context)=>{
+  beforeFollowers = change.before.data()['followers']
+  afterFollowers = change.after.data()['followers']
+
+  if(beforeFollowers.length==afterFollowers.length) return 0
+
   var userId = context.params.userId
-  var postId = context.params.postId
+
+  var newFollower = afterFollowers[afterFollowers.length-1]
+
+  console.log(newFollower)
 
   var db = admin.firestore()
-  var ref = db.collection('users').doc(userId)
+  var ref = db.collection('users').doc(newFollower)
 
   var userData = (await ref.get()).data()
 
   var userName = userData['userName']
 
   const notification = {
-      title: 'Nueva publicación',
-      body: `${userName} ha subido una nueva publicación`,
-      post:postId,
-      sender:userId
-  };
+          title: 'Nuevo suscriptor',
+          body: `${userName} te ha seguido`,
+          sender:newFollower,
+          dateTime:new Date(Date.now())
+      };
 
-  var followers = userData['followers']
-
-  followers.forEach(id => {
-    ref = db.collection('users').doc(id)
+      ref = db.collection('users').doc(userId)
     ref.collection('notifications').add(notification)
-  });
-  
+
 })
 
 exports.onCreateNotification = functions.region('europe-west2').firestore.document('users/{userId}/notifications/{notificationId}').onCreate(async (snap, context) => {

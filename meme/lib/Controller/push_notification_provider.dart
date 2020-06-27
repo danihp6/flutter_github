@@ -12,11 +12,7 @@ class PushNotificationProvider {
       _messagingStreamController.stream;
   initNotifications() {
     _firebaseMessaging.requestNotificationPermissions();
-    _firebaseMessaging.getToken().then((token) {
-      print('==== FCM TOKEN ====');
-      print(token);
-      //cjFfpxx-RI-MKDZDHNBlHZ:APA91bHE7yeIDiwukUTd45lTHQsFEyabwto-2N55duGBk9dR0bpMkGtdQlyHeG87qkp915qqcJUQSdfPORS64e8LiqgkffeqeyhFfvhsDlcbm91be-T2xlmhLZm05OJjEkne8fuZCutX
-    });
+
 
     _firebaseMessaging.configure(
       onMessage: onNotification,
@@ -24,6 +20,8 @@ class PushNotificationProvider {
       onResume: onNotification,
     );
   }
+
+  Future<String> getToken()async=>await _firebaseMessaging.getToken();
 
   Future onNotification(Map<String, dynamic> info) {
     print(info);

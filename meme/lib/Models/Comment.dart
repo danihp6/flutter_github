@@ -38,64 +38,33 @@ class Comment {
         'comments':_comments
       };
 
-  String getId() {
-    return this._id;
-  }
+  get id => this._id;
 
-  void setId(id) {
-    this._id = id;
-  }
+  set id(id) => this._id = id;
 
-  String getText() {
-    return this._text;
-  }
+  get text => this._text;
 
-  void setText(text) {
-    this._text = text;
-  }
+  set text(text) => this._text = text;
 
-  List<String> getLikes() {
-    return this._likes;
-  }
+  get likes => this._likes;
 
-  void setLikes(likes) {
-    this._likes = likes;
-  }
+  set likes(likes) => this._likes = likes;
 
-  String getAuthorId() {
-    return this._authorId;
-  }
+  get authorId => this._authorId;
 
-  void setAuthorId(authorId) {
-    this._authorId = authorId;
-  }
+  set authorId(authorId) => this._authorId = authorId;
 
-  DateTime getDateTime() {
-    return this._dateTime;
-  }
+  get dateTime => this._dateTime;
 
-  void setDateTime(dateTime) {
-    this._dateTime = dateTime;
-  }
+  set dateTime(dateTime) => this._dateTime = dateTime;
 
-  List<String> getComments() {
-    return this._comments;
-  }
+  get comments => this._comments;
 
-  void setComments(comments) {
-    this._comments = comments;
-  }
+  set comments(comments) => this._comments = comments;
 
-  int getLevel() {
-    return this._level;
-  }
+  get level => this._level;
 
-  void setLevel(level) {
-    this._level = level;
-  }
-
-
-
+  set level(level) => this._level = level;
 }
 
 List<Comment> toCommentList(QuerySnapshot query) {

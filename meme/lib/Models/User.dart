@@ -12,9 +12,10 @@ class User {
   List<String> _favourites;
   DateTime _dateTime;
   String _email;
+  List<String> _tokens;
 
   User(userName, avatar, avatarLocation, followers, followed,favourites, description,
-      dateTime, email) {
+      dateTime, email,tokens) {
     this._userName = userName;
     this._avatar = avatar;
     this._avatarLocation = avatarLocation;
@@ -24,6 +25,7 @@ class User {
     this._description = description;
     this._dateTime = dateTime;
     this._email = email;
+    this._tokens = tokens;
   }
 
   User.fromFirestore(DocumentSnapshot doc)
@@ -36,7 +38,8 @@ class User {
         _description = doc.data['description'],
         _favourites = List<String>.from(doc.data['favourites']),
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
-        _email = doc.data['email'];
+        _email = doc.data['email'],
+        _tokens = List<String>.from(doc.data['tokens']);
 
   Map<String, dynamic> toFirestore() => {
         'userName': _userName,
@@ -48,82 +51,51 @@ class User {
         'favourites': _favourites,
         'dateTime': _dateTime,
         'keyWords': generateKeyWords(_userName),
-        'email': _email
+        'email': _email,
+        'tokens':_tokens
       };
 
-  String getId() {
-    return this._id;
-  }
+  get id => this._id;
 
-  void setId(id) {
-    this._id = id;
-  }
+  set id(id) => this._id = id;
 
-  String getUserName() {
-    return this._userName;
-  }
+  get userName => this._userName;
 
-  void setUserName(userName) {
-    this._userName = userName;
-  }
+  set userName(userName) => this._userName = userName;
 
-  String getAvatar() {
-    return this._avatar;
-  }
+  get avatar => this._avatar;
 
-  void setAvatar(avatar) {
-    this._avatar = avatar;
-  }
+  set avatar(avatar) => this._avatar = avatar;
 
-  String getAvatarLocation() {
-    return this._avatarLocation;
-  }
+  get avatarLocation => this._avatarLocation;
 
-  void setAvatarLocation(avatarLocation) {
-    this._avatarLocation = avatarLocation;
-  }
+  set avatarLocation(avatarLocation) => this._avatarLocation = avatarLocation;
 
-  List<String> getFollowers() {
-    return this._followers;
-  }
+  get followers => this._followers;
 
-  void setFollowers(followers) {
-    this._followers = followers;
-  }
+  set followers(followers) => this._followers = followers;
 
-  List<String> getFollowed() {
-    return this._followed;
-  }
+  get followed => this._followed;
 
-  void setFollowed(followed) {
-    this._followed = followed;
-  }
+  set followed(followed) => this._followed = followed;
 
-  String getDescription() {
-    return this._description;
-  }
+  get description => this._description;
 
-  void setDescription(description) {
-    this._description = description;
-  }
+  set description(description) => this._description = description;
 
-  List<String> getFavourites() {
-    return this._favourites;
-  }
+  get favourites => this._favourites;
 
-  void setFavourites(favourites) {
-    this._favourites = favourites;
-  }
+  set favourites(favourites) => this._favourites = favourites;
 
-  DateTime getDateTime() {
-    return this._dateTime;
-  }
+  get dateTime => this._dateTime;
 
-  DateTime setDateTime(dateTime) {
-    this._dateTime = dateTime;
-  }
+  set dateTime(dateTime) => this._dateTime = dateTime;
 
   get email => this._email;
 
   set email(email) => this._email = email;
+
+  get tokens => this._tokens;
+
+  set tokens(tokens) => this._tokens = tokens;
 }

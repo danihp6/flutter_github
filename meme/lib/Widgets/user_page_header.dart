@@ -26,13 +26,13 @@ class UserPageHeader extends StatelessWidget {
               SizedBox(
                 height: 65,
                 width: 65,
-                child: UserAvatar(url: user.getAvatar())),
+                child: UserAvatar(url: user.avatar)),
               SizedBox(
                 width: 10,
               ),
               SizedBox(
                 width: 100,
-                child: user.getId()==db.userId? EditProfileButton(user: user,):FollowButton(userId: user.getId()),
+                child: user.id==db.userId? EditProfileButton(user: user,):FollowButton(userId: user.id),
               )
             ],
           ),
@@ -48,7 +48,7 @@ class UserPageHeader extends StatelessWidget {
                         children: [
                           Text('Seguidores'),
                           Text(
-                            user.getFollowers().length.toString(),
+                            user.followers.length.toString(),
                             style: TextStyle(fontSize: 20),
                           )
                         ],
@@ -56,14 +56,14 @@ class UserPageHeader extends StatelessWidget {
                       onTap: () => Navigator.push(
                           context,
                           SlideLeftRoute(
-                              page: FollowersListPage(userId: user.getId()))),
+                              page: FollowersListPage(userId: user.id))),
                     ),
                     GestureDetector(
                       child: Column(
                         children: [
                           Text('Seguidos'),
                           Text(
-                            user.getFollowed().length.toString(),
+                            user.followed.length.toString(),
                             style: TextStyle(fontSize: 20),
                           )
                         ],
@@ -71,7 +71,7 @@ class UserPageHeader extends StatelessWidget {
                       onTap: () => Navigator.push(
                           context,
                           SlideLeftRoute(
-                              page: FollowedListPage(userId: user.getId()))),
+                              page: FollowedListPage(userId: user.id))),
                     ),
                     IconButton(
                         icon: Icon(Icons.settings),
@@ -90,7 +90,7 @@ class UserPageHeader extends StatelessWidget {
                 Align(
                   alignment: Alignment.topLeft,
                   child: Text(
-                    user.getDescription(),
+                    user.description,
                     maxLines: 3,
                     style: TextStyle(
                       fontSize: 12,

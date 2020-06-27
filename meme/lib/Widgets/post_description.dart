@@ -22,15 +22,16 @@ class PostDescription extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        if(post.description!='')
         Align(
           alignment: Alignment.topLeft,
           child: Text(
-            post.getDescription(),
+            post.description,
             style: TextStyle(fontSize: 15),
           ),
         ),
         StreamBuilder(
-            stream: db.getBestComment(post.getAuthorId(), post.getId()),
+            stream: db.getBestComment(post.authorId, post.id),
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
               if (!snapshot.hasData) return Container();
@@ -38,7 +39,7 @@ class PostDescription extends StatelessWidget {
               return Column(
                 children: [
                   Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
+                      padding: const EdgeInsets.only(left: 30),
                       child: CommentWidget(
                         comment: bestComment,
                         activeInnerComments: false,
@@ -70,12 +71,12 @@ class PostDescription extends StatelessWidget {
               User user = snapshot.data;
               return SizedBox(
                   height: 50,
-                  child: AddCommentField(user: user, postId: post.getId()));
+                  child: AddCommentField(user: user, postId: post.id));
             }),
         Align(
             alignment: Alignment.topLeft,
             child: Text(
-              'Publicada hace ' + getPastTime(post.getDateTime()),
+              'Publicada hace ' + getPastTime(post.dateTime),
               style: TextStyle(fontSize: 13),
             )),
       ],

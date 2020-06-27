@@ -46,77 +46,43 @@ class Post {
         'keyWords': _keyWords
       };
 
-  String getId() {
-    return this._id;
-  }
+  get id => this._id;
 
-  void setId(id) {
-    this._id = id;
-  }
+  set id(id)=>this._id = id;
 
-  String getMedia() {
-    return this._media;
-  }
+   get media => this._media;
 
-  void setMedia(media) {
-    this._media = media;
-  }
+  set media(media)=>this._media = media;
 
-  String getMediaType() {
-    return this._mediaType;
-  }
+ get mediaType => this._mediaType;
 
-  void setMediaType(mediaType) {
-    this._mediaType = mediaType;
-  }
+  set mediaType(mediaType)=>this._mediaType = mediaType;
 
-  String getDescription() {
-    return this._description;
-  }
+ get description => this._description;
 
-  void setDescription(description) {
-    this._description = description;
-  }
+  set description(description)=>this._description = description;
 
-  List<String> getFavourites() {
-    return this._favourites;
-  }
+ get favourites => this._favourites;
 
-  void setFavourites(favourites) {
-    this._favourites = favourites;
-  }
+  set favourites(favourites)=>this._favourites = favourites;
 
-  String getMediaLocation() {
-    return this._mediaLocation;
-  }
+ get dateTime => this._dateTime;
 
-  void setMediaLocation(mediaLocation) {
-    this._mediaLocation = mediaLocation;
-  }
+  set dateTime(dateTime)=>this._dateTime = dateTime;
 
-  String getAuthorId() {
-    return this._authorId;
-  }
+ get mediaLocation => this._mediaLocation;
 
-  void setAuthorId(authorId) {
-    this._authorId = authorId;
-  }
+  set mediaLocation(mediaLocation)=>this._mediaLocation = mediaLocation;
 
-  List<String> getKeyWords() {
-    return this._keyWords;
-  }
+ get authorId => this._authorId;
 
-  void setKeyWords(keyWords) {
-    this._keyWords = keyWords;
-  }
+  set authorId(authorId)=>this._authorId = authorId;
 
-  DateTime getDateTime() {
-    return this._dateTime;
-  }
+ get keyWords => this._keyWords;
 
-  void setDateTime(dateTime) {
-    this._dateTime = dateTime;
-  }
+  set keyWords(keyWords)=>this._keyWords = keyWords;
+
+
 }
 
 List<Post> toPosts(QuerySnapshot query) {

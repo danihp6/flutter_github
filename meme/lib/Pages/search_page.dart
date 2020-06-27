@@ -85,18 +85,18 @@ class _SearchPageState extends State<SearchPage>
                               Row(
                                 children: [
                                   UserAvatar(
-                                    url: item.getAvatar(),
+                                    url: item.avatar,
                                   ),
                                   SizedBox(
                                     width: 10,
                                   ),
                                   Text(
-                                    item.getUserName(),
+                                    item.userName,
                                     style: TextStyle(fontSize: 16),
                                   ),
                                 ],
                               ),
-                              FollowButton(userId: item.getId())
+                              FollowButton(userId: item.id)
                             ],
                           ),
                         );

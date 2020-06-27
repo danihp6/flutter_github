@@ -33,11 +33,11 @@ class _PostListPageState extends State<PostListPage> {
             expandedHeight: 200,
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: true,
-              title: Text(_postList.getName()),
-              background: _postList.getImage() != ''
+              title: Text(_postList.name),
+              background: _postList.image != ''
                   ? Padding(
                       padding: const EdgeInsets.all(50),
-                      child: Image.network(_postList.getImage()),
+                      child: Image.network(_postList.image),
                     )
                   : Container(),
             ),
@@ -51,7 +51,7 @@ class _PostListPageState extends State<PostListPage> {
           ),
           StreamBuilder(
               stream: db.getPostsPathFromPostList(
-                  _postList.getAuthorId(), _postList.getId()),
+                  _postList.authorId, _postList.id),
               builder: (context, snapshot) {
                 if (snapshot.hasError) print(snapshot.error);
                 if (!snapshot.hasData)

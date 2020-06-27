@@ -9,6 +9,7 @@ import 'gallery_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/user_avatar.dart';
 import '../Controller/gallery.dart';
+import '../Controller/image_functions.dart';
 
 class EditProfilePage extends StatefulWidget {
   User user;
@@ -31,12 +32,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void initState() {
     super.initState();
     _user = widget.user;
-    _userName = _user.getUserName();
+    _userName = _user.userName;
     _nameController = new TextEditingController(text: _userName);
-    _description = _user.getDescription();
+    _description = _user.description;
     _descriptionController = new TextEditingController(text: _description);
-    _avatar = _user.getAvatar();
-    _avatarLocation = _user.getAvatarLocation();
+    _avatar = _user.avatar;
+    _avatarLocation = _user.avatarLocation;
   }
 
   @override
@@ -50,21 +51,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     editUser() {
       if (_file != null) {
-        mediaStorage.deleteFile(_user.getAvatarLocation());
+        if(_avatar!='') mediaStorage.deleteFile(_user.avatarLocation);
         mediaStorage.uploadAvatar(_file).then((map) => db.editUser(
-            _user.getId(),
+            _user.id,
             _userName,
             _description,
             map['media'],
             map['location']));
       } else
         db.editUser(
-            _user.getId(), _userName, _description, _avatar, _avatarLocation);
+            _user.id, _userName, _description, _avatar, _avatarLocation);
       Navigator.pop(context);
     }
 
     editAvatar(Media media) async {
-      _file = await media.getFile();
+      
+      File cropedImage = await cropImage(await media.getFile());
+        if (cropedImage != null) _file = cropedImage;
       setState(() {});
       Navigator.pop(context);
     }

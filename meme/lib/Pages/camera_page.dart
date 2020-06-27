@@ -10,18 +10,33 @@ class CameraPage extends StatefulWidget {
 
 class _CameraPageState extends State<CameraPage> {
   CameraController controller;
+  List<CameraDescription> cameras = <CameraDescription>[];
+  CameraDescription camera;
 
   @override
   void initState() {
     super.initState();
-    availableCameras().then((cameras) {
-      controller = CameraController(cameras[0], ResolutionPreset.medium);
+    availableCameras().then((value) {
+      cameras = value;
+      camera = cameras[0];
+      controller = CameraController(camera, ResolutionPreset.medium);
       controller.initialize().then((_) {
         if (!mounted) {
           return;
         }
         setState(() {});
       });
+    });
+  }
+
+  void changeCamera() {
+    camera = camera == cameras[0] ? cameras[1] : cameras[0];
+    controller = CameraController(camera, ResolutionPreset.medium);
+    controller.initialize().then((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
     });
   }
 
@@ -33,13 +48,41 @@ class _CameraPageState extends State<CameraPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (controller == null ||!controller.value.isInitialized) {
+    if (controller == null || !controller.value.isInitialized) {
       return Container();
     }
+    var size = MediaQuery.of(context).size.width;
     return Scaffold(
-      body: AspectRatio(
-          aspectRatio: controller.value.aspectRatio,
-          child: CameraPreview(controller)),
+      body: Container(
+        width: size,
+        height: size,
+        child: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            ClipRect(
+              child: OverflowBox(
+                alignment: Alignment.center,
+                child: FittedBox(
+                  fit: BoxFit.fitWidth,
+                  child: Container(
+                      width: size,
+                      height: size / controller.value.aspectRatio,
+                      child: CameraPreview(controller)),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: IconButton(
+                color: Colors.deepOrange,
+                iconSize: 30,
+                icon: Icon(Icons.rotate_90_degrees_ccw),
+                onPressed: changeCamera,
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

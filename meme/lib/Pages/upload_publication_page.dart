@@ -55,7 +55,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
           child: Column(
             children: [
               widget.mediaType == 'image'
-                  ? Image.file(_file)
+                  ? AspectRatio(aspectRatio: 1, child: Image.file(_file))
                   : VideoPlayerWidget(file: _file),
               SizedBox(height: 20),
               SizedBox(

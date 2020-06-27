@@ -40,69 +40,37 @@ class PostList {
         'dateTime': _dateTime,
       };
 
-  String getId() {
-    return this._id;
-  }
+  get id => this._id;
 
-  void setId(id) {
-    this._id = id;
-  }
+  set id(id) => this._id = id;
 
-  String getName() {
-    return this._name;
-  }
+  get name => this._name;
 
-  void setName(name) {
-    this._name = name;
-  }
+  set name(name) => this._name = name;
 
-  String getImage() {
-    return this._image;
-  }
+  get image => this._image;
 
-  void setImage(image) {
-    this._image = image;
-  }
+  set image(image) => this._image = image;
 
-  String getImageLocation() {
-    return this._imageLocation;
-  }
+  get imageLocation => this._imageLocation;
 
-  void setImageLocation(imageLocation) {
-    this._imageLocation = imageLocation;
-  }
+  set imageLocation(imageLocation) => this._imageLocation = imageLocation;
 
-  String getAuthorId() {
-    return this._authorId;
-  }
+  get posts => this._posts;
 
-  void setAuthorId(authorId) {
-    this._authorId = authorId;
-  }
+  set posts(posts) => this._posts = posts;
 
-  List<String> getPosts() {
-    return this._posts;
-  }
+  get authorId => this._authorId;
 
-  setPosts(posts) {
-    this._posts = posts;
-  }
+  set authorId(authorId) => this._authorId = authorId;
 
-  List<String> getKeyWords() {
-    return this._keyWords;
-  }
+  get keyWords => this._keyWords;
 
-  void setKeyWords(keyWords) {
-    this._keyWords = keyWords;
-  }
+  set keyWords(keyWords) => this._keyWords = keyWords;
 
-    DateTime getDateTime() {
-    return this._dateTime;
-  }
+  get dateTime => this._dateTime;
 
-  void setDateTime(dateTime) {
-    this._dateTime = dateTime;
-  }
+  set dateTime(dateTime) => this._dateTime = dateTime;
 }
 
 List<PostList> toPostLists(QuerySnapshot query) {

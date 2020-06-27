@@ -58,7 +58,7 @@ class _UserPageState extends State<UserPage>
                       preferredSize: Size.fromHeight(40),
                       child: AppBar(
                         backgroundColor: Colors.deepOrange,
-                        title: Text(user.getUserName()),
+                        title: Text(user.userName),
                       ),
                     )
                   : null,
@@ -101,7 +101,7 @@ class _UserPageState extends State<UserPage>
                     physics: NeverScrollableScrollPhysics(),
                     children: [
                       StreamBuilder(
-                        stream: db.getPosts(user.getId()),
+                        stream: db.getPosts(user.id),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData) return Loading();
@@ -119,7 +119,7 @@ class _UserPageState extends State<UserPage>
                         },
                       ),
                       StreamBuilder(
-                        stream: db.getPostsPathFromFavourites(user.getId()),
+                        stream: db.getPostsPathFromFavourites(user.id),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData) return Loading();
@@ -148,12 +148,12 @@ class _UserPageState extends State<UserPage>
                         padding: const EdgeInsets.only(left: 8, right: 8),
                         child: Column(
                           children: [
-                            user.getId() == db.userId
+                            user.id == db.userId
                                 ? NewPostListButton()
                                 : Container(),
                             Expanded(
                               child: StreamBuilder(
-                                stream: db.getPostLists(user.getId()),
+                                stream: db.getPostLists(user.id),
                                 builder: (context, snapshot) {
                                   if (snapshot.hasError)
                                     print(snapshot.error);

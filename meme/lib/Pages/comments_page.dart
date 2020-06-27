@@ -29,7 +29,7 @@ class CommentsPage extends StatelessWidget {
                 child: Column(
                   children: [
                     StreamBuilder(
-                      stream: db.getUser(post.getAuthorId()),
+                      stream: db.getUser(post.authorId),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) print(snapshot.error);
                         if (!snapshot.hasData) return Loading();
@@ -39,17 +39,17 @@ class CommentsPage extends StatelessWidget {
                         SizedBox(
                             width: 30,
                             height: 30,
-                            child: UserAvatar(url: user.getAvatar())),
+                            child: UserAvatar(url: user.avatar)),
                         SizedBox(width: 10),
                         RichText(
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: [
                               TextSpan(
-                                  text: user.getUserName() + ' ',
+                                  text: user.userName + ' ',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(text: post.getDescription()),
+                              TextSpan(text: post.description),
                             ],
                           ),
                         ),
@@ -60,7 +60,7 @@ class CommentsPage extends StatelessWidget {
                     Divider(),
                     StreamBuilder(
                         stream:
-                            db.getComments(post.getAuthorId(), post.getId()),
+                            db.getComments(post.authorId, post.id),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData) return Loading();
@@ -92,7 +92,7 @@ class CommentsPage extends StatelessWidget {
                   color: Colors.grey[300],
                   child: AddCommentField(
                     user: user,
-                    postId: post.getId(),
+                    postId: post.id,
                   ),
                 );
               },

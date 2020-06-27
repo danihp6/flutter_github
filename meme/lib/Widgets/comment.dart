@@ -34,7 +34,7 @@ class _CommentWidgetState extends State<CommentWidget> {
           child: Row(
             children: [
               StreamBuilder(
-                  stream: db.getUser(_comment.getAuthorId()),
+                  stream: db.getUser(_comment.authorId),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) print(snapshot.error);
                     if (!snapshot.hasData) return Loading();
@@ -44,17 +44,17 @@ class _CommentWidgetState extends State<CommentWidget> {
                         SizedBox(
                             width: 30,
                             height: 30,
-                            child: UserAvatar(url: user.getAvatar())),
+                            child: UserAvatar(url: user.avatar)),
                         SizedBox(width: 10),
                         RichText(
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: [
                               TextSpan(
-                                  text: user.getUserName() + ' ',
+                                  text: user.userName + ' ',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(text: _comment.getText()),
+                              TextSpan(text: _comment.text),
                             ],
                           ),
                         ),
@@ -63,7 +63,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                   }),
               Expanded(
                 child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  Text(_comment.getLikes().length.toString()),
+                  Text(_comment.likes.length.toString()),
                   SizedBox(
                     width: 30,
                     child: IconButton(
@@ -71,14 +71,14 @@ class _CommentWidgetState extends State<CommentWidget> {
                         iconSize: 15,
                         onPressed: () {}),
                   ),
-                  Text(getPastTime(_comment.getDateTime()))
+                  Text(getPastTime(_comment.dateTime))
                 ]),
               )
             ],
           ),
         ),
         if (widget.activeInnerComments &&
-            _comment.getComments().length > 0 &&
+            _comment.comments.length > 0 &&
             !_isShowedInnedComments)
           Align(
             alignment: Alignment.topLeft,
@@ -93,11 +93,11 @@ class _CommentWidgetState extends State<CommentWidget> {
                     });
                   },
                   child: Text('Ver ' +
-                      _comment.getComments().length.toString() +
+                      _comment.comments.length.toString() +
                       ' comentarios')),
             ),
           ),
-        if (_isShowedInnedComments && _comment.getLevel() == 0)
+        if (_isShowedInnedComments && _comment.level == 0)
           Align(
             alignment: Alignment.topLeft,
             child: SizedBox(
@@ -133,7 +133,7 @@ class _CommentWidgetState extends State<CommentWidget> {
           //     );
           //   },
           // ),
-          if (_isShowedInnedComments && _comment.getLevel() == 0)
+          if (_isShowedInnedComments && _comment.level == 0)
             Divider(
               thickness: 1,
               indent: 50,
