@@ -72,6 +72,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
       Navigator.pop(context);
     }
 
+    image(){
+      if(_file == null && _avatar == '') return AssetImage('assets/images/user');
+      else if(_file == null) return NetworkImage(_avatar);
+      return FileImage(_file);
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepOrange,
@@ -86,10 +92,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 child: SizedBox(
                     width: 90,
                     height: 90,
-                    child: UserAvatar(
-                      url: _avatar,
-                      file: _file,
-                    )),
+                    child: CircleAvatar(
+                      backgroundImage: image(),
+                    ),),
                 onTap: () => Navigator.push(
                     context,
                     SlideLeftRoute(

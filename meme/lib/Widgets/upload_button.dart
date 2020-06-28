@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Pages/select_media_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../Controller/Configuration.dart';
 import 'fading_dismissible.dart';
 
@@ -30,7 +31,7 @@ class _UploadButtonState extends State<UploadButton> {
             },
             child: FloatingActionButton(
               heroTag: 'tools',
-              onPressed: ()=>Navigator.push(context, SlideLeftRoute(page:SelectMediaPage())),
+              onPressed: ()async =>await Permission.storage.request().isGranted?Navigator.push(context, SlideLeftRoute(page:SelectMediaPage())):null,
               backgroundColor: Colors.deepOrange,
               child: Icon(
                 Icons.file_upload,

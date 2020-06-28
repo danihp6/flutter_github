@@ -27,7 +27,7 @@ class PostHeader extends StatelessWidget {
           User user = snapshot.data;
           return Row(
             children: [
-              UserAvatar(url: user.avatar),
+              UserAvatar(user: user),
               SizedBox(width: 10),
               Text(
                 user.userName,

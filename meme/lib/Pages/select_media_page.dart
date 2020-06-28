@@ -17,16 +17,18 @@ class SelectMediaPage extends StatefulWidget {
 class _SelectMediaPageState extends State<SelectMediaPage>
     with SingleTickerProviderStateMixin {
   TabController tabController;
-  MediaPage page = gallery.imagePage;
+  MediaPage page;
   IconData icon = Icons.image;
-
-  
 
   @override
   void initState() {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
-    
+    gallery.getMediaGallery().then((_) {
+       setState(() {
+         page = gallery.imagePage;
+       });
+    });
   }
 
   @override
@@ -37,6 +39,7 @@ class _SelectMediaPageState extends State<SelectMediaPage>
 
   @override
   Widget build(BuildContext context) {
+    
     onSelectMedia(Media media) async {
       File file = await media.getFile();
       if (media.mediaType == MediaType.image) {
@@ -47,13 +50,12 @@ class _SelectMediaPageState extends State<SelectMediaPage>
               SlideLeftRoute(
                   page: UploadPublicationPage(
                       file: cropedImage, mediaType: 'image')));
-      }
-      else
+      } else
         Navigator.push(
             context,
             SlideLeftRoute(
                 page: UploadPublicationPage(file: file, mediaType: 'video')));
-      }
+    }
 
     return Scaffold(
       appBar: PreferredSize(
@@ -67,7 +69,9 @@ class _SelectMediaPageState extends State<SelectMediaPage>
                 icon: Icon(icon),
                 onPressed: () {
                   setState(() {
-                    page = page == gallery.imagePage ? gallery.videoPage : gallery.imagePage;
+                    page = page == gallery.imagePage
+                        ? gallery.videoPage
+                        : gallery.imagePage;
                     icon = icon == Icons.image ? Icons.slideshow : Icons.image;
                     print(icon);
                   });

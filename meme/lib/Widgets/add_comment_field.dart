@@ -44,7 +44,7 @@ class _AddCommentFieldState extends State<AddCommentField> {
         SizedBox(
           width: 10,
         ),
-        SizedBox(height:30,width:30,child: UserAvatar(url: widget.user.avatar)),
+        SizedBox(height:30,width:30,child: UserAvatar(user: widget.user)),
         SizedBox(width: 10),
         Expanded(
           child: TextField(

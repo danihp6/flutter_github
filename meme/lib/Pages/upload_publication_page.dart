@@ -22,6 +22,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
   File _file;
   String _description = '';
   List<String> keyWords = <String>[];
+  
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +56,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
           child: Column(
             children: [
               widget.mediaType == 'image'
-                  ? AspectRatio(aspectRatio: 1, child: Image.file(_file))
+                  ? AspectRatio(aspectRatio: 1, child: Image.file(_file,fit:BoxFit.cover))
                   : VideoPlayerWidget(file: _file),
               SizedBox(height: 20),
               SizedBox(

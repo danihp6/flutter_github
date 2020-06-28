@@ -41,20 +41,37 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size.width;
     return _controller.value.initialized
-        ? AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: Stack(
-              alignment: AlignmentDirectional.bottomCenter,
-              children: [
-                VideoPlayer(_controller),
-                _PlayPauseOverlay(
-                  controller: _controller,
+        ? Stack(
+          alignment: Alignment.bottomCenter,
+          children: <Widget>[
+            Container(
+                width: size,
+                height: size,
+                child: Stack(
+                  fit: StackFit.expand,
+                  alignment: AlignmentDirectional.bottomCenter,
+                  children: [
+                    ClipRect(
+                        child: OverflowBox(
+                            alignment: Alignment.center,
+                            child: FittedBox(
+                                fit: BoxFit.fitWidth,
+                                child: Container(
+                                    width: size,
+                                    height: size / _controller.value.aspectRatio,
+                                    child: VideoPlayer(_controller))))),
+                    _PlayPauseOverlay(
+                      controller: _controller,
+                    ),
+                    
+                  ],
                 ),
-                VideoProgressIndicator(_controller, allowScrubbing: true),
-              ],
-            ),
-          )
+              ),
+              VideoProgressIndicator(_controller, allowScrubbing: true),
+          ],
+        )
         : Container();
   }
 }

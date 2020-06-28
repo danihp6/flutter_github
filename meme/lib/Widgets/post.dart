@@ -47,7 +47,7 @@ class PostWidget extends StatelessWidget {
                     child: post.mediaType == 'image'
                 ? Image.network(
                     post.media,
-                    fit: BoxFit.contain,
+                    fit: BoxFit.cover,
                   )
                 : VideoPlayerWidget(url: post.media),
           ),

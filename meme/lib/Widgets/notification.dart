@@ -37,7 +37,7 @@ class NotificationWidget extends StatelessWidget {
                   child: Row(children: [
                     GestureDetector(
                       child: UserAvatar(
-                        url: user.avatar,
+                        user: user,
                       ),
                       onTap: () => Navigator.push(
                           context,

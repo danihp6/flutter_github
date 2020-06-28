@@ -24,15 +24,22 @@ class UserPageHeader extends StatelessWidget {
           Column(
             children: [
               SizedBox(
-                height: 65,
-                width: 65,
-                child: UserAvatar(url: user.avatar)),
+                  height: 80,
+                  width: 80,
+                  child: UserAvatar(
+                    user: user,
+                    linked: false,
+                  )),
               SizedBox(
                 width: 10,
               ),
               SizedBox(
                 width: 100,
-                child: user.id==db.userId? EditProfileButton(user: user,):FollowButton(userId: user.id),
+                child: user.id == db.userId
+                    ? EditProfileButton(
+                        user: user,
+                      )
+                    : FollowButton(userId: user.id),
               )
             ],
           ),
@@ -105,4 +112,3 @@ class UserPageHeader extends StatelessWidget {
     );
   }
 }
-

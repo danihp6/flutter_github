@@ -21,17 +21,37 @@ exports.onDeletePost = functions.region('europe-west2').firestore.document('user
 
   ref = db.collection('users')
 
-  deleteFavourites(path,db,ref,batchSize)
+  deleteFavourites(path, db, ref, batchSize)
 
   var query = ref.orderBy('__name__').limit(batchSize)
-  query.get().then((snapshot)=>{
+  query.get().then((snapshot) => {
     console.log(snapshot.size)
     if (snapshot.size === 0) {
       return 0
     }
     snapshot.docs.forEach(function (doc) {
       console.log(doc.ref.collection('postLists'))
-      deletePostInPostList(path,db,doc.ref.collection('postLists'),batchSize)
+      deletePostInPostList(path, db, doc.ref.collection('postLists'), batchSize)
+
+      ref = doc.collection('notifications')
+      query = ref.orderBy('__name__').limit(batchSize)
+
+      query.get().then((snapshot) => {
+        if (snapshot.size === 0) {
+          return 0
+        }
+
+        var notificationData
+        var post
+        snapshot.docs.forEach(function (doc) {
+          notificationData = (await ref.get()).data()
+          post = notificationData['post']
+
+          if (post == userId) doc.delete()
+
+
+        })
+      })
     })
   })
   return Promise.all([deleted])
@@ -69,12 +89,12 @@ function deletePostInPostListInQuery(path, db, query, batchSize, resolve, reject
       // Recurse on the next process tick, to avoid
       // exploding the stack.
       return process.nextTick(function () {
-        deletePostInPostListInQuery(path,db, query, batchSize, resolve, reject)
+        deletePostInPostListInQuery(path, db, query, batchSize, resolve, reject)
       })
     }
 
   })
-  .catch(reject);
+    .catch(reject);
 }
 
 function deleteFavourites(path, db, collectionRef, batchSize) {
@@ -109,12 +129,12 @@ function deleteFavouritesInQuery(path, db, query, batchSize, resolve, reject) {
       // Recurse on the next process tick, to avoid
       // exploding the stack.
       return process.nextTick(function () {
-        deleteFavouritesInQuery(path,db, query, batchSize, resolve, reject)
+        deleteFavouritesInQuery(path, db, query, batchSize, resolve, reject)
       })
     }
 
   })
-  .catch(reject);
+    .catch(reject);
 }
 
 function deleteCollection(db, collectionRef, batchSize) {
@@ -158,6 +178,69 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
     .catch(reject);
 }
 
+// exports.onDeleteUser = functions.region('europe-west2').firestore.document('users/{userId}').onDelete(async (snap, context) => {
+//   var userId = context.params.userId
+//   FALTA COMENTARIOS DE TODAS LAS PUBLICACIONES
+//   var batchSize = 500
+//   var db = admin.firestore()
+
+//   var ref = db.collection('users').doc(userId).collection('notifications')
+
+//   deleteCollection(db, ref, batchSize)
+
+//   ref = db.collection('users').doc(userId)
+
+//   var query = ref.orderBy('__name__').limit(batchSize)
+
+//   query.get((snapshot) => {
+//     if (snapshot.size === 0) {
+//       return 0
+//     }
+
+//     snapshot.docs.forEach(function (doc) {
+//       ref = doc.collection('comments')
+//       await deleteCollection(db, ref, batchSize)
+//       doc.delete()
+//     })
+//   })
+
+//   ref = db.collection('users')
+//   query = ref.orderBy('__name__').limit(batchSize)
+
+//   query.get((snapshot) => {
+//     if (snapshot.size === 0) {
+//       return 0
+//     }
+
+//     snapshot.docs.forEach(function (doc) {
+//       doc.update({
+//         'followers': admin.firestore.FieldValue.arrayRemove(userId),
+//         'followed': admin.firestore.FieldValue.arrayRemove(userId)
+//       })
+
+//       ref = doc.collection('notifications')
+//       query = ref.orderBy('__name__').limit(batchSize)
+
+//       query.get((snapshot)=>{
+//         if (snapshot.size === 0) {
+//           return 0
+//         }
+
+//         var notificationData
+//         snapshot.docs.forEach(function(doc){
+//           notificationData = (await ref.get()).data()
+//           sender = notificationData['sender']
+
+//           if(sender==userId) doc.delete()
+//         })
+//       })
+
+//     })
+//   })
+
+
+// })
+
 // exports.onNewPost = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onCreate(async (snap, context) => {
 //   var userId = context.params.userId
 //   var postId = context.params.postId
@@ -182,18 +265,18 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
 //     ref = db.collection('users').doc(id)
 //     ref.collection('notifications').add(notification)
 //   });
-  
+
 // })
 
-exports.newFollower = functions.region('europe-west2').firestore.document('users/{userId}').onUpdate(async(change,context)=>{
+exports.newFollower = functions.region('europe-west2').firestore.document('users/{userId}').onUpdate(async (change, context) => {
   beforeFollowers = change.before.data()['followers']
   afterFollowers = change.after.data()['followers']
 
-  if(beforeFollowers.length==afterFollowers.length) return 0
+  if (beforeFollowers.length == afterFollowers.length) return 0
 
   var userId = context.params.userId
 
-  var newFollower = afterFollowers[afterFollowers.length-1]
+  var newFollower = afterFollowers[afterFollowers.length - 1]
 
   console.log(newFollower)
 
@@ -205,14 +288,14 @@ exports.newFollower = functions.region('europe-west2').firestore.document('users
   var userName = userData['userName']
 
   const notification = {
-          title: 'Nuevo suscriptor',
-          body: `${userName} te ha seguido`,
-          sender:newFollower,
-          dateTime:new Date(Date.now())
-      };
+    title: 'Nuevo suscriptor',
+    body: `${userName} te ha seguido`,
+    sender: newFollower,
+    dateTime: new Date(Date.now())
+  };
 
-      ref = db.collection('users').doc(userId)
-    ref.collection('notifications').add(notification)
+  ref = db.collection('users').doc(userId)
+  ref.collection('notifications').add(notification)
 
 })
 
@@ -226,15 +309,15 @@ exports.onCreateNotification = functions.region('europe-west2').firestore.docume
   var ref = db.collection('users').doc(sender)
 
   var userName = (await ref.get()).data()['userName']
-  
+
   const payload = {
     notification: {
       title: 'Nueva publicación',
       body: `${userName} ha subido una nueva publicación`,
     },
-    data:{
-      post:post,
-      sender:sender
+    data: {
+      post: post,
+      sender: sender
     }
   };
 
@@ -244,7 +327,7 @@ exports.onCreateNotification = functions.region('europe-west2').firestore.docume
 
   var tokens = (await ref.get()).data()['tokens']
 
-  tokens.forEach(async token =>  {
+  tokens.forEach(async token => {
     await admin.messaging().sendToDevice(token, payload);
   });
 })

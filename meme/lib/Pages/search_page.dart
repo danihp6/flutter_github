@@ -85,7 +85,7 @@ class _SearchPageState extends State<SearchPage>
                               Row(
                                 children: [
                                   UserAvatar(
-                                    url: item.avatar,
+                                    user: item,
                                   ),
                                   SizedBox(
                                     width: 10,

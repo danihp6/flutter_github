@@ -39,7 +39,7 @@ class CommentsPage extends StatelessWidget {
                         SizedBox(
                             width: 30,
                             height: 30,
-                            child: UserAvatar(url: user.avatar)),
+                            child: UserAvatar(user: user)),
                         SizedBox(width: 10),
                         RichText(
                           text: TextSpan(
