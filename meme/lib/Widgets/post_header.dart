@@ -37,15 +37,16 @@ class PostHeader extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      post.favourites.length.toString(),
-                      style: TextStyle(fontSize: 20),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    FavouriteButton(
-                        post: post, userId: post.authorId),
+                    // Text(
+                    //   post.favourites.length.toString(),
+                    //   style: TextStyle(fontSize: 20),
+                    // ),
+                    // SizedBox(
+                    //   width: 5,
+                    // ),
+                    // FavouriteButton(
+                    //     post: post, userId: post.authorId),
+                    IconButton(icon: Icon(Icons.whatshot), onPressed: null),
                     SizedBox(
                       width: 35,
                       child: PostMenu(

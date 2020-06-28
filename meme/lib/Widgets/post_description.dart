@@ -40,6 +40,7 @@ class PostDescription extends StatelessWidget {
               activeOnClearTag: false,
             ),
           ),
+          SizedBox(height: 3,),
         StreamBuilder(
             stream: db.getBestComment(post.authorId, post.id),
             builder: (context, snapshot) {
@@ -48,12 +49,10 @@ class PostDescription extends StatelessWidget {
               Comment bestComment = snapshot.data;
               return Column(
                 children: [
-                  Padding(
-                      padding: const EdgeInsets.only(left: 30),
-                      child: CommentWidget(
-                        comment: bestComment,
-                        activeInnerComments: false,
-                      )),
+                  CommentWidget(
+                    comment: bestComment,
+                    activeInnerComments: false,
+                  ),
                   Align(
                     alignment: Alignment.topLeft,
                     child: SizedBox(
