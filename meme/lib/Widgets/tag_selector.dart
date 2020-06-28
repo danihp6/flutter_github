@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Widgets/tags_viewer.dart';
 
 class TagSelector extends StatefulWidget {
   List<String> tags;
   Function onFieldSubmitted;
   Function onClearTag;
-  TagSelector({
-    @required this.tags,
-    @required this.onFieldSubmitted,
-    @required this.onClearTag
-  }) ;
+  TagSelector(
+      {@required this.tags,
+      @required this.onFieldSubmitted,
+      @required this.onClearTag});
 
   @override
   _TagSelectorState createState() => _TagSelectorState();
@@ -16,9 +16,8 @@ class TagSelector extends StatefulWidget {
 
 class _TagSelectorState extends State<TagSelector> {
   TextEditingController tagsController;
-  
 
-    @override
+  @override
   void initState() {
     super.initState();
     tagsController = TextEditingController();
@@ -29,6 +28,7 @@ class _TagSelectorState extends State<TagSelector> {
     tagsController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -47,12 +47,12 @@ class _TagSelectorState extends State<TagSelector> {
                         tagsController.clear();
                       });
                     })),
-            onFieldSubmitted: (tag){
+            onFieldSubmitted: (tag) {
               widget.onFieldSubmitted(tag);
               setState(() {
                 tagsController.clear();
               });
-              },
+            },
             controller: tagsController,
           ),
         ),
@@ -61,36 +61,9 @@ class _TagSelectorState extends State<TagSelector> {
         ),
         SizedBox(
             height: 25,
-            child: ListView.separated(
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemCount: widget.tags.length,
-              separatorBuilder: (context, index) => SizedBox(
-                width: 6,
-              ),
-              itemBuilder: (context, index) => Container(
-                  decoration: BoxDecoration(
-                    borderRadius:
-                        BorderRadius.all(Radius.circular(3)),
-                    color: Colors.grey[300],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(4),
-                    child: Row(
-                      children: [
-                        Text(widget.tags[index]),
-                        SizedBox(
-                          width: 20,
-                          child: IconButton(
-                            padding: EdgeInsets.all(0),
-                            iconSize: 20,
-                            icon: Icon(Icons.clear),
-                            onPressed: () => widget.onClearTag(index),
-                          ),
-                        )
-                      ],
-                    ),
-                  )),
+            child: TagViewer(
+              tags: widget.tags,
+              onClearTag: widget.onClearTag,
             )),
       ],
     );

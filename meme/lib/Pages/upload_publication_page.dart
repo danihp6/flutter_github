@@ -37,6 +37,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
     }
 
     void addKeyWord(String value) {
+      if(keyWords.length<5)
       setState(() {
         keyWords.add(value.toLowerCase());
       });

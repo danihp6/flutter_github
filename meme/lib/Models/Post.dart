@@ -78,7 +78,7 @@ class Post {
 
   set authorId(authorId)=>this._authorId = authorId;
 
- get keyWords => this._keyWords;
+ List<String> get keyWords => this._keyWords;
 
   set keyWords(keyWords)=>this._keyWords = keyWords;
 
