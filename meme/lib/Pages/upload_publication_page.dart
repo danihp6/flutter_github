@@ -31,7 +31,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
       mediaStorage.uploadMedia(_file).then((map) => db.newPost(
           db.userId,
           new Post(map['media'], _description, widget.mediaType, <String>[],
-              DateTime.now(), map['location'], db.userId, keyWords)));
+              DateTime.now(), map['location'], db.userId, keyWords,[])));
       Navigator.pop(context);
       Navigator.pop(context);
     }

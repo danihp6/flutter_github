@@ -8,23 +8,23 @@ import 'package:meme/Widgets/slide_left_route.dart';
 class UserAvatar extends StatelessWidget {
   User user;
   bool linked;
-   UserAvatar({
-    @required this.user,this.linked = true
-  });
+  UserAvatar({@required this.user, this.linked = true});
 
   @override
   Widget build(BuildContext context) {
-
-    ImageProvider image(){
-      if(user.avatar=='') return AssetImage('assets/images/user.png');
+    ImageProvider image() {
+      if (user.avatar == '') return AssetImage('assets/images/user.png');
       return NetworkImage(user.avatar);
     }
 
     return GestureDetector(
-          child: CircleAvatar(
+      child: CircleAvatar(
         backgroundImage: image(),
       ),
-      onTap: ()=>linked?Navigator.push(context, SlideLeftRoute(page: UserPage(userId:user.id))):null,
+      onTap: () => linked
+          ? Navigator.push(
+              context, SlideLeftRoute(page: UserPage(userId: user.id)))
+          : null,
     );
   }
 }

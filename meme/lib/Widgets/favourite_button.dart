@@ -8,8 +8,7 @@ import '../Controller/db.dart';
 
 class FavouriteButton extends StatefulWidget {
   Post post;
-  String userId;
-  FavouriteButton({@required this.post, @required this.userId});
+  FavouriteButton({@required this.post});
 
   @override
   _FavouriteButtonState createState() => _FavouriteButtonState();
@@ -23,22 +22,20 @@ class _FavouriteButtonState extends State<FavouriteButton> {
       return IconButton(
           icon: Icon(Icons.star),
           iconSize: 30,
-          padding: EdgeInsets.all(0),
           onPressed: () {
             setState(() {
               db.deletePostPathInFavourites(
-                  db.userId, 'users/${widget.userId}/posts/${widget.post.id}');
+                  db.userId, 'users/${widget.post.authorId}/posts/${widget.post.id}');
             });
           });
 
     return IconButton(
         icon: Icon(Icons.star_border),
         iconSize: 30,
-        padding: EdgeInsets.all(0),
         onPressed: () {
           setState(() {
             db.addPostPathInFavourites(
-                db.userId, 'users/${widget.userId}/posts/${widget.post.id}');
+                db.userId, 'users/${widget.post.authorId}/posts/${widget.post.id}');
           });
         });
   }

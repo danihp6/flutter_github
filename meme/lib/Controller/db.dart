@@ -1,3 +1,5 @@
+
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/Post.dart';
@@ -59,29 +61,32 @@ class DataBase {
   Future newUser(User user) =>
       _firestore.collection('users').add(user.toFirestore());
 
-  Future<bool> userNameExists(String userName) async{
-    QuerySnapshot query = await _firestore.collection('users').where('userName',isEqualTo: userName).getDocuments();
+  Future<bool> userNameExists(String userName) async {
+    QuerySnapshot query = await _firestore
+        .collection('users')
+        .where('userName', isEqualTo: userName)
+        .getDocuments();
     return query.documents.length > 0;
   }
 
-  Future follow(String userId,String followedId){ _firestore.document('users/$userId').updateData({
-    'followed': FieldValue.arrayUnion([followedId])
-  });
-  _firestore.document('users/$followedId').updateData({
-    'followers': FieldValue.arrayUnion([userId])
-  });
+  Future follow(String userId, String followedId) {
+    _firestore.document('users/$userId').updateData({
+      'followed': FieldValue.arrayUnion([followedId])
+    });
+    _firestore.document('users/$followedId').updateData({
+      'followers': FieldValue.arrayUnion([userId])
+    });
   }
 
-  Future unfollow(String userId,String unfollowedId){
+  Future unfollow(String userId, String unfollowedId) {
     _firestore.document('users/$userId').updateData({
-    'followed': FieldValue.arrayRemove([unfollowedId])
-  });
+      'followed': FieldValue.arrayRemove([unfollowedId])
+    });
 
-  _firestore.document('users/$unfollowedId').updateData({
-    'followers': FieldValue.arrayRemove([userId])
-  });
-
-  } 
+    _firestore.document('users/$unfollowedId').updateData({
+      'followers': FieldValue.arrayRemove([userId])
+    });
+  }
 
 //---------------POST----------------//
 
@@ -152,12 +157,11 @@ class DataBase {
 
   Stream<List<String>> getPostFavourites(String userId, String postId) {
     //print(userId + '                          ' + postId);
-      return _firestore
-          .document('users/$userId/posts/$postId')
-          .snapshots()
-          .map((doc) => List<String>.from(doc.data['favourites']));
+    return _firestore
+        .document('users/$userId/posts/$postId')
+        .snapshots()
+        .map((doc) => List<String>.from(doc.data['favourites']));
   }
-
 
   Future<List<String>> postSearch(String search) async {
     List<String> keyWordsSearched = search.split(' ');
@@ -177,6 +181,16 @@ class DataBase {
     }
     //ORDENAR POR IMPORTANCIA
     return postsId;
+  }
+
+  Future changeHotPoints(
+      String authorId, String postId, String userId, int hotPointsUser) async {
+    DocumentReference ref =
+        _firestore.document('users/$authorId/posts/$postId');
+    DocumentSnapshot snapshot = await ref.get();
+    Map<String, dynamic> hotPoints = snapshot.data['hotPoints'];
+    hotPoints[userId] = hotPointsUser;
+    ref.updateData({'hotPoints': hotPoints});
   }
 
 //---------------POSTLIST----------------//
@@ -236,6 +250,22 @@ class DataBase {
   Future newComment(String userId, String postId, Comment comment) => _firestore
       .collection('users/$userId/posts/$postId/comments')
       .add(comment.toFirestore());
+
+  Future likeComment(
+          String authorId, String postId, String commentId, String userId) =>
+      _firestore
+          .document('users/$authorId/posts/$postId/comments/$commentId')
+          .updateData({
+        'likes': FieldValue.arrayUnion([userId])
+      });
+
+  Future unlikeComment(
+          String authorId, String postId, String commentId, String userId) =>
+      _firestore
+          .document('users/$authorId/posts/$postId/comments/$commentId')
+          .updateData({
+        'likes': FieldValue.arrayRemove([userId])
+      });
 
 //---------------NOTIFICATIONS----------------//
 

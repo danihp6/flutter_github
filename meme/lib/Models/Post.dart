@@ -12,9 +12,10 @@ class Post {
   String _mediaLocation;
   String _authorId;
   List<String> _keyWords;
+  Map<String, dynamic> _hotPoints;
 
-  Post(media, description,mediaType, favourites, dateTime, mediaLocation, authorId,
-      keyWords) {
+  Post(media, description, mediaType, favourites, dateTime, mediaLocation,
+      authorId, keyWords, hotPoints) {
     this._media = media;
     this._mediaType = mediaType;
     this._description = description;
@@ -23,6 +24,7 @@ class Post {
     this._mediaLocation = mediaLocation;
     this._authorId = authorId;
     this._keyWords = keyWords;
+    this._hotPoints = hotPoints;
   }
 
   Post.fromFirestore(DocumentSnapshot doc)
@@ -34,55 +36,67 @@ class Post {
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
         _mediaLocation = doc.data['mediaLocation'],
         _authorId = doc.reference.parent().parent().documentID,
-        _keyWords = List<String>.from(doc.data['keyWords']);
+        _keyWords = List<String>.from(doc.data['keyWords']),
+        _hotPoints = doc.data['hotPoints'];
 
   Map<String, dynamic> toFirestore() => {
         'media': _media,
-        'mediaType':_mediaType,
+        'mediaType': _mediaType,
         'description': _description,
         'favourites': _favourites,
         'dateTime': _dateTime,
         'mediaLocation': _mediaLocation,
-        'keyWords': _keyWords
+        'keyWords': _keyWords,
+        'hotPoints': _hotPoints
       };
 
   get id => this._id;
 
-  set id(id)=>this._id = id;
+  set id(id) => this._id = id;
 
-   get media => this._media;
+  get media => this._media;
 
-  set media(media)=>this._media = media;
+  set media(media) => this._media = media;
 
- get mediaType => this._mediaType;
+  get mediaType => this._mediaType;
 
-  set mediaType(mediaType)=>this._mediaType = mediaType;
+  set mediaType(mediaType) => this._mediaType = mediaType;
 
- get description => this._description;
+  get description => this._description;
 
-  set description(description)=>this._description = description;
+  set description(description) => this._description = description;
 
- get favourites => this._favourites;
+  get favourites => this._favourites;
 
-  set favourites(favourites)=>this._favourites = favourites;
+  set favourites(favourites) => this._favourites = favourites;
 
- get dateTime => this._dateTime;
+  get dateTime => this._dateTime;
 
-  set dateTime(dateTime)=>this._dateTime = dateTime;
+  set dateTime(dateTime) => this._dateTime = dateTime;
 
- get mediaLocation => this._mediaLocation;
+  get mediaLocation => this._mediaLocation;
 
-  set mediaLocation(mediaLocation)=>this._mediaLocation = mediaLocation;
+  set mediaLocation(mediaLocation) => this._mediaLocation = mediaLocation;
 
- get authorId => this._authorId;
+  get authorId => this._authorId;
 
-  set authorId(authorId)=>this._authorId = authorId;
+  set authorId(authorId) => this._authorId = authorId;
 
- List<String> get keyWords => this._keyWords;
+  List<String> get keyWords => this._keyWords;
 
-  set keyWords(keyWords)=>this._keyWords = keyWords;
+  set keyWords(keyWords) => this._keyWords = keyWords;
 
+  get hotPoints => this._hotPoints;
 
+  set hotPoints(hotPoints) => this._hotPoints = hotPoints;
+
+  int getTotalHotPoints() {
+    int res = 0;
+    hotPoints.forEach((id,hotPoints) {
+      res += hotPoints;
+    });
+    return res;
+  }
 }
 
 List<Post> toPosts(QuerySnapshot query) {

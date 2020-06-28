@@ -15,51 +15,45 @@ import 'loading.dart';
 class PostHeader extends StatelessWidget {
   Post post;
   PostList postList;
-  PostHeader({@required this.post, this.postList});
+  User author;
+  PostHeader({@required this.post, this.postList, @required this.author});
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-        stream: db.getUser(post.authorId),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) print(snapshot.error);
-          if (!snapshot.hasData) return Loading();
-          User user = snapshot.data;
-          return Row(
+    return Row(
+      children: [
+        UserAvatar(user: author),
+        SizedBox(width: 10),
+        Text(
+          author.userName,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              UserAvatar(user: user),
-              SizedBox(width: 10),
-              Text(
-                user.userName,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    // Text(
-                    //   post.favourites.length.toString(),
-                    //   style: TextStyle(fontSize: 20),
-                    // ),
-                    // SizedBox(
-                    //   width: 5,
-                    // ),
-                    // FavouriteButton(
-                    //     post: post, userId: post.authorId),
-                    IconButton(icon: Icon(Icons.whatshot), onPressed: null),
-                    SizedBox(
-                      width: 35,
-                      child: PostMenu(
-                        post: post,
-                        userId: post.authorId,
-                        postList: postList,
-                      ),
-                    )
-                  ],
+              // Text(
+              //   post.favourites.length.toString(),
+              //   style: TextStyle(fontSize: 20),
+              // ),
+              // SizedBox(
+              //   width: 5,
+              // ),
+              // FavouriteButton(
+              //     post: post, userId: post.authorId),
+
+              SizedBox(
+                width: 35,
+                child: PostMenu(
+                  post: post,
+                  userId: post.authorId,
+                  postList: postList,
                 ),
-              ),
+              )
             ],
-          );
-        });
+          ),
+        ),
+      ],
+    );
   }
 }
