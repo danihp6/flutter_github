@@ -17,16 +17,19 @@ class LikeCommentButton extends StatefulWidget {
 }
 
 class _LikeCommentButtonState extends State<LikeCommentButton> {
+  List<String> _likes;
+  Comment _comment;
   @override
   Widget build(BuildContext context) {
-    List<String> likes = widget.comment.likes;
-    if (likes.contains(db.userId))
+    _likes = widget.comment.likes;
+    _comment = widget.comment;
+    if (_likes.contains(db.userId))
       return IconButton(
           icon: Icon(Icons.favorite),
           iconSize: 30,
           onPressed: () {
             setState(() {
-              db.unlikeComment();
+              db.unlikeComment(_comment.userPostId,_comment.postId,_comment.id,db.userId);
             });
           });
 
@@ -35,8 +38,7 @@ class _LikeCommentButtonState extends State<LikeCommentButton> {
         iconSize: 30,
         onPressed: () {
           setState(() {
-            db.addcommentPathInFavourites(
-                db.userId, 'users/${widget.comment.authorId}/comments/${widget.post.id}');
+            db.likeComment(_comment.userPostId,_comment.postId,_comment.id,db.userId);
           });
         });
   }

@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:meme/Models/Tag.dart';
+import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/video_player.dart';
 import '../Widgets/tag_selector.dart';
 import 'package:meme/Controller/Configuration.dart';
@@ -21,31 +24,55 @@ class UploadPublicationPage extends StatefulWidget {
 class _UploadPublicationPageState extends State<UploadPublicationPage> {
   File _file;
   String _description = '';
-  List<String> keyWords = <String>[];
-  
+  List<Tag> tags = <Tag>[];
+  bool activedUpload;
+
+  @override
+  void initState() {
+    activedUpload = true;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     _file = widget.file;
-    uploadPublication() {
-      mediaStorage.uploadMedia(_file).then((map) => db.newPost(
+    uploadPublication() async {
+      setState(() {
+        activedUpload = false;
+      });
+      
+      print(activedUpload);
+      List<String> tagsId = await db.createTags(tags);
+      Map map = await mediaStorage.uploadMedia(_file);
+      DocumentReference ref = await db.newPost(
           db.userId,
-          new Post(map['media'], _description, widget.mediaType, <String>[],
-              DateTime.now(), map['location'], db.userId, keyWords,[])));
+          new Post(
+              map['media'],
+              _description,
+              widget.mediaType,
+              <String>[],
+              DateTime.now(),
+              map['location'],
+              db.userId,
+              tagsId,
+              Map<String, dynamic>()));
+      tagsId.forEach((id) {
+        db.addPostToTag(id, ref);
+      });
       Navigator.pop(context);
       Navigator.pop(context);
     }
 
     void addKeyWord(String value) {
-      if(keyWords.length<5)
-      setState(() {
-        keyWords.add(value.toLowerCase());
-      });
+      if (tags.length < 5)
+        setState(() {
+          tags.add(Tag(value.toLowerCase(), <DocumentReference>[]));
+        });
     }
 
     void removeKeyWord(int index) {
       setState(() {
-        keyWords.removeAt(index);
+        tags.removeAt(index);
       });
     }
 
@@ -57,7 +84,9 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
           child: Column(
             children: [
               widget.mediaType == 'image'
-                  ? AspectRatio(aspectRatio: 1, child: Image.file(_file,fit:BoxFit.cover))
+                  ? AspectRatio(
+                      aspectRatio: 1,
+                      child: Image.file(_file, fit: BoxFit.cover))
                   : VideoPlayerWidget(file: _file),
               SizedBox(height: 20),
               SizedBox(
@@ -79,21 +108,47 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
                 height: 20,
               ),
               TagSelector(
-                tags: keyWords,
+                tags: tags,
                 onFieldSubmitted: addKeyWord,
                 onClearTag: removeKeyWord,
               ),
               SizedBox(
                 height: 20,
               ),
-              RaisedButton(
-                color: Colors.blue,
-                textColor: Colors.white,
-                onPressed: uploadPublication,
-                child: Text(
-                  'Subir',
-                  style: TextStyle(fontSize: 16),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  SizedBox(
+                    child: RaisedButton(
+                      color: Colors.red,
+                      onPressed: activedUpload?(){Navigator.pop(context);Navigator.pop(context);}:null,
+                      child: Text(
+                        'Cancelar',style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 60,
+                    width: 100,
+                                  child: RaisedButton(
+                      color: Colors.deepOrangeAccent,
+                      textColor: Colors.white,
+                      onPressed: activedUpload? uploadPublication:null,
+                      child: Text(
+                        'Subir',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if(!activedUpload)
+              Column(
+                children: <Widget>[
+                  SizedBox(height:10),
+                  Loading(),
+                  SizedBox(height:10),
+                ],
               )
             ],
           ),

@@ -21,7 +21,7 @@ class _FavouriteButtonState extends State<FavouriteButton> {
     if (favourites.contains(db.userId))
       return IconButton(
           icon: Icon(Icons.star),
-          iconSize: 30,
+          iconSize: 35,
           onPressed: () {
             setState(() {
               db.deletePostPathInFavourites(

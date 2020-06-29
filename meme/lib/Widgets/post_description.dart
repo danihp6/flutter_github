@@ -12,6 +12,7 @@ import 'package:meme/Widgets/add_comment_field.dart';
 import 'package:meme/Widgets/favourite_button.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
+import 'package:meme/Widgets/stream_tag_viewer.dart';
 import 'package:meme/Widgets/tag_selector.dart';
 import 'package:meme/Widgets/tags_viewer.dart';
 import 'hot_slider.dart';
@@ -38,13 +39,19 @@ class _PostDescriptionState extends State<PostDescription> {
 
   @override
   void initState() {
-    _value = widget.post.hotPoints[db.userId].toDouble();
-    if (_value == _max)
-      _color = Colors.yellowAccent[700];
-    else if (_value > (_max - _min) / 2)
-      _color = Colors.redAccent;
-    else
-      _color = Colors.blueAccent;
+    try {
+      _value = widget.post.hotPoints[db.userId].toDouble();
+      if (_value == _max)
+        _color = Colors.yellowAccent[700];
+      else if (_value > (_max - _min) / 2)
+        _color = Colors.redAccent;
+      else
+        _color = Colors.blueAccent;
+    } catch (e) {
+      _value = 50;
+      _color = Colors.black;
+    }
+
     super.initState();
   }
 
@@ -86,40 +93,42 @@ class _PostDescriptionState extends State<PostDescription> {
             ),
           ),
         SizedBox(
-          height: 30,
+          height: 40,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget>[
               IconButton(
                   icon: Icon(Icons.whatshot),
-                  iconSize: 30,
+                  iconSize: 35,
                   color: _color,
                   onPressed: () {
                     setState(() {
                       _isHotSliderActived = !_isHotSliderActived;
                     });
                   }),
-              Text(widget.post.getTotalHotPoints().toString()),
+              Text(widget.post.getTotalHotPoints().toString(),
+                  style: TextStyle(fontSize: 18)),
               IconButton(
                 icon: Icon(Icons.comment),
-                iconSize: 30,
+                iconSize: 35,
                 onPressed: () => Navigator.of(context).push(SlideLeftRoute(
                     page: CommentsPage(
                   post: widget.post,
                 ))),
               ),
               StreamBuilder(
-                stream: db.getComments(widget.author.id, widget.post.id),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) print(snapshot.error);
+                  stream: db.getComments(widget.author.id, widget.post.id),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) print(snapshot.error);
                     if (!snapshot.hasData) return Container();
                     List<Comment> comments = snapshot.data;
-                  return Text(comments.length.toString());
-                }
-              ),
+                    return Text(comments.length.toString(),
+                        style: TextStyle(fontSize: 18));
+                  }),
               FavouriteButton(post: widget.post),
-              Text(widget.post.favourites.length.toString())
+              Text(widget.post.favourites.length.toString(),
+                  style: TextStyle(fontSize: 18))
             ],
           ),
         ),
@@ -142,14 +151,11 @@ class _PostDescriptionState extends State<PostDescription> {
                         ]),
                   ),
                 ),
-              if (widget.post.keyWords.length > 0)
+              if (widget.post.tags.length > 0)
                 SizedBox(
                   height: 30,
-                  child: TagViewer(
-                    tags: widget.post.keyWords
-                        .map((keyWord) => '#' + keyWord)
-                        .toList(),
-                    activeOnClearTag: false,
+                  child: StreamTagViewer(
+                    tagsId: widget.post.tags,
                   ),
                 ),
               SizedBox(

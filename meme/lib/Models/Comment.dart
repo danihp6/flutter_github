@@ -9,6 +9,8 @@ class Comment {
   DateTime _dateTime;
   List<String> _comments;
   int _level;
+  String _postId;
+  String _userPostId;
 
   Comment(
       text, likes, authorId, dateTime, comments, level) {
@@ -27,7 +29,9 @@ class Comment {
         _authorId = doc.data['authorId'],
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
         _comments = List<String>.from(doc.data['comments']),
-        _level = doc.data['level'];
+        _level = doc.data['level'],
+        _postId = doc.reference.parent().parent().documentID,
+        _userPostId = doc.reference.parent().parent().parent().parent().documentID;
 
   Map<String, dynamic> toFirestore() => {
         'text': _text,
@@ -65,6 +69,14 @@ class Comment {
   get level => this._level;
 
   set level(level) => this._level = level;
+
+  get postId => this._postId;
+
+  set postId(postId) => this._postId = postId;
+
+  get userPostId => this._userPostId;
+
+  set userPostId(userPostId) => this._userPostId = userPostId;
 }
 
 List<Comment> toCommentList(QuerySnapshot query) {

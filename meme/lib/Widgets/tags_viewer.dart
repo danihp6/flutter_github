@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Models/Tag.dart';
 
 class TagViewer extends StatelessWidget {
-  List<String> tags;
-  bool activeOnClearTag;
+  List<Tag> tags;
   Function onClearTag;
   TagViewer({
     @required this.tags,
-    this.activeOnClearTag = true,
     this.onClearTag
   });
 
@@ -31,8 +30,7 @@ class TagViewer extends StatelessWidget {
             padding: const EdgeInsets.all(4),
             child: Row(
               children: [
-                Text(tags[index]),
-                if(activeOnClearTag)
+                Text('#' + tags[index].name,style:TextStyle(fontSize: 16)),
                 SizedBox(
                   width: 20,
                   child: IconButton(

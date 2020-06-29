@@ -2,6 +2,7 @@ import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
+import 'package:meme/Models/Tag.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/post_list_page.dart';
 import 'package:meme/Widgets/follow_button.dart';
@@ -46,8 +47,8 @@ class _SearchPageState extends State<SearchPage>
         return db.userSearch(search.substring(1));
       }
       if (search[0] == '#') {
-        typeSearched = 'posts';
-        return db.postSearch(search.substring(1));
+        typeSearched = 'tags';
+        return db.tagSearch(search.substring(1));
       }
       if (search[0] == '&') {
         typeSearched = 'postLists';
@@ -55,7 +56,7 @@ class _SearchPageState extends State<SearchPage>
       }
       if (tabController.index == 0) return db.userSearch(search);
 
-      if (tabController.index == 1) return db.postSearch(search);
+      if (tabController.index == 1) return db.tagSearch(search);
 
       if (tabController.index == 2) return db.postListSearch(search);
     }
@@ -100,14 +101,15 @@ class _SearchPageState extends State<SearchPage>
                             ],
                           ),
                         );
-                      if (typeSearched == 'posts')
+                      if (typeSearched == 'tags')
                         return StreamBuilder(
-                            stream: db.getPost(item),
+                            stream: db.getTag(item),
                             builder: (context, snapshot) {
                               if (snapshot.hasError) print(snapshot.error);
                               if (!snapshot.hasData) return Loading();
-                              Post post = snapshot.data;
-                              return PostWidget(post: post);
+                              Tag tag = snapshot.data;
+                              print(tag);
+                              return Text('#'+tag.name,style: TextStyle(fontSize: 16),);
                             });
                       if (typeSearched == 'postLists')
                         return StreamBuilder(
@@ -138,7 +140,7 @@ class _SearchPageState extends State<SearchPage>
                               indicatorColor: Colors.deepOrange,
                               onTap: (value) {
                                 if (value == 0) typeSearched = 'users';
-                                if (value == 1) typeSearched = 'posts';
+                                if (value == 1) typeSearched = 'tags';
                                 if (value == 2) typeSearched = 'postLists';
                                 searchBarController.replayLastSearch();
                               },
@@ -147,7 +149,7 @@ class _SearchPageState extends State<SearchPage>
                                   text: 'Usuarios',
                                 ),
                                 Tab(
-                                  text: 'Publicaciones',
+                                  text: 'Tags',
                                 ),
                                 Tab(
                                   text: 'Listas',

@@ -11,11 +11,11 @@ class Post {
   DateTime _dateTime;
   String _mediaLocation;
   String _authorId;
-  List<String> _keyWords;
+  List<String> _tags;
   Map<String, dynamic> _hotPoints;
 
   Post(media, description, mediaType, favourites, dateTime, mediaLocation,
-      authorId, keyWords, hotPoints) {
+      authorId, tags,hotPoints) {
     this._media = media;
     this._mediaType = mediaType;
     this._description = description;
@@ -23,7 +23,7 @@ class Post {
     this._dateTime = dateTime;
     this._mediaLocation = mediaLocation;
     this._authorId = authorId;
-    this._keyWords = keyWords;
+    this._tags = tags;
     this._hotPoints = hotPoints;
   }
 
@@ -36,7 +36,7 @@ class Post {
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
         _mediaLocation = doc.data['mediaLocation'],
         _authorId = doc.reference.parent().parent().documentID,
-        _keyWords = List<String>.from(doc.data['keyWords']),
+        _tags = List<String>.from(doc.data['tags']),
         _hotPoints = doc.data['hotPoints'];
 
   Map<String, dynamic> toFirestore() => {
@@ -46,7 +46,7 @@ class Post {
         'favourites': _favourites,
         'dateTime': _dateTime,
         'mediaLocation': _mediaLocation,
-        'keyWords': _keyWords,
+        'tags': _tags,
         'hotPoints': _hotPoints
       };
 
@@ -82,9 +82,9 @@ class Post {
 
   set authorId(authorId) => this._authorId = authorId;
 
-  List<String> get keyWords => this._keyWords;
+  List<String> get tags => this._tags;
 
-  set keyWords(keyWords) => this._keyWords = keyWords;
+  set tags(tags) => this._tags = tags;
 
   get hotPoints => this._hotPoints;
 

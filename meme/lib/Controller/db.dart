@@ -1,9 +1,9 @@
 
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
+import 'package:meme/Models/Tag.dart';
 import 'package:meme/Models/User.dart';
 import '../Models/Notification.dart';
 
@@ -149,8 +149,12 @@ class DataBase {
     });
   }
 
-  Future newPost(String userId, Post post) =>
-      _firestore.collection('users/$userId/posts').add(post.toFirestore());
+  Future<DocumentReference> newPost(String userId, Post post) async {
+    DocumentReference ref = await _firestore
+        .collection('users/$userId/posts')
+        .add(post.toFirestore());
+    return ref;
+  }
 
   Future deletePost(String userId, String postId) =>
       _firestore.document('users/$userId/posts/$postId').delete();
@@ -164,7 +168,7 @@ class DataBase {
   }
 
   Future<List<String>> postSearch(String search) async {
-    List<String> keyWordsSearched = search.split(' ');
+    List<String> keyWordsSearched = search.split(' '); //CAMBIARRRRRR
     QuerySnapshot userQuery =
         await _firestore.collection('users').getDocuments();
     List<String> postsId = [];
@@ -214,6 +218,7 @@ class DataBase {
       _firestore.document('users/$userId/postLists/$postListId').delete();
 
   Future<List<String>> postListSearch(String search) async {
+    //CAMBIARRRRRR
     List<String> keyWordsSearched = search.split(' ');
     QuerySnapshot userQuery =
         await _firestore.collection('users').getDocuments();
@@ -252,17 +257,17 @@ class DataBase {
       .add(comment.toFirestore());
 
   Future likeComment(
-          String authorId, String postId, String commentId, String userId) =>
+          String userPostId, String postId, String commentId, String userId) =>
       _firestore
-          .document('users/$authorId/posts/$postId/comments/$commentId')
+          .document('users/$userPostId/posts/$postId/comments/$commentId')
           .updateData({
         'likes': FieldValue.arrayUnion([userId])
       });
 
   Future unlikeComment(
-          String authorId, String postId, String commentId, String userId) =>
+          String userPostId, String postId, String commentId, String userId) =>
       _firestore
-          .document('users/$authorId/posts/$postId/comments/$commentId')
+          .document('users/$userPostId/posts/$postId/comments/$commentId')
           .updateData({
         'likes': FieldValue.arrayRemove([userId])
       });
@@ -281,6 +286,61 @@ class DataBase {
   Future deleteNotification(String userId, String notificationId) => _firestore
       .document('users/$userId/notifications/$notificationId')
       .delete();
+
+//---------------TAGS----------------//
+
+  Stream<List<Tag>> getTendTags() => _firestore
+      .collection('tags')
+      .orderBy('posts')
+      .limit(10)
+      .snapshots()
+      .map(toTagLists);
+
+  Stream<Tag> getTag(String tagId) => _firestore
+      .document('tags/$tagId')
+      .snapshots()
+      .map((doc) => Tag.fromFirestore(doc));
+
+  Future<String> getTagId(String tagName) async {
+    String id = '';
+    QuerySnapshot query = await _firestore.collection('tags').getDocuments();
+    query.documents.forEach((doc) {
+      if (doc.data['name'] == tagName) id = doc.documentID;
+    });
+    return id;
+  }
+
+  Future<String> addTag(Tag tag) async {
+    DocumentReference ref =
+        await _firestore.collection('tags').add(tag.toFirestore());
+    return ref.documentID;
+  }
+
+  Future<List<String>> createTags(List<Tag> tags) async {
+    List<String> tagsId = <String>[];
+    tags.forEach((tag) async {
+      String id = await getTagId(tag.name);
+      if (id != '')
+        tagsId.add(id);
+      else
+        tagsId.add(await addTag(tag));
+    });
+    return tagsId;
+  }
+
+  Future addPostToTag(String tagId, DocumentReference ref) {
+    _firestore.document('tags/$tagId').updateData({
+      'posts': FieldValue.arrayUnion([ref])
+    });
+  }
+
+  Future<List<Tag>> tagSearch(String search) async {
+    var query = await _firestore
+        .collection('tags')
+        .where('keyWords', arrayContains: search)
+        .getDocuments();
+    return query.documents.map((doc) => Tag.fromFirestore(doc)).toList();
+  }
 }
 
 DataBase db = new DataBase();

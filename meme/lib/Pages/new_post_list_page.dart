@@ -20,7 +20,6 @@ class _NewPostListPageState extends State<NewPostListPage> {
   File _file;
   String _image = '';
   String _imageLocation = '';
-  List<String> _keyWords = <String>[];
   @override
   Widget build(BuildContext context) {
     Future createPostList() async {
@@ -33,7 +32,7 @@ class _NewPostListPageState extends State<NewPostListPage> {
         db.newPostList(
             db.userId,
             new PostList(_name, _image, _imageLocation, <String>[],
-                db.userId, _keyWords,DateTime.now()));
+                db.userId,DateTime.now()));
         Navigator.pop(context);
       }
     }
@@ -45,17 +44,6 @@ class _NewPostListPageState extends State<NewPostListPage> {
       Navigator.pop(context);
     }
 
-    void addKeyWord(String value) {
-      setState(() {
-        _keyWords.add(value.toLowerCase());
-      });
-    }
-
-    void removeKeyWord(int index) {
-      setState(() {
-        _keyWords.removeAt(index);
-      });
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -96,10 +84,6 @@ class _NewPostListPageState extends State<NewPostListPage> {
               ),
               Text('Selecciona una imagen'),
               SizedBox(height: 30),
-              TagSelector(
-                  tags: _keyWords,
-                  onFieldSubmitted: addKeyWord,
-                  onClearTag: removeKeyWord),
               SizedBox(
                 height: 30,
               ),
