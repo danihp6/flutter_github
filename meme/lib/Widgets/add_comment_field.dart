@@ -5,6 +5,7 @@ import 'package:meme/Controller/string_functions.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/user_avatar.dart';
+import 'loading.dart';
 
 class AddCommentField extends StatefulWidget {
   User user;
@@ -20,22 +21,34 @@ class _AddCommentFieldState extends State<AddCommentField> {
   TextEditingController controller;
   FocusNode focus;
   bool isMentionsShowed;
+  String userSearch = '';
+  List<String> userMentions = [];
+  int startWordIndex;
 
-@override
+  @override
   void initState() {
     text = '';
     isMentionsShowed = false;
     controller = new TextEditingController();
     controller.addListener(() {
-      if(controller.selection.baseOffset>0){
-      int startWordIndex = startIndexWordAtPosition(controller.value.text, controller.selection.baseOffset-1);
-      print(startWordIndex);
-       if (controller.value.text[startWordIndex] == '@' && (startWordIndex-1 == 0 || controller.value.text[startWordIndex-2] == ' '))print('@');
+      isMentionsShowed = false;
+      if (controller.selection.baseOffset > 0) {
+        startWordIndex = startIndexWordAtPosition(
+            controller.value.text, controller.selection.baseOffset - 1);
+        if (startWordIndex != -1) {
+          if (controller.value.text[startWordIndex] == '@') {
+            isMentionsShowed = true;
+            userSearch = nextWord(controller.value.text
+                .substring(startWordIndex + 1, (controller.value.text.length)));
+          }
+        }
       }
-     });
+      setState(() {});
+    });
     focus = new FocusNode();
     super.initState();
   }
+
   @override
   void dispose() {
     controller.dispose();
@@ -43,53 +56,76 @@ class _AddCommentFieldState extends State<AddCommentField> {
     super.dispose();
   }
 
-      
-
   @override
   Widget build(BuildContext context) {
     void sendComment() {
+      userMentions = wordsStartWith(text, '@');
+      print(userMentions);
       db.newComment(
           db.userId,
           widget.postId,
-          new Comment(text, <String>[], db.userId,
-              DateTime.now(), <String>[], 0));
+          new Comment(
+              text, <String>[], db.userId, DateTime.now(), <String>[], 0));
       controller.clear();
       text = '';
       focus.unfocus();
     }
 
-bool possibleMention(){
-        if(text[controller.selection.baseOffset] == '@') return true;
-        return false;
-    }
-
-    return Row(
-      children: [
-        SizedBox(
-          width: 10,
+    return Column(
+      children: <Widget>[
+        if (isMentionsShowed)
+          FutureBuilder(
+              future: db.userSearch(userSearch),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) print(snapshot.error);
+                if (!snapshot.hasData) return Loading();
+                List<User> users = snapshot.data;
+                return ListView.builder(
+                  itemCount: users.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) => GestureDetector(child: Text(users[index].userName),onTap: (){
+                    String textBefore = controller.selection.textBefore(text).substring(0,startWordIndex + 1) ?? '';
+                    String textAfter = controller.selection.textAfter(text).substring(controller.selection.baseOffset - userSearch.length - 1,controller.selection.textAfter(text).length) ?? ''; 
+                    text = textBefore + users[index].userName + textAfter;
+                    controller.text= text;
+                    print( controller.selection.baseOffset + userSearch.length - startWordIndex );
+                    controller.selection = TextSelection.fromPosition(TextPosition(offset:controller.selection.baseOffset+ controller.selection.baseOffset - userSearch.length - 1 ));
+                    setState(() {
+                      
+                    });
+                  },),
+                );
+              }),
+        Row(
+          children: [
+            SizedBox(
+              width: 10,
+            ),
+            SizedBox(
+                height: 30, width: 30, child: UserAvatar(user: widget.user)),
+            SizedBox(width: 10),
+            Expanded(
+              child: TextField(
+                decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.comment),
+                    hintText: 'Escribe un comentario',
+                    border: InputBorder.none),
+                onChanged: (value) {
+                  setState(() {
+                    text = value;
+                  });
+                },
+                controller: controller,
+                focusNode: focus,
+              ),
+            ),
+            if (text.length > 0)
+              IconButton(
+                icon: Icon(Icons.send),
+                onPressed: sendComment,
+              )
+          ],
         ),
-        SizedBox(height:30,width:30,child: UserAvatar(user: widget.user)),
-        SizedBox(width: 10),
-        Expanded(
-          child: TextField(
-            decoration: InputDecoration(
-                prefixIcon: Icon(Icons.comment),
-                hintText: 'Escribe un comentario',
-                border: InputBorder.none),
-            onChanged: (value) {
-              setState(() {
-                text = value;
-              });
-            },
-            controller: controller,
-            focusNode: focus,
-          ),
-        ),
-        if (text.length > 0)
-          IconButton(
-            icon: Icon(Icons.send),
-            onPressed: sendComment,
-          )
       ],
     );
   }
