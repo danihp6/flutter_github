@@ -35,10 +35,8 @@ List<String> wordsStartWith(String string,String letter){
 
 int restOffWord (String string,int position){
   int i = 0;
-  while(i<string.length && string[position]!= ' '){
-    print(string[i]);
+  while(position + i<string.length && string[position + i]!= ' '){
     i++;
   }
-  print(i);
   return i;
 }

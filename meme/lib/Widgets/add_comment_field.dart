@@ -82,17 +82,31 @@ class _AddCommentFieldState extends State<AddCommentField> {
                 return ListView.builder(
                   itemCount: users.length,
                   shrinkWrap: true,
-                  itemBuilder: (context, index) => GestureDetector(child: Text(users[index].userName),onTap: (){
-                    String textBefore = controller.selection.textBefore(text).substring(0,startWordIndex + 1) ?? '';
-                    String textAfter = controller.selection.textAfter(text).substring(restOffWord(text, controller.selection.baseOffset),controller.selection.textAfter(text).length ) ?? ''; 
-                    text = textBefore + users[index].userName + textAfter;
-                    controller.text= text;
-                    // print( controller.selection.baseOffset + userSearch.length - startWordIndex );
-                    // controller.selection = TextSelection.fromPosition(TextPosition(offset:controller.selection.baseOffset+ controller.selection.baseOffset - startWordIndex ));
-                    setState(() {
-                      
-                    });
-                  },),
+                  itemBuilder: (context, index) => GestureDetector(
+                    child: Text(users[index].userName),
+                    onTap: () {
+                      String textBefore = controller.selection
+                              .textBefore(text)
+                              .substring(0, startWordIndex + 1) ??
+                          '';
+                      String textAfter = controller.selection
+                              .textAfter(text)
+                              .substring(
+                                  restOffWord(
+                                      text, controller.selection.baseOffset),
+                                  controller.selection
+                                      .textAfter(text)
+                                      .length) ??
+                          '';
+                      text = textBefore + users[index].userName + textAfter;
+                      controller.text = text;
+                      controller.selection = TextSelection.fromPosition(
+                          TextPosition(
+                              offset: textBefore.length +
+                                  users[index].userName.length));
+                      setState(() {});
+                    },
+                  ),
                 );
               }),
         Row(
@@ -106,12 +120,16 @@ class _AddCommentFieldState extends State<AddCommentField> {
             Expanded(
               child: TextField(
                 decoration: InputDecoration(
-                    prefixIcon: text.length > 0?IconButton(icon: Icon(Icons.clear), onPressed: (){
-                      setState(() {
-                        controller.clear();
-                        text = '';
-                      });
-                    }) :Icon(Icons.comment),
+                    prefixIcon: text.length > 0
+                        ? IconButton(
+                            icon: Icon(Icons.clear),
+                            onPressed: () {
+                              setState(() {
+                                controller.clear();
+                                text = '';
+                              });
+                            })
+                        : Icon(Icons.comment),
                     hintText: 'Escribe un comentario',
                     border: InputBorder.none),
                 onChanged: (value) {
