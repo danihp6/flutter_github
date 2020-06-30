@@ -3,6 +3,7 @@ import 'package:meme/Controller/datetime_functions.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Pages/like_comment_button.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/user_avatar.dart';
 import '../Controller/db.dart';
@@ -66,11 +67,9 @@ class _CommentWidgetState extends State<CommentWidget> {
                   Text(_comment.likes.length.toString()),
                   SizedBox(
                     width: 30,
-                    child: IconButton(
-                        icon: Icon(Icons.favorite_border),
-                        iconSize: 15,
-                        onPressed: () {}),
+                    child: LikeCommentButton(comment: _comment),
                   ),
+                  SizedBox(width: 2,),
                   Text(getPastTime(_comment.dateTime))
                 ]),
               )

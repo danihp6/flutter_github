@@ -84,8 +84,7 @@ class NotificationWidget extends StatelessWidget {
                         context,
                         SlideLeftRoute(
                             page: PostPage(
-                          userId: notification.sender,
-                          postId: notification.post,
+                          post:post
                         ))),
                   );
                 })

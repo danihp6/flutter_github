@@ -5,9 +5,8 @@ import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/post.dart';
 
 class PostPage extends StatelessWidget {
-  String postId;
-  String userId;
-  PostPage({@required this.userId, @required this.postId});
+  Post post;
+  PostPage({@required this.post});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +21,7 @@ class PostPage extends StatelessWidget {
         ),
         body: SingleChildScrollView(
                   child: StreamBuilder(
-              stream: db.getPost('users/$userId/posts/$postId'),
+              stream: db.getPost('users/${post.authorId}/posts/${post.id}'),
               builder: (context, snapshot) {
                 if (snapshot.hasError) print(snapshot.error);
                 if (!snapshot.hasData) return Loading();

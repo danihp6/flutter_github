@@ -90,8 +90,7 @@ class DataBase {
 
 //---------------POST----------------//
 
-  Stream<Post> getPost(String postPath) => _firestore
-      .document(postPath)
+  Stream<Post> getPost(String postPath) => _firestore.document(postPath)
       .snapshots()
       .map((doc) => Post.fromFirestore(doc));
 

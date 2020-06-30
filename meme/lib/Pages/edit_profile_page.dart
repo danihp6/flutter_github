@@ -5,6 +5,7 @@ import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/media_storage.dart';
 import 'package:meme/Models/User.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'gallery_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/user_avatar.dart';
@@ -38,6 +39,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _descriptionController = new TextEditingController(text: _description);
     _avatar = _user.avatar;
     _avatarLocation = _user.avatarLocation;
+    gallery.getMediaGallery().then((_) { // PONER SI AUN NO HA ESTADO INICIADO
+
+    });
   }
 
   @override
@@ -73,7 +77,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
 
     image(){
-      if(_file == null && _avatar == '') return AssetImage('assets/images/user');
+      if(_file == null && _avatar == '') return AssetImage('assets/images/user.png');
       else if(_file == null) return NetworkImage(_avatar);
       return FileImage(_file);
     }
@@ -95,13 +99,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     child: CircleAvatar(
                       backgroundImage: image(),
                     ),),
-                onTap: () => Navigator.push(
+                onTap: () async => await Permission.storage.request().isGranted? Navigator.push(
                     context,
                     SlideLeftRoute(
                         page: GalleryPage(
                       onTap: editAvatar,
                       page: gallery.imagePage,
-                    ))),
+                    ))):null,
               ),
               SizedBox(
                 height: 10,
