@@ -24,15 +24,10 @@ class _NewPostListPageState extends State<NewPostListPage> {
   Widget build(BuildContext context) {
     Future createPostList() async {
       if (_name != '') {
-        if (_file != null) {
-          var map = await mediaStorage.uploadMedia(_file);
-          _image = map['media'];
-          _imageLocation = map['location'];
-        }
         db.newPostList(
             db.userId,
             new PostList(_name, _image, _imageLocation, <String>[],
-                db.userId,DateTime.now()));
+                db.userId,DateTime.now()),_file);
         Navigator.pop(context);
       }
     }

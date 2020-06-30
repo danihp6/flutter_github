@@ -40,22 +40,13 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
       setState(() {
         activedUpload = false;
       });
-      
-      print(activedUpload);
+
       List<String> tagsId = await db.createTags(tags);
-      Map map = await mediaStorage.uploadMedia(_file);
       DocumentReference ref = await db.newPost(
           db.userId,
-          new Post(
-              map['media'],
-              _description,
-              widget.mediaType,
-              <String>[],
-              DateTime.now(),
-              map['location'],
-              db.userId,
-              tagsId,
-              Map<String, dynamic>()));
+          new Post('', _description, widget.mediaType, <String>[],
+              DateTime.now(), '', db.userId, tagsId, Map<String, dynamic>()),
+          _file);
       tagsId.forEach((id) {
         db.addPostToTag(id, ref);
       });
@@ -121,19 +112,25 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
                   SizedBox(
                     child: RaisedButton(
                       color: Colors.red,
-                      onPressed: activedUpload?(){Navigator.pop(context);Navigator.pop(context);}:null,
+                      onPressed: activedUpload
+                          ? () {
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            }
+                          : null,
                       child: Text(
-                        'Cancelar',style: TextStyle(fontSize: 16),
+                        'Cancelar',
+                        style: TextStyle(fontSize: 16),
                       ),
                     ),
                   ),
                   SizedBox(
                     height: 60,
                     width: 100,
-                                  child: RaisedButton(
+                    child: RaisedButton(
                       color: Colors.deepOrangeAccent,
                       textColor: Colors.white,
-                      onPressed: activedUpload? uploadPublication:null,
+                      onPressed: activedUpload ? uploadPublication : null,
                       child: Text(
                         'Subir',
                         style: TextStyle(fontSize: 20),
@@ -142,14 +139,14 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
                   ),
                 ],
               ),
-              if(!activedUpload)
-              Column(
-                children: <Widget>[
-                  SizedBox(height:10),
-                  Loading(),
-                  SizedBox(height:10),
-                ],
-              )
+              if (!activedUpload)
+                Column(
+                  children: <Widget>[
+                    SizedBox(height: 10),
+                    Loading(),
+                    SizedBox(height: 10),
+                  ],
+                )
             ],
           ),
         ),

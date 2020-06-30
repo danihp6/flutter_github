@@ -46,7 +46,7 @@ class PostMenu extends StatelessWidget {
                 ],
               ),
               value: () {
-                mediaStorage.deleteFile(post.mediaLocation);
+                // mediaStorage.deleteFile(post.mediaLocation);
                 db.deletePost(userId, post.id);
               },
             ),

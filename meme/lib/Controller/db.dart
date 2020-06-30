@@ -1,3 +1,4 @@
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meme/Models/Comment.dart';
@@ -6,6 +7,7 @@ import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/Tag.dart';
 import 'package:meme/Models/User.dart';
 import '../Models/Notification.dart';
+import 'media_storage.dart';
 
 class DataBase {
   final _firestore = Firestore.instance;
@@ -32,13 +34,20 @@ class DataBase {
   }
 
   Future editUser(String userId, String name, String description, String avatar,
-          String avatarLocation) =>
-      _firestore.document('users/$userId').updateData({
-        'name': name,
-        'description': description,
-        'avatar': avatar,
-        'avatarLocation': avatarLocation
-      });
+      String avatarLocation, File file) async {
+    if (file != null) {
+      if (avatar != '') mediaStorage.deleteFile(avatarLocation);
+      Map map = await mediaStorage.uploadAvatar(file,userId);
+      avatar = map['media'];
+      avatarLocation = map['location'];
+    }
+    _firestore.document('users/$userId').updateData({
+      'name': name,
+      'description': description,
+      'avatar': avatar,
+      'avatarLocation': avatarLocation
+    });
+  }
 
   Stream<List<String>> getFollowers(String userId) => _firestore
       .document('users/$userId')
@@ -90,7 +99,8 @@ class DataBase {
 
 //---------------POST----------------//
 
-  Stream<Post> getPost(String postPath) => _firestore.document(postPath)
+  Stream<Post> getPost(String postPath) => _firestore
+      .document(postPath)
       .snapshots()
       .map((doc) => Post.fromFirestore(doc));
 
@@ -148,7 +158,10 @@ class DataBase {
     });
   }
 
-  Future<DocumentReference> newPost(String userId, Post post) async {
+  Future<DocumentReference> newPost(String userId, Post post, File file) async {
+    Map map = await mediaStorage.uploadMedia(file,userId);
+    post.media = map['media'];
+    post.mediaLocation = map['mediaLocation'];
     DocumentReference ref = await _firestore
         .collection('users/$userId/posts')
         .add(post.toFirestore());
@@ -209,9 +222,16 @@ class DataBase {
       .snapshots()
       .map(toPostLists);
 
-  Future newPostList(String userId, PostList postList) => _firestore
-      .collection('users/$userId/postLists')
-      .add(postList.toFirestore());
+  Future newPostList(String userId, PostList postList, File file) async {
+    if (file != null) {
+      Map map = await mediaStorage.uploadMedia(file,userId);
+      postList.image = map['media'];
+      postList.imageLocation = map['location'];
+    }
+    _firestore
+        .collection('users/$userId/postLists')
+        .add(postList.toFirestore());
+  }
 
   Future deletePostList(String userId, String postListId) =>
       _firestore.document('users/$userId/postLists/$postListId').delete();

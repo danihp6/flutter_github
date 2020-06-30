@@ -39,8 +39,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _descriptionController = new TextEditingController(text: _description);
     _avatar = _user.avatar;
     _avatarLocation = _user.avatarLocation;
-    gallery.getMediaGallery().then((_) { // PONER SI AUN NO HA ESTADO INICIADO
-
+    gallery.getMediaGallery().then((_) {
+      // PONER SI AUN NO HA ESTADO INICIADO
     });
   }
 
@@ -54,31 +54,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     editUser() {
-      if (_file != null) {
-        if(_avatar!='') mediaStorage.deleteFile(_user.avatarLocation);
-        mediaStorage.uploadAvatar(_file).then((map) => db.editUser(
-            _user.id,
-            _userName,
-            _description,
-            map['media'],
-            map['location']));
-      } else
-        db.editUser(
-            _user.id, _userName, _description, _avatar, _avatarLocation);
+      db.editUser(
+          _user.id, _userName, _description, _avatar, _avatarLocation, _file);
       Navigator.pop(context);
     }
 
     editAvatar(Media media) async {
-      
       File cropedImage = await cropImage(await media.getFile());
-        if (cropedImage != null) _file = cropedImage;
+      if (cropedImage != null) _file = cropedImage;
       setState(() {});
       Navigator.pop(context);
     }
 
-    image(){
-      if(_file == null && _avatar == '') return AssetImage('assets/images/user.png');
-      else if(_file == null) return NetworkImage(_avatar);
+    image() {
+      if (_file == null && _avatar == '')
+        return AssetImage('assets/images/user.png');
+      else if (_file == null) return NetworkImage(_avatar);
       return FileImage(_file);
     }
 
@@ -94,18 +85,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
             children: [
               GestureDetector(
                 child: SizedBox(
-                    width: 90,
-                    height: 90,
-                    child: CircleAvatar(
-                      backgroundImage: image(),
-                    ),),
-                onTap: () async => await Permission.storage.request().isGranted? Navigator.push(
-                    context,
-                    SlideLeftRoute(
-                        page: GalleryPage(
-                      onTap: editAvatar,
-                      page: gallery.imagePage,
-                    ))):null,
+                  width: 90,
+                  height: 90,
+                  child: CircleAvatar(
+                    backgroundImage: image(),
+                  ),
+                ),
+                onTap: () async => await Permission.storage.request().isGranted
+                    ? Navigator.push(
+                        context,
+                        SlideLeftRoute(
+                            page: GalleryPage(
+                          onTap: editAvatar,
+                          page: gallery.imagePage,
+                        )))
+                    : null,
               ),
               SizedBox(
                 height: 10,

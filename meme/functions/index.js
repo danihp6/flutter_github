@@ -33,29 +33,38 @@ exports.onDeletePost = functions.region('europe-west2').firestore.document('user
       console.log(doc.ref.collection('postLists'))
       deletePostInPostList(path, db, doc.ref.collection('postLists'), batchSize)
 
-      ref = doc.collection('notifications')
-      query = ref.orderBy('__name__').limit(batchSize)
+      // ref = doc.collection('notifications')
+      // query = ref.orderBy('__name__').limit(batchSize)
 
-      query.get().then((snapshot) => {
-        if (snapshot.size === 0) {
-          return 0
-        }
+      // query.get().then((snapshot) => {
+      //   if (snapshot.size === 0) {
+      //     return 0
+      //   }
 
-        var notificationData
-        var post
-        snapshot.docs.forEach(function (doc) {
-          notificationData = (await ref.get()).data()
-          post = notificationData['post']
+      //   var notificationData
+      //   var post
+      //   snapshot.docs.forEach(function (doc) {
+      //     notificationData = (await ref.get()).data()
+      //     post = notificationData['post']
 
-          if (post == userId) doc.delete()
+      //     if (post == userId) doc.delete()
 
 
-        })
-      })
+      //   })
+      // })
     })
   })
+
+  var path = snap.data()['mediaLocation']
+  console.log(path)
+  var bucket = admin.storage().bucket()
+  deleteMedia(path,bucket)
   return Promise.all([deleted])
 })
+
+function deleteMedia(path,bucket){
+  bucket.file(path).delete()
+}
 
 function deletePostInPostList(path, db, collectionRef, batchSize) {
   var query = collectionRef.orderBy('__name__').limit(batchSize)
