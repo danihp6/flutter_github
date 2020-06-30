@@ -32,3 +32,13 @@ List<String> wordsStartWith(String string,String letter){
   }
   return words;
 }
+
+int restOffWord (String string,int position){
+  int i = 0;
+  while(i<string.length && string[position]!= ' '){
+    print(string[i]);
+    i++;
+  }
+  print(i);
+  return i;
+}

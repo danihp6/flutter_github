@@ -60,7 +60,6 @@ class _AddCommentFieldState extends State<AddCommentField> {
   Widget build(BuildContext context) {
     void sendComment() {
       userMentions = wordsStartWith(text, '@');
-      print(userMentions);
       db.newComment(
           db.userId,
           widget.postId,
@@ -85,11 +84,11 @@ class _AddCommentFieldState extends State<AddCommentField> {
                   shrinkWrap: true,
                   itemBuilder: (context, index) => GestureDetector(child: Text(users[index].userName),onTap: (){
                     String textBefore = controller.selection.textBefore(text).substring(0,startWordIndex + 1) ?? '';
-                    String textAfter = controller.selection.textAfter(text).substring(controller.selection.baseOffset - userSearch.length - 1,controller.selection.textAfter(text).length) ?? ''; 
+                    String textAfter = controller.selection.textAfter(text).substring(restOffWord(text, controller.selection.baseOffset),controller.selection.textAfter(text).length ) ?? ''; 
                     text = textBefore + users[index].userName + textAfter;
                     controller.text= text;
-                    print( controller.selection.baseOffset + userSearch.length - startWordIndex );
-                    controller.selection = TextSelection.fromPosition(TextPosition(offset:controller.selection.baseOffset+ controller.selection.baseOffset - userSearch.length - 1 ));
+                    // print( controller.selection.baseOffset + userSearch.length - startWordIndex );
+                    // controller.selection = TextSelection.fromPosition(TextPosition(offset:controller.selection.baseOffset+ controller.selection.baseOffset - startWordIndex ));
                     setState(() {
                       
                     });
@@ -107,7 +106,12 @@ class _AddCommentFieldState extends State<AddCommentField> {
             Expanded(
               child: TextField(
                 decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.comment),
+                    prefixIcon: text.length > 0?IconButton(icon: Icon(Icons.clear), onPressed: (){
+                      setState(() {
+                        controller.clear();
+                        text = '';
+                      });
+                    }) :Icon(Icons.comment),
                     hintText: 'Escribe un comentario',
                     border: InputBorder.none),
                 onChanged: (value) {
