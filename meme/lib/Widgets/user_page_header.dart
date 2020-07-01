@@ -12,8 +12,8 @@ import 'package:meme/Widgets/user_avatar.dart';
 
 class UserPageHeader extends StatelessWidget {
   User user;
-  Function refresh;
-  UserPageHeader({@required this.user, this.refresh});
+  GlobalKey<ScaffoldState> scaffoldKey;
+  UserPageHeader({@required this.user, this.scaffoldKey});
 
   @override
   Widget build(BuildContext context) {
@@ -80,15 +80,12 @@ class UserPageHeader extends StatelessWidget {
                           SlideLeftRoute(
                               page: FollowedListPage(userId: user.id))),
                     ),
-                    Drawer(
-                      child: Container(),
-                    )
-                    // IconButton(
-                    //     icon: Icon(Icons.settings),
-                    //     iconSize: 30,
-                    //     onPressed: () {
-                    //       auth.signOut().then((_) => refresh());
-                    //     })
+                    IconButton(
+                        icon: Icon(Icons.menu),
+                        iconSize: 30,
+                        onPressed: () {
+                          scaffoldKey.currentState.openEndDrawer();
+                        })
                   ],
                 ),
                 SizedBox(

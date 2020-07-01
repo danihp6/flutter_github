@@ -19,6 +19,8 @@ import 'package:meme/Widgets/user_avatar.dart';
 import 'package:meme/Widgets/user_row.dart';
 import '../Controller/db.dart';
 import 'post_page.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_widgets/flutter_widgets.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -218,6 +220,8 @@ class _SearchPageState extends State<SearchPage>
         );
     }
 
+    
+
     return WillPopScope(
       onWillPop: onWillPop,
       child: SafeArea(
@@ -277,43 +281,7 @@ class _SearchPageState extends State<SearchPage>
                                             ),
                                             SizedBox(
                                               height: 200,
-                                              child: ListView.separated(
-                                                itemCount: posts.length,
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                separatorBuilder:
-                                                    (context, index) =>
-                                                        SizedBox(
-                                                  width: 5,
-                                                ),
-                                                itemBuilder: (context, index) =>
-                                                    StreamBuilder(
-                                                  stream: db.getPost(
-                                                      posts[index].path),
-                                                  builder: (context, snapshot) {
-                                                    if (snapshot.hasError)
-                                                      print(snapshot.error);
-                                                    if (!snapshot.hasData)
-                                                      return Loading();
-                                                    Post post = snapshot.data;
-                                                    return GestureDetector(
-                                                      child: post.mediaType ==
-                                                              'image'
-                                                          ? Image.network(
-                                                              post.media)
-                                                          : null,
-                                                      onTap: () =>
-                                                          Navigator.push(
-                                                              context,
-                                                              SlideLeftRoute(
-                                                                  page:
-                                                                      PostPage(
-                                                                post: post,
-                                                              ))),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
+                                              child: Carousel(posts: posts),
                                             )
                                           ],
                                         ),
@@ -433,6 +401,72 @@ class _SearchPageState extends State<SearchPage>
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class Carousel extends StatefulWidget {
+  Carousel({
+    @required this.posts,
+  });
+
+  List<DocumentReference> posts;
+
+  @override
+  _CarouselState createState() => _CarouselState();
+}
+
+class _CarouselState extends State<Carousel> {
+  bool visible = true;
+
+  List<Widget> carousel(List<DocumentReference> posts) => posts
+        .map((post) => StreamBuilder(
+              stream: db.getPost(post.path),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) print(snapshot.error);
+                if (!snapshot.hasData) return Loading();
+                Post post = snapshot.data;
+                return GestureDetector(
+                  child: post.mediaType == 'image'
+                      ? Image.network(post.media)
+                      : null,
+                  onTap: () => Navigator.push(
+                      context,
+                      SlideLeftRoute(
+                          page: PostPage(
+                        post: post,
+                      ))),
+                );
+              },
+            ))
+        .toList();
+
+  @override
+  Widget build(BuildContext context) {
+    return VisibilityDetector(
+      key: UniqueKey(),
+      onVisibilityChanged: (info) {
+          // visible = info.visibleFraction == 0?false:true;
+          // setState(() {
+            
+          // });
+      },
+      child: CarouselSlider(
+        options: CarouselOptions(
+          aspectRatio: 1.5,
+          enlargeCenterPage: false,
+          enableInfiniteScroll: false,
+          initialPage: 0,
+          autoPlay: visible,
+          autoPlayAnimationDuration:
+              Duration(seconds: 5),
+          autoPlayInterval:
+              Duration(seconds: 5),
+          autoPlayCurve:
+              Curves.decelerate,
+        ),
+        items: carousel(widget.posts),
       ),
     );
   }
