@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:meme/Controller/configuration.dart';
 import 'package:meme/Controller/datetime_functions.dart';
 import 'package:meme/Controller/db.dart';
@@ -21,77 +22,126 @@ class NotificationWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FadingDismissible(
-      key: UniqueKey(),
-      onDismissed: (direction) =>
-          db.deleteNotification(db.userId, notification.id),
-      child: Row(
-        children: [
-          StreamBuilder(
-              stream: db.getUser(notification.sender),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) print(snapshot.error);
-                if (!snapshot.hasData) return Loading();
-                User user = snapshot.data;
-                return Expanded(
-                  child: Row(children: [
-                    GestureDetector(
-                      child: UserAvatar(
-                        user: user,
-                      ),
-                      onTap: () => Navigator.push(
-                          context,
-                          SlideLeftRoute(
-                              page: UserPage(
-                            userId: user.id,
-                          ))),
-                    ),
-                    SizedBox(
-                      width: 12,
-                    ),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          RichText(
-                            text: TextSpan(
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.black),
-                              children: [
-                                TextSpan(text: notification.body),
-                              ],
-                            ),
-                          ),
-                          Text(getPastTime(notification.dateTime)),
-                        ],
-                      ),
-                    )
-                  ]),
-                );
-              }),
-          if (notification.post != null)
-            StreamBuilder(
+    if (notification.post != null)
+      return StreamBuilder(
+          stream: db.getUser(notification.sender),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) print(snapshot.error);
+            if (!snapshot.hasData) return Loading();
+            User user = snapshot.data;
+            return StreamBuilder(
                 stream: db.getPost(
                     'users/${notification.sender}/posts/${notification.post}'),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) print(snapshot.error);
                   if (!snapshot.hasData) return Loading();
                   Post post = snapshot.data;
-                  return GestureDetector(
-                    child: Image.network(post.media),
-                    onTap: () => Navigator.push(
-                        context,
-                        SlideLeftRoute(
-                            page: PostPage(
-                          post:post
-                        ))),
+                  return Slidable(
+                    actionPane: SlidableDrawerActionPane(),
+                    actionExtentRatio: 0.25,
+                    actions: <Widget>[
+                      IconSlideAction(
+                        caption: 'Borrar',
+                        color: Colors.deepOrangeAccent,
+                        icon: Icons.delete,
+                        onTap: () =>
+                            db.deleteNotification(db.userId, notification.id),
+                      ),
+                    ],
+                    child: Row(children: [
+                      GestureDetector(
+                        child: UserAvatar(
+                          user: user,
+                        ),
+                        onTap: () => Navigator.push(
+                            context,
+                            SlideLeftRoute(
+                                page: UserPage(
+                              userId: user.id,
+                            ))),
+                      ),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      Expanded(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            RichText(
+                              text: TextSpan(
+                                style: TextStyle(
+                                    fontSize: 16, color: Colors.black),
+                                children: [
+                                  TextSpan(text: notification.body),
+                                ],
+                              ),
+                            ),
+                            Text(getPastTime(notification.dateTime)),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        child: Image.network(post.media),
+                        onTap: () => Navigator.push(context,
+                            SlideLeftRoute(page: PostPage(post: post))),
+                      )
+                    ]),
                   );
-                })
-          else
-            FollowButton(userId: notification.sender)
-        ],
-      ),
-    );
+                });
+          });
+    return StreamBuilder(
+        stream: db.getUser(notification.sender),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+          if (!snapshot.hasData) return Loading();
+          User user = snapshot.data;
+          return Slidable(
+            actionPane: SlidableDrawerActionPane(),
+            actionExtentRatio: 0.25,
+            actions: <Widget>[
+              IconSlideAction(
+                caption: 'Borrar',
+                color: Colors.deepOrangeAccent,
+                icon: Icons.delete,
+                onTap: () => db.deleteNotification(db.userId, notification.id),
+              ),
+            ],
+            child: Row(children: [
+              GestureDetector(
+                child: UserAvatar(
+                  user: user,
+                ),
+                onTap: () => Navigator.push(
+                    context,
+                    SlideLeftRoute(
+                        page: UserPage(
+                      userId: user.id,
+                    ))),
+              ),
+              SizedBox(
+                width: 12,
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    RichText(
+                      text: TextSpan(
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                        children: [
+                          TextSpan(text: notification.body),
+                        ],
+                      ),
+                    ),
+                    Text(getPastTime(notification.dateTime)),
+                  ],
+                ),
+              ),
+              FollowButton(userId: notification.sender)
+            ]),
+          );
+        });
   }
 }

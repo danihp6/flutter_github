@@ -102,15 +102,16 @@ class _CommentsPageState extends State<CommentsPage> {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData) return Loading();
                           List<Comment> parentComments = snapshot.data;
-                          return ListView.builder(
+                          return ListView.separated(
                               shrinkWrap: true,
                               physics: NeverScrollableScrollPhysics(),
                               itemCount: parentComments.length,
+                              separatorBuilder: (context, index) => SizedBox(height: 5,),
                               itemBuilder: (context, index) {
                                 return CommentWidget(
-                                    comment: parentComments[index],
-                                    response:response
-                                    );
+                                      comment: parentComments[index],
+                                      response:response
+                                      );
                               });
                         }),
                   ],

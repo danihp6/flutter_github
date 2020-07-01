@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:meme/Controller/string_functions.dart';
 
 class PostList {
   String _id;
@@ -32,6 +33,7 @@ class PostList {
         'image': _image,
         'imageLocation': _imageLocation,
         'posts': _posts,
+        'keyWords': generateKeyWords(_name),
         'authorId': _authorId,
         'dateTime': _dateTime,
       };

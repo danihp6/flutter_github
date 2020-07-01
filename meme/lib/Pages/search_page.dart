@@ -1,18 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/local_storage.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/Tag.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/post_list_page.dart';
 import 'package:meme/Pages/tag_page.dart';
+import 'package:meme/Pages/user_page.dart';
 import 'package:meme/Widgets/follow_button.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/post.dart';
 import 'package:meme/Widgets/post_list.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
+import 'package:meme/Widgets/tag.dart';
 import 'package:meme/Widgets/user_avatar.dart';
+import 'package:meme/Widgets/user_row.dart';
 import '../Controller/db.dart';
 import 'post_page.dart';
 
@@ -33,6 +37,9 @@ class _SearchPageState extends State<SearchPage>
   void initState() {
     super.initState();
     tabController = TabController(initialIndex: 0, length: 3, vsync: this);
+    tabController.addListener(() {
+      if (tabController.index != tabController.previousIndex) setState(() {});
+    });
     searchBarController = SearchBarController();
     focusNode = FocusNode();
     focusNode.addListener(() {
@@ -42,9 +49,7 @@ class _SearchPageState extends State<SearchPage>
         isRecentsView = false;
         searchBarController.clear();
       }
-      setState(() {
-        
-      });
+      setState(() {});
     });
   }
 
@@ -81,7 +86,7 @@ class _SearchPageState extends State<SearchPage>
     }
 
     Future<bool> onWillPop() async {
-      if(isRecentsView){
+      if (isRecentsView) {
         focusNode.unfocus();
         return false;
       }
@@ -89,9 +94,133 @@ class _SearchPageState extends State<SearchPage>
       return true;
     }
 
+    Widget recentsView() {
+      if (tabController.index == 0)
+        return ListView.builder(
+          itemCount: storage.recentUsers.length,
+          itemBuilder: (context, index) {
+            String userRecentId = storage.recentUsers[index];
+            return StreamBuilder(
+                stream: db.getUser(userRecentId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) print(snapshot.error);
+                  if (!snapshot.hasData) return Loading();
+                  User user = snapshot.data;
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        GestureDetector(
+                          child: Row(
+                            children: <Widget>[
+                              UserAvatar(user: user),
+                              SizedBox(width: 10),
+                              Text(user.userName,
+                                  style: TextStyle(fontSize: 16)),
+                            ],
+                          ),
+                          onTap: () => Navigator.push(context,
+                              SlideLeftRoute(page: UserPage(userId: user.id))),
+                        ),
+                        IconButton(
+                            icon: Icon(Icons.clear),
+                            onPressed: () {
+                              var newRecentUsers = storage.recentUsers;
+                              newRecentUsers.remove(userRecentId);
+                              storage.recentUsers = newRecentUsers;
+                              setState(() {});
+                            })
+                      ],
+                    ),
+                  );
+                });
+          },
+        );
+      if (tabController.index == 1)
+        return ListView.builder(
+          itemCount: storage.recentTags.length,
+          itemBuilder: (context, index) {
+            String tagRecentId = storage.recentTags[index];
+            return StreamBuilder(
+                stream: db.getTag(tagRecentId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) print(snapshot.error);
+                  if (!snapshot.hasData) return Loading();
+                  Tag tag = snapshot.data;
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        TagWidget(
+                            tag: tag,
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  SlideLeftRoute(
+                                      page: TagPage(
+                                    tagId: tag.id,
+                                  )));
+                            }),
+                        IconButton(
+                            icon: Icon(Icons.clear),
+                            onPressed: () {
+                              var newRecentTags = storage.recentTags;
+                              newRecentTags.remove(tagRecentId);
+                              storage.recentTags = newRecentTags;
+                              setState(() {});
+                            })
+                      ],
+                    ),
+                  );
+                });
+          },
+        );
+      if (tabController.index == 2)
+        return ListView.builder(
+          itemCount: storage.recentPostLists.length,
+          itemBuilder: (context, index) {
+            String postListRecentId = storage.recentPostLists[index];
+            return StreamBuilder(
+                stream: db.getPostList(postListRecentId),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) print(snapshot.error);
+                  if (!snapshot.hasData) return Loading();
+                  PostList postList = snapshot.data;
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        PostListWidget(
+                            postList: postList,
+                            activeMoreOptions: false,
+                            onTap: () => Navigator.push(
+                                context,
+                                SlideLeftRoute(
+                                    page: PostListPage(
+                                  postList: postList,
+                                )))),
+                        IconButton(
+                            icon: Icon(Icons.clear),
+                            onPressed: () {
+                              var newRecentPostLists = storage.recentPostLists;
+                              newRecentPostLists.remove(postListRecentId);
+                              storage.recentPostLists = newRecentPostLists;
+                              setState(() {});
+                            })
+                      ],
+                    ),
+                  );
+                });
+          },
+        );
+    }
+
     return WillPopScope(
       onWillPop: onWillPop,
-          child: SafeArea(
+      child: SafeArea(
         child: Scaffold(
           body: Column(
             children: [
@@ -111,8 +240,8 @@ class _SearchPageState extends State<SearchPage>
                                   }),
                             )
                           : Icon(Icons.search),
-                      emptyWidget:
-                          Center(child: Text('No se han encontrado resultados')),
+                      emptyWidget: Center(
+                          child: Text('No se han encontrado resultados')),
                       hintText: 'Busca...',
                       iconActiveColor: Colors.deepOrange,
                       crossAxisSpacing: 20,
@@ -134,38 +263,8 @@ class _SearchPageState extends State<SearchPage>
                                         padding: const EdgeInsets.all(8.0),
                                         child: Column(
                                           children: <Widget>[
-                                            GestureDetector(
-                                              child: Row(
-                                                children: <Widget>[
-                                                  Container(
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius.all(
-                                                                Radius.circular(
-                                                                    3)),
-                                                        color: Colors.grey[300],
-                                                      ),
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets.all(
-                                                                4),
-                                                        child: Text(
-                                                          '#' + tag.name,
-                                                          style: TextStyle(
-                                                              fontSize: 16),
-                                                        ),
-                                                      )),
-                                                  SizedBox(
-                                                    width: 5,
-                                                  ),
-                                                  Text(
-                                                    tag.posts.length.toString() +
-                                                        ' publicación',
-                                                    style:
-                                                        TextStyle(fontSize: 16),
-                                                  )
-                                                ],
-                                              ),
+                                            TagWidget(
+                                              tag: tag,
                                               onTap: () => Navigator.push(
                                                   context,
                                                   SlideLeftRoute(
@@ -180,15 +279,17 @@ class _SearchPageState extends State<SearchPage>
                                               height: 200,
                                               child: ListView.separated(
                                                 itemCount: posts.length,
-                                                scrollDirection: Axis.horizontal,
+                                                scrollDirection:
+                                                    Axis.horizontal,
                                                 separatorBuilder:
-                                                    (context, index) => SizedBox(
+                                                    (context, index) =>
+                                                        SizedBox(
                                                   width: 5,
                                                 ),
                                                 itemBuilder: (context, index) =>
                                                     StreamBuilder(
-                                                  stream: db
-                                                      .getPost(posts[index].path),
+                                                  stream: db.getPost(
+                                                      posts[index].path),
                                                   builder: (context, snapshot) {
                                                     if (snapshot.hasError)
                                                       print(snapshot.error);
@@ -196,14 +297,19 @@ class _SearchPageState extends State<SearchPage>
                                                       return Loading();
                                                     Post post = snapshot.data;
                                                     return GestureDetector(
-                                                      child: post.mediaType=='image'?Image.network(
-                                                          post.media):null,
-                                                      onTap: () => Navigator.push(
-                                                          context,
-                                                          SlideLeftRoute(
-                                                              page: PostPage(
-                                                            post: post,
-                                                          ))),
+                                                      child: post.mediaType ==
+                                                              'image'
+                                                          ? Image.network(
+                                                              post.media)
+                                                          : null,
+                                                      onTap: () =>
+                                                          Navigator.push(
+                                                              context,
+                                                              SlideLeftRoute(
+                                                                  page:
+                                                                      PostPage(
+                                                                post: post,
+                                                              ))),
                                                     );
                                                   },
                                                 ),
@@ -214,62 +320,50 @@ class _SearchPageState extends State<SearchPage>
                                       );
                                     });
                               })
-                          : null,
+                          : Column(
+                              children: <Widget>[
+                                Text('Recientes'),
+                                Expanded(
+                                  child: recentsView(),
+                                ),
+                              ],
+                            ),
                       onItemFound: (item, index) {
                         if (typeSearched == 'users')
                           return Padding(
-                            padding: const EdgeInsets.only(left: 8.0, right: 8),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    UserAvatar(
-                                      user: item,
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      item.userName,
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                                FollowButton(userId: item.id)
-                              ],
-                            ),
-                          );
+                              padding:
+                                  const EdgeInsets.only(left: 8.0, right: 8),
+                              child: GestureDetector(
+                                  child: UserRow(
+                                user: item,
+                                onTap: () {
+                                  if (!storage.recentUsers.contains(item.id))
+                                    storage.recentUsers =
+                                        storage.recentUsers + [item.id];
+                                  setState(() {});
+                                  Navigator.push(
+                                      context,
+                                      SlideLeftRoute(
+                                          page: UserPage(
+                                        userId: item.id,
+                                      )));
+                                },
+                              )));
                         if (typeSearched == 'tags')
                           return Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: GestureDetector(
-                              child: Row(
-                                children: <Widget>[
-                                  Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.all(Radius.circular(3)),
-                                        color: Colors.grey[300],
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(4),
-                                        child: Text(
-                                          '#' + item.name,
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                      )),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    item.posts.length.toString() + ' publicación',
-                                    style: TextStyle(fontSize: 16),
-                                  )
-                                ],
-                              ),
-                              onTap: () => Navigator.push(context,
-                                  SlideLeftRoute(page: TagPage(tagId: item.id))),
+                            child: TagWidget(
+                              tag: item,
+                              onTap: () {
+                                if (!storage.recentTags.contains(item.id))
+                                  storage.recentTags =
+                                      storage.recentTags + [item.id];
+                                setState(() {});
+                                Navigator.push(
+                                    context,
+                                    SlideLeftRoute(
+                                        page: TagPage(tagId: item.id)));
+                              },
                             ),
                           );
 
@@ -280,14 +374,24 @@ class _SearchPageState extends State<SearchPage>
                                 if (snapshot.hasError) print(snapshot.error);
                                 if (!snapshot.hasData) return Loading();
                                 PostList postList = snapshot.data;
-                                return PostListWidget(
-                                  postList: postList,
-                                  onTap: () => Navigator.push(
-                                      context,
-                                      SlideLeftRoute(
-                                          page: PostListPage(
-                                        postList: postList,
-                                      ))),
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  child: PostListWidget(
+                                    postList: postList,
+                                    onTap: () {
+                                      if (!storage.recentPostLists
+                                          .contains(item))
+                                        storage.recentPostLists =
+                                            storage.recentPostLists + [item];
+                                      setState(() {});
+                                      Navigator.push(
+                                          context,
+                                          SlideLeftRoute(
+                                              page: PostListPage(
+                                            postList: postList,
+                                          )));
+                                    },
+                                  ),
                                 );
                               });
                       },

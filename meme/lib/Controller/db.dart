@@ -246,8 +246,6 @@ class DataBase {
       _firestore.document('users/$userId/postLists/$postListId').delete();
 
   Future<List<String>> postListSearch(String search) async {
-    //CAMBIARRRRRR
-    List<String> keyWordsSearched = search.split(' ');
     QuerySnapshot userQuery =
         await _firestore.collection('users').getDocuments();
     List<String> postListsId = [];
@@ -255,14 +253,13 @@ class DataBase {
     for (var userSnap in userQuery.documents) {
       var postQuery = await userSnap.reference
           .collection('postLists')
-          .where('keyWords', arrayContainsAny: keyWordsSearched)
+          .where('keyWords', arrayContains: search)
           .getDocuments();
       for (var postSnap in postQuery.documents) {
         postListsId.add(
             'users/${userSnap.documentID}/postLists/${postSnap.documentID}');
       }
     }
-    //ORDENAR POR IMPORTANCIA
     return postListsId;
   }
 

@@ -80,12 +80,15 @@ class UserPageHeader extends StatelessWidget {
                           SlideLeftRoute(
                               page: FollowedListPage(userId: user.id))),
                     ),
-                    IconButton(
-                        icon: Icon(Icons.settings),
-                        iconSize: 30,
-                        onPressed: () {
-                          auth.signOut().then((_) => refresh());
-                        })
+                    Drawer(
+                      child: Container(),
+                    )
+                    // IconButton(
+                    //     icon: Icon(Icons.settings),
+                    //     iconSize: 30,
+                    //     onPressed: () {
+                    //       auth.signOut().then((_) => refresh());
+                    //     })
                   ],
                 ),
                 SizedBox(

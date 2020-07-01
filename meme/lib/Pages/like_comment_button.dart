@@ -23,6 +23,7 @@ class _LikeCommentButtonState extends State<LikeCommentButton> {
       return IconButton(
           icon: Icon(Icons.favorite),
           iconSize: 18,
+          padding: EdgeInsets.all(0),
           onPressed: () {
             setState(() {
               db.unlikeComment(_comment.userPostId,_comment.postId,_comment.id,db.userId);
@@ -32,6 +33,7 @@ class _LikeCommentButtonState extends State<LikeCommentButton> {
     return IconButton(
         icon: Icon(Icons.favorite_border),
         iconSize: 18,
+        padding: EdgeInsets.all(0),
         onPressed: () {
           setState(() {
             db.likeComment(_comment.userPostId,_comment.postId,_comment.id,db.userId);

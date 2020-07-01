@@ -6,6 +6,7 @@ import 'package:meme/Widgets/follow_button.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/user_avatar.dart';
+import 'package:meme/Widgets/user_row.dart';
 
 class FollowedListPage extends StatelessWidget {
   String userId;
@@ -36,31 +37,14 @@ class FollowedListPage extends StatelessWidget {
                       if (snapshot.hasError) print(snapshot.error);
                       if (!snapshot.hasData) return Loading();
                       User followedUser = snapshot.data;
-                      return Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GestureDetector(
-                            child: Row(
-                              children: [
-                                UserAvatar(user: followedUser),
-                                SizedBox(
-                                  width: 10,
-                                ),
-                                Text(
-                                  followedUser.userName,
-                                  style: TextStyle(fontSize: 15),
-                                )
-                              ],
-                            ),
-                            onTap: () => Navigator.push(
-                                context,
-                                SlideLeftRoute(
-                                    page: UserPage(
-                                  userId: followedUser.id,
-                                ))),
-                          ),
-                          FollowButton(userId: followedUser.id)
-                        ],
+                      return UserRow(
+                        user: followedUser,
+                        onTap: () => Navigator.push(
+                            context,
+                            SlideLeftRoute(
+                                page: UserPage(
+                              userId: user.id,
+                            ))),
                       );
                     },
                   );

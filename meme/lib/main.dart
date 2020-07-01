@@ -4,6 +4,7 @@ import 'package:meme/Controller/push_notification_provider.dart';
 import 'package:meme/Pages/root_page.dart';
 
 import 'Controller/gallery.dart';
+import 'Controller/local_storage.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,6 +21,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     pushProvider.initNotifications();
+    storage.initStorage();
     
   }
 
