@@ -9,12 +9,49 @@ import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/user_avatar.dart';
 import '../Models/Comment.dart';
 
-class CommentsPage extends StatelessWidget {
+class CommentsPage extends StatefulWidget {
   Post post;
   CommentsPage({@required this.post});
 
   @override
+  _CommentsPageState createState() => _CommentsPageState();
+}
+
+class _CommentsPageState extends State<CommentsPage> {
+  FocusNode focusNode;
+  Comment commentResponse;
+
+  @override
+  void initState() {
+    focusNode = FocusNode();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
+  }
+
+  
+  @override
   Widget build(BuildContext context) {
+
+    response(Comment comment){
+      setState(() {
+        commentResponse = comment;
+        focusNode.requestFocus();
+        
+      });
+    }
+
+    cancelResponse(){
+      setState(() {
+        commentResponse = null;
+        focusNode.unfocus();
+      });
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepOrange,
@@ -29,7 +66,7 @@ class CommentsPage extends StatelessWidget {
                 child: Column(
                   children: [
                     StreamBuilder(
-                      stream: db.getUser(post.authorId),
+                      stream: db.getUser(widget.post.authorId),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) print(snapshot.error);
                         if (!snapshot.hasData) return Loading();
@@ -49,7 +86,7 @@ class CommentsPage extends StatelessWidget {
                                   text: user.userName + ' ',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(text: post.description),
+                              TextSpan(text: widget.post.description),
                             ],
                           ),
                         ),
@@ -60,7 +97,7 @@ class CommentsPage extends StatelessWidget {
                     Divider(),
                     StreamBuilder(
                         stream:
-                            db.getComments(post.authorId, post.id),
+                            db.getOuterComments(widget.post.authorId, widget.post.id),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData) return Loading();
@@ -72,7 +109,8 @@ class CommentsPage extends StatelessWidget {
                               itemBuilder: (context, index) {
                                 return CommentWidget(
                                     comment: parentComments[index],
-                                    activeInnerComments: true);
+                                    response:response
+                                    );
                               });
                         }),
                   ],
@@ -92,7 +130,10 @@ class CommentsPage extends StatelessWidget {
                   color: Colors.grey[300],
                   child: AddCommentField(
                     user: user,
-                    postId: post.id,
+                    post: widget.post,
+                    focusNode: focusNode,
+                    commentResponse:commentResponse,
+                    cancelResponse:cancelResponse
                   ),
                 );
               },

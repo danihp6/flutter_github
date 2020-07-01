@@ -37,7 +37,7 @@ class DataBase {
       String avatarLocation, File file) async {
     if (file != null) {
       if (avatar != '') mediaStorage.deleteFile(avatarLocation);
-      Map map = await mediaStorage.uploadAvatar(file,userId);
+      Map map = await mediaStorage.uploadAvatar(file, userId);
       avatar = map['media'];
       avatarLocation = map['location'];
     }
@@ -95,6 +95,15 @@ class DataBase {
     _firestore.document('users/$unfollowedId').updateData({
       'followers': FieldValue.arrayRemove([userId])
     });
+  }
+
+  Future<String> userIdByUserName(String userName) async {
+    print(userName);
+    QuerySnapshot query = await _firestore
+        .collection('users')
+        .where('userName', isEqualTo: userName)
+        .getDocuments();
+    return query.documents.first.documentID;
   }
 
 //---------------POST----------------//
@@ -159,7 +168,7 @@ class DataBase {
   }
 
   Future<DocumentReference> newPost(String userId, Post post, File file) async {
-    Map map = await mediaStorage.uploadMedia(file,userId);
+    Map map = await mediaStorage.uploadMedia(file, userId);
     post.media = map['media'];
     post.mediaLocation = map['mediaLocation'];
     DocumentReference ref = await _firestore
@@ -224,7 +233,7 @@ class DataBase {
 
   Future newPostList(String userId, PostList postList, File file) async {
     if (file != null) {
-      Map map = await mediaStorage.uploadMedia(file,userId);
+      Map map = await mediaStorage.uploadMedia(file, userId);
       postList.image = map['media'];
       postList.imageLocation = map['location'];
     }
@@ -259,10 +268,23 @@ class DataBase {
 
 //---------------COMMENTS----------------//
 
+  Stream<Comment> getComment(String userId, String postId, String commentId) =>
+      _firestore
+          .document('users/$userId/posts/$postId/comments/$commentId')
+          .snapshots()
+          .map((doc) => Comment.fromFirestore(doc));
+
   Stream<List<Comment>> getComments(String userId, String postId) => _firestore
       .collection('users/$userId/posts/$postId/comments')
       .snapshots()
       .map(toCommentList);
+
+  Stream<List<Comment>> getOuterComments(String userId, String postId) =>
+      _firestore
+          .collection('users/$userId/posts/$postId/comments')
+          .where('level', isEqualTo: 0)
+          .snapshots()
+          .map(toCommentList);
 
   Stream<Comment> getBestComment(String userId, String postId) => _firestore
       .collection('users/$userId/posts/$postId/comments')
@@ -271,9 +293,45 @@ class DataBase {
       .snapshots()
       .map((snap) => Comment.fromFirestore(snap.documents.first));
 
-  Future newComment(String userId, String postId, Comment comment) => _firestore
-      .collection('users/$userId/posts/$postId/comments')
-      .add(comment.toFirestore());
+  Future<String> newComment(String userPostId, String postId, Comment comment) async {
+    DocumentReference ref = await  _firestore
+          .collection('users/$userPostId/posts/$postId/comments')
+          .add(comment.toFirestore());
+          return ref.documentID;
+  }
+      
+
+  Future newOuterComment(String userPostId, String postId, Comment comment) =>
+      newComment(userPostId, postId, comment);
+
+  Future newInnerComment(String userPostId, String postId,
+      String outerCommentId, Comment comment) async {
+    String id = await newComment(userPostId, postId, comment);
+    _firestore
+        .document('users/$userPostId/posts/$postId/comments/$outerCommentId')
+        .updateData({
+      'comments': FieldValue.arrayUnion([id])
+    });
+  }
+
+  Future deleteComment(String userPostId, String postId, String commentId) =>
+      _firestore
+          .document('users/$userPostId/posts/$postId/comments/$commentId')
+          .delete();
+
+  Future deleteOuterComment(
+          String userPostId, String postId, String commentId) =>
+      deleteComment(userPostId, postId, commentId);
+
+  Future deleteInnerComment(String userPostId, String postId,
+      String outerCommentId, String commentId) {
+    _firestore
+        .document('users/$userPostId/posts/$postId/comments/$outerCommentId')
+        .updateData({
+      'comments': FieldValue.arrayRemove([commentId])
+    });
+    deleteComment(userPostId, postId, commentId);
+  }
 
   Future likeComment(
           String userPostId, String postId, String commentId, String userId) =>

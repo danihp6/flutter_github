@@ -13,7 +13,7 @@ Future<Map<String, dynamic>> uploadMedia(File file,String userId) async {
   final StorageUploadTask uploadTask = refPublicationImages.putFile(file);
   final StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
   final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-  return {'media': downloadUrl, 'location': 'media/' +name};
+  return {'media': downloadUrl, 'location': userId + '/media/' +name};
 }
 
 Future<Map<String, dynamic>> uploadAvatar(File file,String userId) async {
@@ -22,7 +22,7 @@ Future<Map<String, dynamic>> uploadAvatar(File file,String userId) async {
   final StorageUploadTask uploadTask = refPublicationImages.putFile(file);
   final StorageTaskSnapshot taskSnapshot = await uploadTask.onComplete;
   final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-  return {'media': downloadUrl, 'location': 'avatars/' +name};
+  return {'media': downloadUrl, 'location': userId + '/avatars/' +name};
 }
 
 Future<void> deleteFile(String path) {

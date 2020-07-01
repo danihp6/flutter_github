@@ -41,6 +41,7 @@ dependencies:
   path_provider: ^1.6.11
   permission_handler: ^5.0.1+1
   flutter_xlider: ^3.4.0
+  flutter_slidable: ^0.5.4
   flutter:
     sdk: flutter
 

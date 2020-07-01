@@ -8,8 +8,7 @@ class Notification {
   String _post;
   DateTime _dateTime;
 
-  Notification(id, title, body, sender, post,dateTime) {
-    this._id = id;
+  Notification( title, body, sender, post,dateTime) {
     this._title = title;
     this._body = body;
     this._sender = sender;

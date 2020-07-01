@@ -13,6 +13,11 @@ class PushNotificationProvider {
   initNotifications() {
     _firebaseMessaging.requestNotificationPermissions();
 
+    _firebaseMessaging.getToken().then((value) {
+      print('--------------------------TOKEN--------------------------------');
+      print(value);
+    });
+
 
     _firebaseMessaging.configure(
       onMessage: onNotification,
