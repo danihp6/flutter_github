@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Models/Tag.dart';
+import 'package:meme/Pages/tag_page.dart';
+import 'package:meme/Widgets/slide_left_route.dart';
+import 'package:meme/Widgets/tag.dart';
 import '../Controller/db.dart';
 
 class StreamTagViewer extends StatelessWidget {
@@ -25,16 +28,7 @@ class StreamTagViewer extends StatelessWidget {
           if (snapshot.hasError) print(snapshot.error);
                     if (!snapshot.hasData) return Container();
                     Tag tag = snapshot.data;
-          return Container(
-              decoration: BoxDecoration(
-                borderRadius:
-                    BorderRadius.all(Radius.circular(3)),
-                color: Colors.grey[300],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(4),
-                child: Text('#'+tag.name,style: TextStyle(fontSize: 16),),
-              ));
+          return TagWidget(tag: tag,isNumberPublicationsShowed: false, onTap: ()=>Navigator.push(context, SlideLeftRoute(page: TagPage(tagId: tag.id))));
         }
       ),
     );

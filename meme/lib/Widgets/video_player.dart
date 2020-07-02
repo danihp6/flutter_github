@@ -2,22 +2,25 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_widgets/flutter_widgets.dart';
 
 class VideoPlayerWidget extends StatefulWidget {
   String url;
   File file;
-  VideoPlayerWidget({this.url, this.file});
+  bool isPausable;
+  VideoPlayerWidget({this.url, this.file, this.isPausable = true});
   @override
   _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   VideoPlayerController _controller;
+  bool _isManualPaused;
 
   @override
   void initState() {
     super.initState();
-    print(widget.file);
+    _isManualPaused = false;
     _controller = widget.file == null
         ? VideoPlayerController.network(widget.url)
         : VideoPlayerController.file(widget.file);
@@ -28,7 +31,6 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
           setState(() {});
         });
         _controller.setLooping(true);
-        _controller.play();
         setState(() {});
       });
   }
@@ -39,47 +41,73 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     super.dispose();
   }
 
+  manualPause() {
+    _isManualPaused = !_isManualPaused;
+  }
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size.width;
     return _controller.value.initialized
-        ? Stack(
-          alignment: Alignment.bottomCenter,
-          children: <Widget>[
-            Container(
-                width: size,
-                height: size,
-                child: Stack(
-                  fit: StackFit.expand,
-                  alignment: AlignmentDirectional.bottomCenter,
-                  children: [
-                    ClipRect(
-                        child: OverflowBox(
-                            alignment: Alignment.center,
-                            child: FittedBox(
-                                fit: BoxFit.fitWidth,
-                                child: Container(
-                                    width: size,
-                                    height: size / _controller.value.aspectRatio,
-                                    child: VideoPlayer(_controller))))),
-                    _PlayPauseOverlay(
-                      controller: _controller,
-                    ),
-                    
-                  ],
+        ? VisibilityDetector(
+            key: UniqueKey(),
+            onVisibilityChanged: (info) {
+              if (info.visibleFraction > 0.8 &&
+                  !_controller.value.isPlaying &&
+                  !_isManualPaused)
+                setState(() {
+                  _controller.play();
+                });
+              if (info.visibleFraction < 0.8 && _controller.value.isPlaying)
+                setState(() {
+                  _controller.pause();
+                });
+            },
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: <Widget>[
+                Container(
+                  width: size,
+                  height: size,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    alignment: AlignmentDirectional.bottomCenter,
+                    children: [
+                      ClipRect(
+                          child: OverflowBox(
+                              alignment: Alignment.center,
+                              child: FittedBox(
+                                  fit: BoxFit.fitWidth,
+                                  child: Container(
+                                      width: size,
+                                      height:
+                                          size / _controller.value.aspectRatio,
+                                      child: VideoPlayer(_controller))))),
+                      _PlayPauseOverlay(
+                        controller: _controller,
+                        isPausable: widget.isPausable,
+                        manualPause: manualPause,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              VideoProgressIndicator(_controller, allowScrubbing: true),
-          ],
-        )
+                if (widget.isPausable)
+                  VideoProgressIndicator(_controller, allowScrubbing: true),
+              ],
+            ),
+          )
         : Container();
   }
 }
 
 class _PlayPauseOverlay extends StatelessWidget {
-  const _PlayPauseOverlay({Key key, this.controller}) : super(key: key);
+  _PlayPauseOverlay(
+      {Key key, this.controller, this.isPausable, this.manualPause})
+      : super(key: key);
 
-  final VideoPlayerController controller;
+  VideoPlayerController controller;
+  bool isPausable;
+  Function manualPause;
 
   @override
   Widget build(BuildContext context) {
@@ -88,24 +116,30 @@ class _PlayPauseOverlay extends StatelessWidget {
         AnimatedSwitcher(
           duration: Duration(milliseconds: 50),
           reverseDuration: Duration(milliseconds: 200),
-          child: controller.value.isPlaying
-              ? SizedBox.shrink()
-              : Container(
-                  color: Colors.black26,
-                  child: Center(
-                    child: Icon(
-                      Icons.play_arrow,
-                      color: Colors.white,
-                      size: 100.0,
-                    ),
-                  ),
+          child: AnimatedOpacity(
+            opacity: !controller.value.isPlaying ? 1.0 : 0.0,
+            duration: Duration(seconds: 5),
+            child: Container(
+              color: Colors.black26,
+              child: Center(
+                child: Icon(
+                  Icons.play_arrow,
+                  color: Colors.white,
+                  size: 100.0,
                 ),
+              ),
+            ),
+          ),
         ),
-        GestureDetector(
-          onTap: () {
-            controller.value.isPlaying ? controller.pause() : controller.play();
-          },
-        ),
+        if (isPausable)
+          GestureDetector(
+            onTap: () {
+              controller.value.isPlaying
+                  ? controller.pause()
+                  : controller.play();
+              manualPause();
+            },
+          ),
       ],
     );
   }
