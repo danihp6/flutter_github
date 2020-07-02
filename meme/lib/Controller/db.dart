@@ -170,7 +170,7 @@ class DataBase {
   Future<DocumentReference> newPost(String userId, Post post, File file) async {
     Map map = await mediaStorage.uploadMedia(file, userId);
     post.media = map['media'];
-    post.mediaLocation = map['mediaLocation'];
+    post.mediaLocation = map['location'];
     DocumentReference ref = await _firestore
         .collection('users/$userId/posts')
         .add(post.toFirestore());

@@ -2,149 +2,55 @@ const functions = require('firebase-functions');
 
 const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
-// exports.helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
 
-exports.onDeletePost = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onDelete((snap, context) => {
-  var userId = context.params.userId
-  var postId = context.params.postId
-  var path = 'users/' + userId + '/posts/' + postId
+var db = admin.firestore()
+
+exports.onDeletePost = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onDelete(async (snap, context) => {
+  var path = snap.ref
   var batchSize = 500
-  var db = admin.firestore()
-  var ref = db.collection('users').doc(userId).collection('posts').doc(postId).collection('comments')
+  var commentsRef = path.collection('comments')
 
-  var deleted = deleteCollection(db, ref, batchSize)
+  deleteCollection(db, commentsRef, batchSize)
 
-  ref = db.collection('users')
+  var usersSnapshot = await db.collection('users').orderBy('__name__').limit(batchSize).get()
 
-  deleteFavourites(path, db, ref, batchSize)
-
-  var query = ref.orderBy('__name__').limit(batchSize)
-  query.get().then((snapshot) => {
-    console.log(snapshot.size)
-    if (snapshot.size === 0) {
-      return 0
-    }
-    snapshot.docs.forEach(function (doc) {
-      console.log(doc.ref.collection('postLists'))
-      deletePostInPostList(path, db, doc.ref.collection('postLists'), batchSize)
-
-      // ref = doc.collection('notifications')
-      // query = ref.orderBy('__name__').limit(batchSize)
-
-      // query.get().then((snapshot) => {
-      //   if (snapshot.size === 0) {
-      //     return 0
-      //   }
-
-      //   var notificationData
-      //   var post
-      //   snapshot.docs.forEach(function (doc) {
-      //     notificationData = (await ref.get()).data()
-      //     post = notificationData['post']
-
-      //     if (post == userId) doc.delete()
-
-
-      //   })
-      // })
+  usersSnapshot.docs.forEach(async(doc) => {
+    doc.ref.update({
+      'favourites': admin.firestore.FieldValue.arrayRemove(path)
     })
-  })
 
-  var path = snap.data()['mediaLocation']
-  console.log(path)
-  var bucket = admin.storage().bucket()
-  deleteMedia(path,bucket)
-  return Promise.all([deleted])
-})
+    var postListsSnapshot = await doc.ref.collection('postLists').orderBy('__name__').limit(batchSize).get()
 
-function deleteMedia(path,bucket){
-  bucket.file(path).delete()
-}
-
-function deletePostInPostList(path, db, collectionRef, batchSize) {
-  var query = collectionRef.orderBy('__name__').limit(batchSize)
-
-  return new Promise(function (resolve, reject) {
-    deletePostInPostListInQuery(path, db, query, batchSize, resolve, reject)
-  })
-}
-
-function deletePostInPostListInQuery(path, db, query, batchSize, resolve, reject) {
-  query.get().then((snapshot) => {
-    if (snapshot.size === 0) {
-      return 0
-    }
-
-    var batch = db.batch()
-    snapshot.docs.forEach(function (doc) {
-      batch.update(doc.ref, {
+    postListsSnapshot.docs.forEach((doc) => {
+      doc.ref.update({
         'posts': admin.firestore.FieldValue.arrayRemove(path)
       })
     })
-    return batch.commit().then(function () {
-      return snapshot.size
+
+    var notificationsSnapshot = await doc.ref.collection('notifications').orderBy('__name__').limit(batchSize).get()
+
+    notificationsSnapshot.docs.forEach((doc) => {
+      var post = doc.data()['post']
+      if (post == path) doc.ref.delete()
     })
-  }).then(function (numChanged) {
-    if (numChanged <= batchSize) {
-      resolve()
-      return
-    }
-    else {
-      // Recurse on the next process tick, to avoid
-      // exploding the stack.
-      return process.nextTick(function () {
-        deletePostInPostListInQuery(path, db, query, batchSize, resolve, reject)
-      })
-    }
+
 
   })
-    .catch(reject);
-}
 
-function deleteFavourites(path, db, collectionRef, batchSize) {
-  var query = collectionRef.orderBy('__name__').limit(batchSize)
+  var mediaPath = snap.data()['mediaLocation']
+  var bucket = admin.storage().bucket()
+  bucket.file(mediaPath).delete()
 
-  return new Promise(function (resolve, reject) {
-    deleteFavouritesInQuery(path, db, query, batchSize, resolve, reject)
-  })
-}
+  tagsSnapshot = await db.collection('tags').orderBy('__name__').limit(batchSize).get()
 
-function deleteFavouritesInQuery(path, db, query, batchSize, resolve, reject) {
-  query.get().then((snapshot) => {
-    if (snapshot.size === 0) {
-      return 0
-    }
 
-    var batch = db.batch()
-    snapshot.docs.forEach(function (doc) {
-      batch.update(doc.ref, {
-        'favourites': admin.firestore.FieldValue.arrayRemove(path)
-      })
+  tagsSnapshot.docs.forEach(function (doc) {
+    doc.ref.update({
+      'posts': admin.firestore.FieldValue.arrayRemove(path)
     })
-    return batch.commit().then(function () {
-      return snapshot.size
-    })
-  }).then(function (numChanged) {
-    if (numChanged <= batchSize) {
-      resolve()
-      return
-    }
-    else {
-      // Recurse on the next process tick, to avoid
-      // exploding the stack.
-      return process.nextTick(function () {
-        deleteFavouritesInQuery(path, db, query, batchSize, resolve, reject)
-      })
-    }
-
   })
-    .catch(reject);
-}
+
+})
 
 function deleteCollection(db, collectionRef, batchSize) {
 
@@ -187,95 +93,56 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
     .catch(reject);
 }
 
-// exports.onDeleteUser = functions.region('europe-west2').firestore.document('users/{userId}').onDelete(async (snap, context) => {
-//   var userId = context.params.userId
-//   FALTA COMENTARIOS DE TODAS LAS PUBLICACIONES
-//   var batchSize = 500
-//   var db = admin.firestore()
+exports.onDeleteUser = functions.region('europe-west2').firestore.document('users/{userId}').onDelete(async (snap, context) => {
+  var path = snap.ref
+  var batchSize = 500
+  var userId = context.params.userId
 
-//   var ref = db.collection('users').doc(userId).collection('notifications')
+  var mediaPath = snap.data()['avatarLocation']
+  var bucket = admin.storage().bucket()
+  bucket.file(mediaPath).delete()
 
-//   deleteCollection(db, ref, batchSize)
+  var notificationsRef = path.collection('notifications')
 
-//   ref = db.collection('users').doc(userId)
+  deleteCollection(db,notificationsRef,batchSize)
 
-//   var query = ref.orderBy('__name__').limit(batchSize)
+  var postListsRef = path.collection('postLists')
 
-//   query.get((snapshot) => {
-//     if (snapshot.size === 0) {
-//       return 0
-//     }
+  deleteCollection(db,postListsRef,batchSize)
 
-//     snapshot.docs.forEach(function (doc) {
-//       ref = doc.collection('comments')
-//       await deleteCollection(db, ref, batchSize)
-//       doc.delete()
-//     })
-//   })
+  var postsRef = path.collection('posts')
 
-//   ref = db.collection('users')
-//   query = ref.orderBy('__name__').limit(batchSize)
+  deleteCollection(db,postsRef,batchSize)
 
-//   query.get((snapshot) => {
-//     if (snapshot.size === 0) {
-//       return 0
-//     }
+  var usersSnapshot = await db.collection('users').orderBy('__name__').limit(batchSize).get()
 
-//     snapshot.docs.forEach(function (doc) {
-//       doc.update({
-//         'followers': admin.firestore.FieldValue.arrayRemove(userId),
-//         'followed': admin.firestore.FieldValue.arrayRemove(userId)
-//       })
+  usersSnapshot.docs.forEach(async(doc)=>{
+    doc.ref.update({
+      'followed': admin.firestore.FieldValue.arrayRemove(userId),
+      'followers':admin.firestore.FieldValue.arrayRemove(userId)
+    })
 
-//       ref = doc.collection('notifications')
-//       query = ref.orderBy('__name__').limit(batchSize)
+    var userNotifications = await doc.ref.collection('notifications').get()
 
-//       query.get((snapshot)=>{
-//         if (snapshot.size === 0) {
-//           return 0
-//         }
+    userNotifications.docs.forEach((doc)=>{
+      var sender = doc.data()['sender']
+      if (sender == userId) doc.ref.delete()
+    })
 
-//         var notificationData
-//         snapshot.docs.forEach(function(doc){
-//           notificationData = (await ref.get()).data()
-//           sender = notificationData['sender']
+    var userPostsSnapshot = await doc.ref.collection('posts').get()
 
-//           if(sender==userId) doc.delete()
-//         })
-//       })
+    userPostsSnapshot.docs.forEach((doc)=>{
+      var commentsSnapshot = await doc.ref.collection('comments').get()
 
-//     })
-//   })
+      commentsSnapshot.docs.forEach((doc)=>{
+        var userCommentId = doc.data()['authorId']
 
+        if(userCommentId == userId)doc.ref.delete()
+      })
+    })
+  })
 
-// })
-
-// exports.onNewPost = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onCreate(async (snap, context) => {
-//   var userId = context.params.userId
-//   var postId = context.params.postId
-
-//   var db = admin.firestore()
-//   var ref = db.collection('users').doc(userId)
-
-//   var userData = (await ref.get()).data()
-
-//   var userName = userData['userName']
-
-//   const notification = {
-//       title: 'Nueva publicación',
-//       body: `${userName} ha subido una nueva publicación`,
-//       post:postId,
-//       sender:userId
-//   };
-
-//   var followers = userData['followers']
-
-//   followers.forEach(id => {
-//     ref = db.collection('users').doc(id)
-//     ref.collection('notifications').add(notification)
-//   });
-
-// })
+})
 
 exports.newFollower = functions.region('europe-west2').firestore.document('users/{userId}').onUpdate(async (change, context) => {
   beforeFollowers = change.before.data()['followers']
@@ -283,18 +150,11 @@ exports.newFollower = functions.region('europe-west2').firestore.document('users
 
   if (beforeFollowers.length == afterFollowers.length) return 0
 
-  var userId = context.params.userId
+  var path = snap.ref
 
   var newFollower = afterFollowers[afterFollowers.length - 1]
 
-  console.log(newFollower)
-
-  var db = admin.firestore()
-  var ref = db.collection('users').doc(newFollower)
-
-  var userData = (await ref.get()).data()
-
-  var userName = userData['userName']
+  var userName = (await db.collection('users').doc(newFollower).get()).data()['userName']
 
   const notification = {
     title: 'Nuevo suscriptor',
@@ -303,8 +163,8 @@ exports.newFollower = functions.region('europe-west2').firestore.document('users
     dateTime: new Date(Date.now())
   };
 
-  ref = db.collection('users').doc(userId)
-  ref.collection('notifications').add(notification)
+
+  path.collection('notifications').add(notification)
 
 })
 
@@ -314,15 +174,12 @@ exports.onCreateNotification = functions.region('europe-west2').firestore.docume
   var sender = notification['sender']
   var post = notification['post']
 
-  var db = admin.firestore()
-  var ref = db.collection('users').doc(sender)
-
-  var userName = (await ref.get()).data()['userName']
+  var senderName = (await db.collection('users').doc(sender).get()).data()['userName']
 
   const payload = {
     notification: {
       title: 'Nueva publicación',
-      body: `${userName} ha subido una nueva publicación`,
+      body: `${senderName} ha subido una nueva publicación`,
     },
     data: {
       post: post,
@@ -330,13 +187,9 @@ exports.onCreateNotification = functions.region('europe-west2').firestore.docume
     }
   };
 
-  var userId = context.params.userId
+  tokens = (await db.collection('users').doc(context.params.userId).get()).data()['tokens']
 
-  ref = db.collection('users').doc(userId)
-
-  var tokens = (await ref.get()).data()['tokens']
-
-  tokens.forEach(async token => {
-    await admin.messaging().sendToDevice(token, payload);
+  tokens.forEach(token => {
+    admin.messaging().sendToDevice(token, payload);
   });
 })
