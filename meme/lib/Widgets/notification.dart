@@ -30,8 +30,7 @@ class NotificationWidget extends StatelessWidget {
             if (!snapshot.hasData) return Loading();
             User user = snapshot.data;
             return StreamBuilder(
-                stream: db.getPost(
-                    'users/${notification.sender}/posts/${notification.post}'),
+                stream: db.getPost(notification.sender,notification.post),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) print(snapshot.error);
                   if (!snapshot.hasData) return Loading();

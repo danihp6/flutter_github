@@ -46,7 +46,6 @@ class PostHeader extends StatelessWidget {
                 width: 35,
                 child: PostMenu(
                   post: post,
-                  userId: post.authorId,
                   postList: postList,
                 ),
               )

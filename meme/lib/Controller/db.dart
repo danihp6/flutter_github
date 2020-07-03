@@ -108,7 +108,12 @@ class DataBase {
 
 //---------------POST----------------//
 
-  Stream<Post> getPost(String postPath) => _firestore
+  Stream<Post> getPost(String userId, String postId) => _firestore
+      .document('users/$userId/posts/$postId')
+      .snapshots()
+      .map((doc) => Post.fromFirestore(doc));
+
+  Stream<Post> getPostByPath(String postPath) => _firestore
       .document(postPath)
       .snapshots()
       .map((doc) => Post.fromFirestore(doc));
@@ -126,55 +131,48 @@ class DataBase {
       .snapshots()
       .map(toPosts);
 
-  Future addPostPathInPostList(
-          String userId, String postId, String postListId) =>
+  Future addPostPathInPostList(String userId, String postId,
+          String postAuthorId, String postListId) =>
       _firestore.document('users/$userId/postLists/$postListId').updateData({
-        'posts': FieldValue.arrayUnion(['users/$userId/posts/$postId'])
+        'posts': FieldValue.arrayUnion(['users/$postAuthorId/posts/$postId'])
       });
 
-  Future deletePostPathInPostList(
-          String userId, String postListId, String postPath) =>
+  Future deletePostPathInPostList(String userId, String postListId,
+          String postAuthorId, String postId) =>
       _firestore.document('users/$userId/postLists/$postListId').updateData({
-        'posts': FieldValue.arrayRemove([postPath])
+        'posts': FieldValue.arrayRemove(['users/$postAuthorId/posts/$postId'])
       });
 
-  Stream<List<String>> getPostsPathFromPostList(
-          String userId, String postListId) =>
-      _firestore
-          .document('users/$userId/postLists/$postListId')
-          .snapshots()
-          .map((doc) => List<String>.from(doc.data['posts']));
-  Stream<List<String>> getPostsPathFromFavourites(String userId) => _firestore
-      .document('users/$userId')
-      .snapshots()
-      .map((doc) => List<String>.from(doc.data['favourites']));
-
-  Future addPostPathInFavourites(String userId, String postPath) {
-    _firestore.document(postPath).updateData({
+  Future addPostPathInFavourites(
+      String userId, String postAuthorId, String postId) {
+    _firestore.document('users/$postAuthorId/posts/$postId').updateData({
       'favourites': FieldValue.arrayUnion([userId])
     });
     _firestore.document('users/$userId').updateData({
-      'favourites': FieldValue.arrayUnion([postPath])
+      'favourites': FieldValue.arrayUnion(['users/$postAuthorId/posts/$postId'])
     });
   }
 
-  Future deletePostPathInFavourites(String userId, String postPath) {
-    _firestore.document(postPath).updateData({
+  Future deletePostPathInFavourites(
+      String userId, String postAuthorId, String postId) {
+    _firestore.document('users/$postAuthorId/posts/$postId').updateData({
       'favourites': FieldValue.arrayRemove([userId])
     });
     _firestore.document('users/$userId').updateData({
-      'favourites': FieldValue.arrayRemove([postPath])
+      'favourites':
+          FieldValue.arrayRemove(['users/$postAuthorId/posts/$postId'])
     });
   }
 
-  Future<DocumentReference> newPost(String userId, Post post, File file) async {
+  Future<String> newPost(String userId, Post post, File file) async {
     Map map = await mediaStorage.uploadMedia(file, userId);
     post.media = map['media'];
     post.mediaLocation = map['location'];
-    DocumentReference ref = await _firestore
-        .collection('users/$userId/posts')
-        .add(post.toFirestore());
-    return ref;
+    String id = (await _firestore
+            .collection('users/$userId/posts')
+            .add(post.toFirestore()))
+        .documentID;
+    return id;
   }
 
   Future deletePost(String userId, String postId) =>
@@ -220,7 +218,12 @@ class DataBase {
 
 //---------------POSTLIST----------------//
 
-  Stream<PostList> getPostList(String postListPath) => _firestore
+  Stream<PostList> getPostList(String userId, String postListId) => _firestore
+      .document('users/$userId/postLists/$postListId')
+      .snapshots()
+      .map((doc) => PostList.fromFirestore(doc));
+
+  Stream<PostList> getPostListByPath(String postListPath) => _firestore
       .document(postListPath)
       .snapshots()
       .map((doc) => PostList.fromFirestore(doc));
@@ -290,13 +293,13 @@ class DataBase {
       .snapshots()
       .map((snap) => Comment.fromFirestore(snap.documents.first));
 
-  Future<String> newComment(String userPostId, String postId, Comment comment) async {
-    DocumentReference ref = await  _firestore
-          .collection('users/$userPostId/posts/$postId/comments')
-          .add(comment.toFirestore());
-          return ref.documentID;
+  Future<String> newComment(
+      String userPostId, String postId, Comment comment) async {
+    DocumentReference ref = await _firestore
+        .collection('users/$userPostId/posts/$postId/comments')
+        .add(comment.toFirestore());
+    return ref.documentID;
   }
-      
 
   Future newOuterComment(String userPostId, String postId, Comment comment) =>
       newComment(userPostId, postId, comment);
@@ -402,9 +405,9 @@ class DataBase {
     return tagsId;
   }
 
-  Future addPostToTag(String tagId, DocumentReference ref) {
+  Future addPostToTag(String tagId, String postAuthorId, String postId) {
     _firestore.document('tags/$tagId').updateData({
-      'posts': FieldValue.arrayUnion([ref])
+      'posts': FieldValue.arrayUnion(['users/$postAuthorId/posts/$postId'])
     });
   }
 

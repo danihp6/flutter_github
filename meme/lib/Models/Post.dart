@@ -10,7 +10,7 @@ class Post {
   List<String> _favourites;
   DateTime _dateTime;
   String _mediaLocation;
-  String _authorId;
+  String _author;
   List<String> _tags;
   Map<String, dynamic> _hotPoints;
 
@@ -22,7 +22,7 @@ class Post {
     this._favourites = favourites;
     this._dateTime = dateTime;
     this._mediaLocation = mediaLocation;
-    this._authorId = authorId;
+    this._author = authorId;
     this._tags = tags;
     this._hotPoints = hotPoints;
   }
@@ -35,7 +35,7 @@ class Post {
         _favourites = List<String>.from(doc.data['favourites']),
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
         _mediaLocation = doc.data['mediaLocation'],
-        _authorId = doc.reference.parent().parent().documentID,
+        _author = doc.reference.parent().parent().documentID,
         _tags = List<String>.from(doc.data['tags']),
         _hotPoints = doc.data['hotPoints'];
 
@@ -78,9 +78,9 @@ class Post {
 
   set mediaLocation(mediaLocation) => this._mediaLocation = mediaLocation;
 
-  get authorId => this._authorId;
+  get author => this._author;
 
-  set authorId(authorId) => this._authorId = authorId;
+  set author(author) => this._author = author;
 
   List<String> get tags => this._tags;
 

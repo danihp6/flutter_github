@@ -163,7 +163,7 @@ class _PostDescriptionState extends State<PostDescription> {
               ),
               StreamBuilder(
                   stream:
-                      db.getBestComment(widget.post.authorId, widget.post.id),
+                      db.getBestComment(widget.post.author, widget.post.id),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) print(snapshot.error);
                     if (!snapshot.hasData) return Container();

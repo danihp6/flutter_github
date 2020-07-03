@@ -10,6 +10,7 @@ import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/new_post_list_button.dart';
 import 'package:meme/Widgets/post.dart';
 import 'package:meme/Widgets/post_list.dart';
+import 'package:meme/Widgets/post_list_carousel.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/user_page_header.dart';
 
@@ -26,7 +27,6 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage>
     with SingleTickerProviderStateMixin {
   TabController tabController;
-  PostList postList;
   GlobalKey<ScaffoldState> scaffoldKey;
 
   @override
@@ -44,10 +44,11 @@ class _UserPageState extends State<UserPage>
 
   @override
   Widget build(BuildContext context) {
-    goToPostList() {
-      Navigator.of(context)
+
+      goPostList(PostList postList){
+    Navigator.of(context)
           .push(SlideLeftRoute(page: PostListPage(postList: postList)));
-    }
+  }
 
     return SafeArea(
       child: StreamBuilder(
@@ -56,6 +57,7 @@ class _UserPageState extends State<UserPage>
             if (snap.hasError) print(snap.error);
             if (!snap.hasData) return Loading();
             User user = snap.data;
+            List<String> favourites = user.favourites;
             return Scaffold(
               key: scaffoldKey,
               endDrawer: Container(
@@ -64,8 +66,8 @@ class _UserPageState extends State<UserPage>
                   child: Column(
                     children: <Widget>[
                       FlatButton(
-                          onPressed: () =>
-                              Navigator.push(context, SlideLeftRoute(page: SettingsPage())),
+                          onPressed: () => Navigator.push(
+                              context, SlideLeftRoute(page: SettingsPage())),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
@@ -73,7 +75,7 @@ class _UserPageState extends State<UserPage>
                               Text('Configuración'),
                             ],
                           )),
-                          FlatButton(
+                      FlatButton(
                           onPressed: () {},
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -108,9 +110,8 @@ class _UserPageState extends State<UserPage>
               body: NestedScrollView(
                 headerSliverBuilder: (context, _) => [
                   SliverToBoxAdapter(
-                      child: UserPageHeader(
-                          user: user,
-                          scaffoldKey: scaffoldKey)),
+                      child:
+                          UserPageHeader(user: user, scaffoldKey: scaffoldKey)),
                   SliverToBoxAdapter(
                     child: TabBar(
                       controller: tabController,
@@ -163,32 +164,24 @@ class _UserPageState extends State<UserPage>
                           );
                         },
                       ),
-                      StreamBuilder(
-                        stream: db.getPostsPathFromFavourites(user.id),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) print(snapshot.error);
-                          if (!snapshot.hasData) return Loading();
-                          List<String> postsId = snapshot.data;
-                          if (postsId.length == 0)
-                            return Center(child: Text('Usuario sin favoritos'));
-                          return ListView.builder(
-                            itemCount: postsId.length,
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              return StreamBuilder(
-                                  stream: db.getPost(postsId[index]),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasError)
-                                      print(snapshot.error);
-                                    if (!snapshot.hasData) return Loading();
-                                    Post post = snapshot.data;
-                                    return PostWidget(post: post);
-                                  });
-                            },
-                          );
-                        },
-                      ),
+                      favourites.length == 0
+                          ? Center(child: Text('Usuario sin favoritos'))
+                          : ListView.builder(
+                              itemCount: favourites.length,
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                return StreamBuilder(
+                                    stream: db.getPostByPath(favourites[index]),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasError)
+                                        print(snapshot.error);
+                                      if (!snapshot.hasData) return Loading();
+                                      Post post = snapshot.data;
+                                      return PostWidget(post: post);
+                                    });
+                              },
+                            ),
                       Padding(
                         padding: const EdgeInsets.only(left: 8, right: 8),
                         child: Column(
@@ -211,12 +204,9 @@ class _UserPageState extends State<UserPage>
                                     itemCount: postlists.length,
                                     physics: NeverScrollableScrollPhysics(),
                                     itemBuilder: (context, index) {
-                                      return PostListWidget(
+                                      return PostListCarousel(
                                         postList: postlists[index],
-                                        onTap: () {
-                                          postList = postlists[index];
-                                          goToPostList();
-                                        },
+                                        onTap: ()=>goPostList(postlists[index]),
                                       );
                                     },
                                   );

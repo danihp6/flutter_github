@@ -6,16 +6,16 @@ class PostList {
   String _name;
   String _image;
   String _imageLocation;
-  String _authorId;
+  String _author;
   List<String> _posts;
   DateTime _dateTime;
 
-  PostList(name, image, imageLocation, posts, authorId,dateTime) {
+  PostList(name, image, imageLocation, posts, author,dateTime) {
     this._name = name;
     this._image = image;
     this._imageLocation = imageLocation;
     this._posts = posts;
-    this._authorId = authorId;
+    this._author = author;
     this._dateTime = dateTime;
   }
 
@@ -24,7 +24,7 @@ class PostList {
         _name = doc.data['name'],
         _image = doc.data['image'],
         _imageLocation = doc.data['imageLocation'],
-        _authorId = doc.data['authorId'],
+        _author = doc.reference.parent().parent().documentID,
         _posts = List<String>.from(doc.data['posts']),
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate();
 
@@ -34,7 +34,6 @@ class PostList {
         'imageLocation': _imageLocation,
         'posts': _posts,
         'keyWords': generateKeyWords(_name),
-        'authorId': _authorId,
         'dateTime': _dateTime,
       };
 
@@ -58,9 +57,9 @@ class PostList {
 
   set posts(posts) => this._posts = posts;
 
-  get authorId => this._authorId;
+  get author => this._author;
 
-  set authorId(authorId) => this._authorId = authorId;
+  set author(author) => this._author = author;
 
   get dateTime => this._dateTime;
 

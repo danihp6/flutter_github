@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/local_storage.dart';
@@ -9,19 +8,16 @@ import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/post_list_page.dart';
 import 'package:meme/Pages/tag_page.dart';
 import 'package:meme/Pages/user_page.dart';
-import 'package:meme/Widgets/follow_button.dart';
 import 'package:meme/Widgets/loading.dart';
-import 'package:meme/Widgets/post.dart';
+import 'package:meme/Widgets/posts_carousel.dart';
 import 'package:meme/Widgets/post_list.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/tag.dart';
 import 'package:meme/Widgets/user_avatar.dart';
 import 'package:meme/Widgets/user_row.dart';
-import 'package:meme/Widgets/video_player.dart';
+
 import '../Controller/db.dart';
 import 'post_page.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter_widgets/flutter_widgets.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -186,7 +182,7 @@ class _SearchPageState extends State<SearchPage>
           itemBuilder: (context, index) {
             String postListRecentId = storage.recentPostLists[index];
             return StreamBuilder(
-                stream: db.getPostList(postListRecentId),
+                stream: db.getPostListByPath(postListRecentId),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) print(snapshot.error);
                   if (!snapshot.hasData) return Loading();
@@ -261,7 +257,7 @@ class _SearchPageState extends State<SearchPage>
                                     itemCount: tags.length,
                                     itemBuilder: (context, index) {
                                       Tag tag = tags[index];
-                                      List<DocumentReference> posts = tag.posts;
+                                      List<String> posts = tag.posts;
                                       return Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Column(
@@ -280,8 +276,11 @@ class _SearchPageState extends State<SearchPage>
                                             ),
                                             SizedBox(
                                               height: 200,
-                                              child: Carousel(posts: posts),
-                                            )
+                                              child: 
+                                                     PostsCarousel(
+                                                      posts: posts,
+                                                    ))
+                                                  
                                           ],
                                         ),
                                       );
@@ -336,7 +335,7 @@ class _SearchPageState extends State<SearchPage>
 
                         if (typeSearched == 'postLists')
                           return StreamBuilder(
-                              stream: db.getPostList(item),
+                              stream: db.getPostList(item.author, item.id),
                               builder: (context, snapshot) {
                                 if (snapshot.hasError) print(snapshot.error);
                                 if (!snapshot.hasData) return Loading();
@@ -405,95 +404,3 @@ class _SearchPageState extends State<SearchPage>
   }
 }
 
-class Carousel extends StatefulWidget {
-  Carousel({
-    @required this.posts,
-  });
-
-  List<DocumentReference> posts;
-
-  @override
-  _CarouselState createState() => _CarouselState();
-}
-
-class _CarouselState extends State<Carousel> {
-  bool _visible;
-
-  @override
-  void initState() {
-    super.initState();
-    _visible = false;
-  }
-
-  List<Widget> carousel(List<DocumentReference> posts) => posts
-      .map((post) => StreamBuilder(
-            stream: db.getPost(post.path),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) print(snapshot.error);
-              if (!snapshot.hasData) return Loading();
-              Post post = snapshot.data;
-              return GestureDetector(
-                child: post.mediaType == 'image'
-                    ? Image.network(post.media)
-                    : VideoPlayerWidget(url:post.media,isPausable: false,),
-                onTap: () => Navigator.push(
-                    context,
-                    SlideLeftRoute(
-                        page: PostPage(
-                      post: post,
-                    ))),
-              );
-            },
-          ))
-      .toList();
-
-  @override
-  Widget build(BuildContext context) {
-    return VisibilityDetector(
-      key: UniqueKey(),
-      onVisibilityChanged: (info) {
-        print(info.visibleFraction.toString());
-        if (info.visibleFraction < 0.8 &&
-            info.visibleFraction > 0.1 &&
-            _visible == true &&
-            widget.posts.length > 1)
-          setState(() {
-            _visible = false;
-          });
-        if (info.visibleFraction > 0.8 &&
-            _visible == false &&
-            widget.posts.length > 1)
-          setState(() {
-            _visible = true;
-          });
-      },
-      child: Stack(
-        alignment: Alignment.center,
-        children: <Widget>[
-          CarouselSlider(
-            options: CarouselOptions(
-              aspectRatio: 1.5,
-              enlargeCenterPage: false,
-              enableInfiniteScroll: false,
-              initialPage: 0,
-              autoPlay: _visible,
-              autoPlayAnimationDuration: Duration(seconds: 5),
-              autoPlayInterval: Duration(seconds: 8),
-              autoPlayCurve: Curves.decelerate,
-            ),
-            items: carousel(widget.posts),
-          ),
-          if (widget.posts.length > 1)
-            AnimatedOpacity(
-                opacity: _visible ? 0 : 1,
-                duration: Duration(seconds: 5),
-                child: Icon(
-                  Icons.play_arrow,
-                  size: 70,
-                  color: Colors.black54,
-                ))
-        ],
-      ),
-    );
-  }
-}

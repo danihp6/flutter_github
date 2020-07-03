@@ -26,47 +26,43 @@ class _PostListPageState extends State<PostListPage> {
             setState(() {});
           },
         ),
-        body: CustomScrollView(slivers: [
-          SliverAppBar(
-            backgroundColor: Colors.deepOrange,
-            pinned: true,
-            expandedHeight: 200,
-            flexibleSpace: FlexibleSpaceBar(
-              centerTitle: true,
-              title: Text(_postList.name),
-              background: _postList.image != ''
-                  ? Padding(
-                      padding: const EdgeInsets.all(50),
-                      child: Image.network(_postList.image),
+        body: StreamBuilder(
+            stream: db.getPostList(_postList.author, _postList.id),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) print(snapshot.error);
+              if (!snapshot.hasData) return Loading();
+              PostList postList = snapshot.data;
+              List<String> posts = postList.posts;
+              return CustomScrollView(slivers: [
+                SliverAppBar(
+                  backgroundColor: Colors.deepOrange,
+                  pinned: true,
+                  expandedHeight: 200,
+                  flexibleSpace: FlexibleSpaceBar(
+                    centerTitle: true,
+                    title: Text(_postList.name),
+                    background: _postList.image != ''
+                        ? Padding(
+                            padding: const EdgeInsets.all(50),
+                            child: Image.network(postList.image),
+                          )
+                        : Container(),
+                  ),
+                  actions: [
+                    IconButtonComments(
+                      refresh: () {
+                        setState(() {});
+                      },
                     )
-                  : Container(),
-            ),
-            actions: [
-              IconButtonComments(
-                refresh: () {
-                  setState(() {});
-                },
-              )
-            ],
-          ),
-          StreamBuilder(
-              stream: db.getPostsPathFromPostList(
-                  _postList.authorId, _postList.id),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) print(snapshot.error);
-                if (!snapshot.hasData)
-                  return SliverToBoxAdapter(
-                    child: Loading(),
-                  );
-                List<String> postPaths = snapshot.data;
-                return SliverList(
+                  ],
+                ),
+                SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
                   return StreamBuilder(
-                      stream: db.getPost(postPaths[index]),
+                      stream: db.getPostByPath(posts[index]),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) print(snapshot.error);
-                        if (!snapshot.hasData)
-                          return Loading();
+                        if (!snapshot.hasData) return Loading();
                         Post post = snapshot.data;
                         return Column(children: [
                           if (index != 0 &&
@@ -80,13 +76,13 @@ class _PostListPageState extends State<PostListPage> {
                           )
                         ]);
                       });
-                }, childCount: postPaths.length));
-              }),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 100,
-            ),
-          )
-        ]));
+                }, childCount: posts.length)),
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 100,
+                  ),
+                )
+              ]);
+            }));
   }
 }

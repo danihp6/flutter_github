@@ -18,8 +18,7 @@ class TagPage extends StatelessWidget {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return Loading();
           Tag tag = snapshot.data;
-          List<DocumentReference> posts = tag.posts;
-          print(posts.first.path);
+          List<String> posts = tag.posts;
           return Scaffold(
             appBar: AppBar(
               backgroundColor: Colors.deepOrange,
@@ -28,7 +27,7 @@ class TagPage extends StatelessWidget {
             body: ListView.builder(
               itemCount: posts.length,
               itemBuilder: (context, index) => StreamBuilder(
-                stream: db.getPost(posts[index].path),
+                stream: db.getPostByPath(posts[index]),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) print(snapshot.error);
                   if (!snapshot.hasData) return Loading();

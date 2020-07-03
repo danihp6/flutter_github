@@ -9,10 +9,9 @@ import 'package:meme/Widgets/slide_left_route.dart';
 
 class PostMenu extends StatelessWidget {
   Post post;
-  String userId;
   PostList postList;
 
-  PostMenu({@required this.post, @required this.userId, this.postList});
+  PostMenu({@required this.post, this.postList});
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +29,10 @@ class PostMenu extends StatelessWidget {
                 Text('Añadir a categoria')
               ],
             ),
-            value: () => Navigator.push(context,
-                SlideLeftRoute(page: SelectPostList(postId: post.id))),
+            value: () => Navigator.push(
+                context, SlideLeftRoute(page: SelectPostList(postId: post.id))),
           ),
-          if (postList == null &&
-              post.authorId == db.userId)
+          if (postList == null && post.author == db.userId)
             PopupMenuItem(
               child: Row(
                 children: [
@@ -46,12 +44,10 @@ class PostMenu extends StatelessWidget {
                 ],
               ),
               value: () {
-                // mediaStorage.deleteFile(post.mediaLocation);
-                db.deletePost(userId, post.id);
+                db.deletePost(db.userId, post.id);
               },
             ),
-          if (postList != null &&
-              postList.authorId == db.userId)
+          if (postList != null && postList.author == db.userId)
             PopupMenuItem(
               child: Row(
                 children: [
@@ -62,8 +58,8 @@ class PostMenu extends StatelessWidget {
                   Text('Quitar de la lista'),
                 ],
               ),
-              value: () => db.deletePostPathInPostList(db.userId,
-                  postList.id, 'users/$userId/posts/${post.id}'),
+              value: () => db.deletePostPathInPostList(
+                  db.userId, postList.id, post.author, post.id),
             ),
         ];
       },

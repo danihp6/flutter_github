@@ -21,7 +21,7 @@ class PostPage extends StatelessWidget {
         ),
         body: SingleChildScrollView(
                   child: StreamBuilder(
-              stream: db.getPost('users/${post.authorId}/posts/${post.id}'),
+              stream: db.getPost(post.author,post.id),
               builder: (context, snapshot) {
                 if (snapshot.hasError) print(snapshot.error);
                 if (!snapshot.hasData) return Loading();

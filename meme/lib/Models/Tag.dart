@@ -4,7 +4,7 @@ import 'package:meme/Controller/string_functions.dart';
 class Tag {
   String _id;
   String _name;
-  List<DocumentReference> _posts;
+  List<String> _posts;
 
   Tag(name, posts) {
     this._name = name;
@@ -14,7 +14,7 @@ class Tag {
   Tag.fromFirestore(DocumentSnapshot doc)
       : _id = doc.documentID,
         _name = doc.data['name'],
-        _posts = List<DocumentReference>.from(doc.data['posts']);
+        _posts = List<String>.from(doc.data['posts']);
 
   Map<String, dynamic> toFirestore() => {'name': _name, 'posts': _posts,'keyWords':generateKeyWords(_name)};
 

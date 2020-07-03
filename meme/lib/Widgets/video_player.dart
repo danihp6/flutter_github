@@ -52,6 +52,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         ? VisibilityDetector(
             key: UniqueKey(),
             onVisibilityChanged: (info) {
+              if(!mounted)return;
               if (info.visibleFraction > 0.8 &&
                   !_controller.value.isPlaying &&
                   !_isManualPaused)

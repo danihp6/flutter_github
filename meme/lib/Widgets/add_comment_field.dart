@@ -33,6 +33,7 @@ class _AddCommentFieldState extends State<AddCommentField> {
   String userSearch = '';
   List<String> userMentions = [];
   int startWordIndex;
+  String image = '';
 
   @override
   void initState() {
@@ -69,18 +70,18 @@ class _AddCommentFieldState extends State<AddCommentField> {
       userMentions = wordsStartWith(text, '@');
       if (widget.commentResponse != null) {
         db.newInnerComment(
-            widget.post.authorId,
+            widget.post.author,
             widget.post.id,
             widget.commentResponse.id,
             new Comment(
-                text, <String>[], db.userId, DateTime.now(), <String>[], 1));
+                text, <String>[], db.userId, DateTime.now(), <String>[], 1,image));
         widget.cancelResponse();
       } else
         db.newOuterComment(
-            widget.post.authorId,
+            widget.post.author,
             widget.post.id,
             new Comment(
-                text, <String>[], db.userId, DateTime.now(), <String>[], 0));
+                text, <String>[], db.userId, DateTime.now(), <String>[], 0,image));
       userMentions.forEach((userName) async {
         String id =
             await db.userIdByUserName(userName.substring(1, userName.length));
@@ -89,7 +90,7 @@ class _AddCommentFieldState extends State<AddCommentField> {
             new mynotification.Notification(
                 'Te han mencionado',
                 widget.user.userName + ' te ha mencionado',
-                widget.post.authorId,
+                widget.post.author,
                 widget.post.id,
                 DateTime.now()));
       });
@@ -164,7 +165,9 @@ class _AddCommentFieldState extends State<AddCommentField> {
                                 text = '';
                               });
                             })
-                        : Icon(Icons.comment),
+                        : !widget.focusNode.hasFocus
+                            ? Icon(Icons.comment)
+                            : null,
                     hintText: 'Escribe un comentario',
                     border: InputBorder.none),
                 onChanged: (value) {
@@ -176,6 +179,8 @@ class _AddCommentFieldState extends State<AddCommentField> {
                 focusNode: widget.focusNode,
               ),
             ),
+            if (text.length == 0)
+              IconButton(icon: Icon(Icons.image), onPressed: () {}),
             if (text.length > 0)
               IconButton(
                 icon: Icon(Icons.send),

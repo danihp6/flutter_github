@@ -28,17 +28,16 @@ class _PostWidgetState extends State<PostWidget> {
     bool _isShowedComments = configuration.getIsShowedComments();
     List<String> favourites = widget.post.favourites;
 
-    addOrRemoveFavourite(String userId, String postId) {
-      String postPath = 'users/${widget.post.authorId}/posts/${widget.post.id}';
+    addOrRemoveFavourite(String userId, String postAuthorId, String postId) {
       print(favourites.contains(db.userId));
       if (!favourites.contains(db.userId))
-        db.addPostPathInFavourites(userId, postPath);
+        db.addPostPathInFavourites(userId, postAuthorId, postId);
       else
-        db.deletePostPathInFavourites(userId, postPath);
+        db.deletePostPathInFavourites(userId, postAuthorId, postId);
     }
 
     return StreamBuilder(
-        stream: db.getUser(widget.post.authorId),
+        stream: db.getUser(widget.post.author),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return Loading();
@@ -70,8 +69,8 @@ class _PostWidgetState extends State<PostWidget> {
                               return Container();
                             },
                           ),
-                          onDoubleTap: () => addOrRemoveFavourite(db.userId,
-                              'users/${widget.post.authorId}/posts/${widget.post.id}'))
+                          onDoubleTap: () => addOrRemoveFavourite(
+                              db.userId, widget.post.author, widget.post.id))
                       : VideoPlayerWidget(url: widget.post.media),
                 ),
               ],

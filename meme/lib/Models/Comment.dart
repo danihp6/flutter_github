@@ -11,15 +11,17 @@ class Comment {
   int _level;
   String _postId;
   String _userPostId;
+  String _image;
 
   Comment(
-      text, likes, authorId, dateTime, comments, level) {
+      text, likes, authorId, dateTime, comments, level,image) {
     this._text = text;
     this._likes = likes;
     this._authorId = authorId;
     this._dateTime = dateTime;
     this._comments = comments;
     this._level = level;
+    this._image = image;
   }
 
   Comment.fromFirestore(DocumentSnapshot doc)
@@ -31,7 +33,8 @@ class Comment {
         _comments = List<String>.from(doc.data['comments']),
         _level = doc.data['level'],
         _postId = doc.reference.parent().parent().documentID,
-        _userPostId = doc.reference.parent().parent().parent().parent().documentID;
+        _userPostId = doc.reference.parent().parent().parent().parent().documentID,
+        _image = doc.data['image'];
 
   Map<String, dynamic> toFirestore() => {
         'text': _text,
@@ -39,7 +42,8 @@ class Comment {
         'authorId': _authorId,
         'dateTime': _dateTime,
         'level':_level,
-        'comments':_comments
+        'comments':_comments,
+        'image':_image
       };
 
   get id => this._id;
@@ -77,6 +81,10 @@ class Comment {
   get userPostId => this._userPostId;
 
   set userPostId(userPostId) => this._userPostId = userPostId;
+
+  get image => this._image;
+
+  set image(image) => this._image = image;
 }
 
 List<Comment> toCommentList(QuerySnapshot query) {

@@ -5,23 +5,18 @@ import 'package:meme/Models/PostList.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/new_post_list_button.dart';
 import 'package:meme/Widgets/post_list.dart';
+import 'package:meme/Widgets/post_list_carousel.dart';
 
-class SelectPostList extends StatelessWidget {
-  String postId;
-
-  SelectPostList({@required this.postId});
-
+class SelectPostFromPostListPage extends StatelessWidget {
+Function onTap;
+SelectPostFromPostListPage({@required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    addPublicationAndGoBack(String userId, String postId, String postAuthorId, String postListId) {
-      db.addPostPathInPostList(userId, postId,postAuthorId, postListId);
-      Navigator.pop(context);
-    }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Selecciona una lista'),
+        title: Text('Selecciona un meme'),
         backgroundColor: Colors.deepOrangeAccent,
       ),
       body: SingleChildScrollView(
@@ -41,12 +36,10 @@ class SelectPostList extends StatelessWidget {
                       shrinkWrap: true,
                       itemCount: postLists.length,
                       itemBuilder: (context, index) {
-                        return PostListWidget(
+                        return PostListCarousel(
                           postList: postLists[index],
                           activeMoreOptions: false,
-                          onTap: () {
-                            addPublicationAndGoBack(db.userId, postId,postLists[index].author, postLists[index].id);
-                          },
+                          onTap: onTap,
                         );
                       },
                     ),

@@ -66,7 +66,7 @@ class _CommentsPageState extends State<CommentsPage> {
                 child: Column(
                   children: [
                     StreamBuilder(
-                      stream: db.getUser(widget.post.authorId),
+                      stream: db.getUser(widget.post.author),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) print(snapshot.error);
                         if (!snapshot.hasData) return Loading();
@@ -97,7 +97,7 @@ class _CommentsPageState extends State<CommentsPage> {
                     Divider(),
                     StreamBuilder(
                         stream:
-                            db.getOuterComments(widget.post.authorId, widget.post.id),
+                            db.getOuterComments(widget.post.author, widget.post.id),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData) return Loading();

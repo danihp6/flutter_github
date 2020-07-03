@@ -25,17 +25,17 @@ class _FavouriteButtonState extends State<FavouriteButton> {
           onPressed: () {
             setState(() {
               db.deletePostPathInFavourites(
-                  db.userId, 'users/${widget.post.authorId}/posts/${widget.post.id}');
+                  db.userId, widget.post.author,widget.post.id);
             });
           });
 
     return IconButton(
         icon: Icon(Icons.star_border),
-        iconSize: 30,
+        iconSize: 35,
         onPressed: () {
           setState(() {
             db.addPostPathInFavourites(
-                db.userId, 'users/${widget.post.authorId}/posts/${widget.post.id}');
+                db.userId, widget.post.author,widget.post.id);
           });
         });
   }

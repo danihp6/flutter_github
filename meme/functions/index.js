@@ -6,9 +6,9 @@ admin.initializeApp(functions.config().firebase);
 var db = admin.firestore()
 
 exports.onDeletePost = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onDelete(async (snap, context) => {
-  var path = snap.ref
+  var path = snap.ref.path
   var batchSize = 500
-  var commentsRef = path.collection('comments')
+  var commentsRef = snap.ref.collection('comments')
 
   deleteCollection(db, commentsRef, batchSize)
 
@@ -94,7 +94,7 @@ function deleteQueryBatch(db, query, batchSize, resolve, reject) {
 }
 
 exports.onDeleteUser = functions.region('europe-west2').firestore.document('users/{userId}').onDelete(async (snap, context) => {
-  var path = snap.ref
+  var ref = snap.ref
   var batchSize = 500
   var userId = context.params.userId
 
@@ -102,15 +102,15 @@ exports.onDeleteUser = functions.region('europe-west2').firestore.document('user
   var bucket = admin.storage().bucket()
   bucket.file(mediaPath).delete()
 
-  var notificationsRef = path.collection('notifications')
+  var notificationsRef = ref.collection('notifications')
 
   deleteCollection(db,notificationsRef,batchSize)
 
-  var postListsRef = path.collection('postLists')
+  var postListsRef = ref.collection('postLists')
 
   deleteCollection(db,postListsRef,batchSize)
 
-  var postsRef = path.collection('posts')
+  var postsRef = ref.collection('posts')
 
   deleteCollection(db,postsRef,batchSize)
 
@@ -131,7 +131,7 @@ exports.onDeleteUser = functions.region('europe-west2').firestore.document('user
 
     var userPostsSnapshot = await doc.ref.collection('posts').get()
 
-    userPostsSnapshot.docs.forEach((doc)=>{
+    userPostsSnapshot.docs.forEach(async(doc)=>{
       var commentsSnapshot = await doc.ref.collection('comments').get()
 
       commentsSnapshot.docs.forEach((doc)=>{
@@ -150,7 +150,6 @@ exports.newFollower = functions.region('europe-west2').firestore.document('users
 
   if (beforeFollowers.length == afterFollowers.length) return 0
 
-  var path = snap.ref
 
   var newFollower = afterFollowers[afterFollowers.length - 1]
 
@@ -164,8 +163,12 @@ exports.newFollower = functions.region('europe-west2').firestore.document('users
   };
 
 
-  path.collection('notifications').add(notification)
+  snap.ref.collection('notifications').add(notification)
 
+})
+
+exports.avoidTag = functions.region('europe-west2').firestore.document('tags/{tagId}').onUpdate(async (change, context) => {
+  if(change.after.data()['posts'].length == 0) change.after.ref.delete()
 })
 
 exports.onCreateNotification = functions.region('europe-west2').firestore.document('users/{userId}/notifications/{notificationId}').onCreate(async (snap, context) => {

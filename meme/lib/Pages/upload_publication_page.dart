@@ -42,13 +42,13 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
       });
 
       List<String> tagsId = await db.createTags(tags);
-      DocumentReference ref = await db.newPost(
+      String postId = await db.newPost(
           db.userId,
           new Post('', _description, widget.mediaType, <String>[],
               DateTime.now(), '', db.userId, tagsId, Map<String, dynamic>()),
           _file);
       tagsId.forEach((id) {
-        db.addPostToTag(id, ref);
+        db.addPostToTag(id,db.userId,postId );
       });
       Navigator.pop(context);
       Navigator.pop(context);
@@ -57,7 +57,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
     void addKeyWord(String value) {
       if (tags.length < 5)
         setState(() {
-          tags.add(Tag(value.toLowerCase(), <DocumentReference>[]));
+          tags.add(Tag(value.toLowerCase(), <String>[]));
         });
     }
 
