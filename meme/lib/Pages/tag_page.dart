@@ -21,7 +21,6 @@ class TagPage extends StatelessWidget {
           List<String> posts = tag.posts;
           return Scaffold(
             appBar: AppBar(
-              backgroundColor: Colors.deepOrange,
               title: Text('#' + tag.name),
             ),
             body: ListView.builder(

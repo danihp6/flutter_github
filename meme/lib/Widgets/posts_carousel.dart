@@ -7,9 +7,10 @@ import 'package:meme/Pages/post_page.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/video_player.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class PostsCarousel extends StatefulWidget {
-  PostsCarousel({@required this.posts, this.onTap});
+  PostsCarousel({@required this.posts, @required this.onTap});
 
   List<String> posts;
   Function onTap;
@@ -35,22 +36,21 @@ class _PostsCarouselState extends State<PostsCarousel> {
             if (!snapshot.hasData) return Loading();
             Post post = snapshot.data;
             return GestureDetector(
-                child: post.mediaType == 'image'
-                    ? Image.network(post.media)
-                    : VideoPlayerWidget(
-                        url: post.media,
-                        isPausable: false,
-                      ),
-                onTap: widget.onTap==null?()=>goPost(post):widget.onTap);
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: post.mediaType == 'image'
+                      ? FadeInImage(
+                        fit: BoxFit.cover,
+                        placeholder: MemoryImage(kTransparentImage),
+                        image: NetworkImage(post.media))
+                      : VideoPlayerWidget(
+                          url: post.media,
+                          isPausable: false,
+                        ),
+                ),
+                onTap: () => widget.onTap(post));
           }))
       .toList();
-
-  goPost(Post post) => Navigator.push(
-      context,
-      SlideLeftRoute(
-          page: PostPage(
-        post: post,
-      )));
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +84,9 @@ class _PostsCarouselState extends State<PostsCarousel> {
               autoPlayAnimationDuration: Duration(seconds: 5),
               autoPlayInterval: Duration(seconds: 8),
               autoPlayCurve: Curves.decelerate,
+              height: 240,
+              pauseAutoPlayOnManualNavigate: true,
+
             ),
             items: carousel(widget.posts),
           ),

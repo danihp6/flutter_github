@@ -16,7 +16,6 @@ class FollowersListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepOrange,
         title: Text('Seguidores'),
       ),
       body: Padding(

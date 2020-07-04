@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/gallery.dart';
 import 'package:meme/Controller/media_storage.dart';
 import 'package:meme/Models/PostList.dart';
 import '../Widgets/tag_selector.dart';
@@ -20,14 +21,22 @@ class _NewPostListPageState extends State<NewPostListPage> {
   File _file;
   String _image = '';
   String _imageLocation = '';
+
+  @override
+  void initState() {
+    gallery.getMediaGallery().then((_) {});
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     Future createPostList() async {
       if (_name != '') {
         db.newPostList(
             db.userId,
-            new PostList(_name, _image, _imageLocation, <String>[],
-                db.userId,DateTime.now()),_file);
+            new PostList(_name, _image, _imageLocation, <String>[], db.userId,
+                DateTime.now()),
+            _file);
         Navigator.pop(context);
       }
     }
@@ -38,7 +47,6 @@ class _NewPostListPageState extends State<NewPostListPage> {
       });
       Navigator.pop(context);
     }
-
 
     return Scaffold(
       appBar: AppBar(
@@ -75,7 +83,8 @@ class _NewPostListPageState extends State<NewPostListPage> {
                 onTap: () => Navigator.push(
                     context,
                     SlideLeftRoute(
-                        page: GalleryPage(onTap: selectImage))),
+                        page: GalleryPage(
+                            onTap: selectImage, page: gallery.imagePage))),
               ),
               Text('Selecciona una imagen'),
               SizedBox(height: 30),

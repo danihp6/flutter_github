@@ -217,6 +217,13 @@ class _SearchPageState extends State<SearchPage>
         );
     }
 
+      goPost(Post post) => Navigator.push(
+      context,
+      SlideLeftRoute(
+          page: PostPage(
+        post: post,
+      )));
+
     return WillPopScope(
       onWillPop: onWillPop,
       child: SafeArea(
@@ -242,7 +249,7 @@ class _SearchPageState extends State<SearchPage>
                       emptyWidget: Center(
                           child: Text('No se han encontrado resultados')),
                       hintText: 'Busca...',
-                      iconActiveColor: Colors.deepOrange,
+                      iconActiveColor: Theme.of(context).primaryColor,
                       crossAxisSpacing: 20,
                       searchBarPadding: EdgeInsets.only(left: 8, right: 8),
                       minimumChars: 1,
@@ -279,6 +286,7 @@ class _SearchPageState extends State<SearchPage>
                                               child: 
                                                      PostsCarousel(
                                                       posts: posts,
+                                                      onTap: goPost,
                                                     ))
                                                   
                                           ],
@@ -370,7 +378,6 @@ class _SearchPageState extends State<SearchPage>
                                       controller: tabController,
                                       labelStyle: TextStyle(fontSize: 15),
                                       labelColor: Colors.black,
-                                      indicatorColor: Colors.deepOrange,
                                       onTap: (value) {
                                         if (value == 0) typeSearched = 'users';
                                         if (value == 1) typeSearched = 'tags';

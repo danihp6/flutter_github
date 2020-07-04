@@ -40,7 +40,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _avatar = _user.avatar;
     _avatarLocation = _user.avatarLocation;
     gallery.getMediaGallery().then((_) {
-      // PONER SI AUN NO HA ESTADO INICIADO
     });
   }
 
@@ -75,7 +74,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepOrange,
         title: Text('Edita tu perfil'),
       ),
       body: SingleChildScrollView(

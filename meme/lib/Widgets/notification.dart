@@ -41,7 +41,7 @@ class NotificationWidget extends StatelessWidget {
                     actions: <Widget>[
                       IconSlideAction(
                         caption: 'Borrar',
-                        color: Colors.deepOrangeAccent,
+                        color: Theme.of(context).accentColor,
                         icon: Icons.delete,
                         onTap: () =>
                             db.deleteNotification(db.userId, notification.id),
@@ -101,7 +101,7 @@ class NotificationWidget extends StatelessWidget {
             actions: <Widget>[
               IconSlideAction(
                 caption: 'Borrar',
-                color: Colors.deepOrangeAccent,
+                color: Theme.of(context).accentColor,
                 icon: Icons.delete,
                 onTap: () => db.deleteNotification(db.userId, notification.id),
               ),

@@ -6,7 +6,6 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Configuración'),
-        backgroundColor: Colors.deepOrangeAccent,
       ),
       body: Column(
         children: <Widget>[

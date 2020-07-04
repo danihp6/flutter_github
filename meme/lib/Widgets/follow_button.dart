@@ -27,7 +27,7 @@ class _FollowButtonState extends State<FollowButton> {
                 ? db.unfollow(user.id, _lookedUserId)
                 : db.follow(user.id, _lookedUserId),
             child: Text(userFollowed ? 'Siguiendo' : 'Seguir'),
-            color: userFollowed?Colors.orange:Colors.blue,
+            color: userFollowed?Colors.blueAccent:Theme.of(context).accentColor,
             textColor: Colors.white,
           );
         });

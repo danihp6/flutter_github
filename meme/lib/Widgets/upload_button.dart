@@ -32,7 +32,6 @@ class _UploadButtonState extends State<UploadButton> {
             child: FloatingActionButton(
               heroTag: 'tools',
               onPressed: ()async =>await Permission.storage.request().isGranted?Navigator.push(context, SlideLeftRoute(page:SelectMediaPage())):null,
-              backgroundColor: Colors.deepOrange,
               child: Icon(
                 Icons.file_upload,
                 size: 35,
@@ -52,7 +51,6 @@ class _UploadButtonState extends State<UploadButton> {
               child: Icon(
                   Icons.arrow_back_ios,
                   size: 30,
-                  color: Colors.deepOrange,
                 ),
             ),
           );

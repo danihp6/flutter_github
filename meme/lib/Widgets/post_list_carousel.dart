@@ -11,11 +11,13 @@ import 'slide_left_route.dart';
 class PostListCarousel extends StatefulWidget {
   PostList postList;
   bool activeMoreOptions;
-  Function onTap;
+  Function onTapPostList;
+  Function onTapPost;
 
   PostListCarousel(
       {@required this.postList,
-      this.onTap,
+      this.onTapPostList,
+      this.onTapPost,
       this.activeMoreOptions = true});
 
   @override
@@ -23,8 +25,6 @@ class PostListCarousel extends StatefulWidget {
 }
 
 class _PostListCarouselState extends State<PostListCarousel> {
-
-
   @override
   Widget build(BuildContext context) {
     PostList _postList = widget.postList;
@@ -32,7 +32,7 @@ class _PostListCarouselState extends State<PostListCarousel> {
     return Column(
       children: <Widget>[
         GestureDetector(
-                  child: Row(
+          child: Row(
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,10 +82,16 @@ class _PostListCarouselState extends State<PostListCarousel> {
                   : Container()
             ],
           ),
-          onTap: widget.onTap,
+          onTap: () => widget.onTapPostList(_postList),
         ),
-        SizedBox(height: 5,),
-      PostsCarousel(posts: posts)
+        SizedBox(
+          height: 5,
+        ),
+        if (posts.length > 0)
+          PostsCarousel(
+            posts: posts,
+            onTap: widget.onTapPost,
+          )
       ],
     );
   }

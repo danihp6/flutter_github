@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:meme/Widgets/loading.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 
@@ -97,7 +98,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
               ],
             ),
           )
-        : Container();
+        : Loading();
   }
 }
 

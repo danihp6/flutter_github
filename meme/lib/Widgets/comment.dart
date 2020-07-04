@@ -4,9 +4,10 @@ import 'package:meme/Controller/datetime_functions.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/User.dart';
-import 'package:meme/Pages/like_comment_button.dart';
+import 'package:meme/Widgets/like_comment_button.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/user_avatar.dart';
+import 'package:meme/Widgets/video_player.dart';
 import '../Controller/db.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -51,7 +52,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                   if (db.userId == _comment.authorId)
                     IconSlideAction(
                       caption: 'Borrar',
-                      color: Colors.deepOrangeAccent,
+                      color: Theme.of(context).accentColor,
                       icon: Icons.delete,
                       onTap: () => _comment.level == 0
                           ? db.deleteOuterComment(
@@ -113,6 +114,18 @@ class _CommentWidgetState extends State<CommentWidget> {
                 ),
               );
             }),
+            if(_comment.media != '')
+            Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+                width: 200,
+                child: AspectRatio(aspectRatio: 1,
+                child: _comment.mediaType == 'image'
+                    ? Image.network(_comment.media)
+                    : VideoPlayerWidget(
+                        url: _comment.media,
+                      ),)),
+          ),
         if (widget.activeInnerComments &&
             _innerCommentsId.length > 0 &&
             !_isShowedInnedComments)
@@ -135,6 +148,7 @@ class _CommentWidgetState extends State<CommentWidget> {
         if (_isShowedInnedComments) SizedBox(height: 5),
         if (_isShowedInnedComments)
           ListView.separated(
+            physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
             itemCount: _comment.comments.length,
             separatorBuilder: (context, index) => SizedBox(height: 5),

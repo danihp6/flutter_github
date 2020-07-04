@@ -39,7 +39,6 @@ class _SignInPageState extends State<SignInPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Registrarse'),
-          backgroundColor: Colors.deepOrange,
         ),
         body: Container(
           decoration: BoxDecoration(

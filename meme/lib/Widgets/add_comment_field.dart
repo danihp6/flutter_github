@@ -5,7 +5,10 @@ import 'package:meme/Controller/string_functions.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Pages/select_post_from_post_list_page.dart';
+import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/user_avatar.dart';
+import 'package:meme/Widgets/video_player.dart';
 import 'loading.dart';
 import '../Models/Notification.dart' as mynotification;
 
@@ -33,7 +36,8 @@ class _AddCommentFieldState extends State<AddCommentField> {
   String userSearch = '';
   List<String> userMentions = [];
   int startWordIndex;
-  String image = '';
+  String media = '';
+  String mediaType = '';
 
   @override
   void initState() {
@@ -73,15 +77,15 @@ class _AddCommentFieldState extends State<AddCommentField> {
             widget.post.author,
             widget.post.id,
             widget.commentResponse.id,
-            new Comment(
-                text, <String>[], db.userId, DateTime.now(), <String>[], 1,image));
+            new Comment(text, <String>[], db.userId, DateTime.now(), <String>[],
+                1, media, mediaType));
         widget.cancelResponse();
       } else
         db.newOuterComment(
             widget.post.author,
             widget.post.id,
-            new Comment(
-                text, <String>[], db.userId, DateTime.now(), <String>[], 0,image));
+            new Comment(text, <String>[], db.userId, DateTime.now(), <String>[],
+                0, media, mediaType));
       userMentions.forEach((userName) async {
         String id =
             await db.userIdByUserName(userName.substring(1, userName.length));
@@ -96,7 +100,16 @@ class _AddCommentFieldState extends State<AddCommentField> {
       });
       controller.clear();
       text = '';
+      media = '';
       widget.focusNode.unfocus();
+    }
+
+    selectMedia(Post post) {
+      setState(() {
+        media = post.media;
+        mediaType = post.mediaType;
+        Navigator.pop(context);
+      });
     }
 
     return Column(
@@ -145,6 +158,33 @@ class _AddCommentFieldState extends State<AddCommentField> {
             child: Text(
                 'Respondiendo al comentario: ${widget.commentResponse.text}'),
           ),
+        if (media != '')
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(
+                    width: 200,
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: mediaType == 'image'
+                          ? Image.network(media)
+                          : VideoPlayerWidget(
+                              url: media,
+                            ),
+                    )),
+                IconButton(
+                    icon: Icon(Icons.clear),
+                    onPressed: () {
+                      setState(() {
+                        media = '';
+                        mediaType = '';
+                      });
+                    })
+              ],
+            ),
+          ),
         Row(
           children: [
             SizedBox(
@@ -180,7 +220,16 @@ class _AddCommentFieldState extends State<AddCommentField> {
               ),
             ),
             if (text.length == 0)
-              IconButton(icon: Icon(Icons.image), onPressed: () {}),
+              IconButton(
+                  icon: Icon(Icons.image),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        SlideLeftRoute(
+                            page: SelectPostFromPostListPage(
+                          onTap: selectMedia,
+                        )));
+                  }),
             if (text.length > 0)
               IconButton(
                 icon: Icon(Icons.send),

@@ -22,7 +22,6 @@ class SelectPostList extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Selecciona una lista'),
-        backgroundColor: Colors.deepOrangeAccent,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -36,10 +35,11 @@ class SelectPostList extends StatelessWidget {
                   List<PostList> postLists = snapshot.data;
                   return Padding(
                     padding: const EdgeInsets.only(left: 8, right: 8),
-                    child: ListView.builder(
+                    child: ListView.separated(
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: postLists.length,
+                      separatorBuilder: (context, index) => SizedBox(height: 5,),
                       itemBuilder: (context, index) {
                         return PostListWidget(
                           postList: postLists[index],

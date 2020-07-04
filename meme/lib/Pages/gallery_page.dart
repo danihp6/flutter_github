@@ -9,7 +9,7 @@ class GalleryPage extends StatelessWidget {
   Function onTap;
   MediaPage page;
 
-  GalleryPage({@required this.onTap, this.page});
+  GalleryPage({@required this.onTap, @required this.page});
   @override
   Widget build(BuildContext context) {
     if (page == null) return Scaffold(body: Loading());

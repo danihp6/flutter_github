@@ -21,7 +21,6 @@ class _HomePageState extends State<HomePage> {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(40),
           child: AppBar(
-            backgroundColor: Colors.deepOrange,
             title: Text('Meme'),
             actions: [
               CommentsButton(

@@ -17,12 +17,10 @@ SelectPostFromPostListPage({@required this.onTap});
     return Scaffold(
       appBar: AppBar(
         title: Text('Selecciona un meme'),
-        backgroundColor: Colors.deepOrangeAccent,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            NewPostListButton(),
             StreamBuilder(
                 stream: db.getPostLists(db.userId),
                 builder: (context, snapshot) {
@@ -39,7 +37,8 @@ SelectPostFromPostListPage({@required this.onTap});
                         return PostListCarousel(
                           postList: postLists[index],
                           activeMoreOptions: false,
-                          onTap: onTap,
+                          onTapPost: onTap,
+                          onTapPostList: (postList)=>print(postList),
                         );
                       },
                     ),

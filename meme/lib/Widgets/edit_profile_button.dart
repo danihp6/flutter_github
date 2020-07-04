@@ -16,7 +16,7 @@ class EditProfileButton extends StatelessWidget {
               page: EditProfilePage(
             user: user,
           ))),
-      color: Colors.deepOrange,
+      color: Theme.of(context).accentColor,
       textColor: Colors.white,
       child: Text('Editar'),
       shape: RoundedRectangleBorder(

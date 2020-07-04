@@ -16,7 +16,6 @@ class FollowedListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepOrange,
         title: Text('Seguidos'),
       ),
       body: Padding(

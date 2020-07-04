@@ -61,7 +61,6 @@ class _SelectMediaPageState extends State<SelectMediaPage>
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(40),
         child: AppBar(
-          backgroundColor: Colors.deepOrange,
           title: Text('Nuevo post'),
           actions: <Widget>[
             if (tabController.index == 0)

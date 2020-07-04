@@ -34,7 +34,8 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.deepOrange,
+        accentColor: Colors.deepOrangeAccent,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: RootPage(),

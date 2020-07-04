@@ -15,7 +15,6 @@ class PostPage extends StatelessWidget {
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(50),
           child: AppBar(
-            backgroundColor: Colors.deepOrange,
             title: Text('Publicacion'),
           ),
         ),

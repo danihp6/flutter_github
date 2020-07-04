@@ -5,6 +5,7 @@ import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/post_list_page.dart';
+import 'package:meme/Pages/post_page.dart';
 import 'package:meme/Pages/settings_page.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/new_post_list_button.dart';
@@ -45,10 +46,13 @@ class _UserPageState extends State<UserPage>
   @override
   Widget build(BuildContext context) {
 
-      goPostList(PostList postList){
+      goPostList(PostList postList)=>
     Navigator.of(context)
           .push(SlideLeftRoute(page: PostListPage(postList: postList)));
-  }
+
+          goPost(Post post)=>
+    Navigator.of(context)
+          .push(SlideLeftRoute(page: PostPage(post: post)));
 
     return SafeArea(
       child: StreamBuilder(
@@ -137,7 +141,6 @@ class _UserPageState extends State<UserPage>
                       ],
                       labelColor: Colors.deepOrange,
                       unselectedLabelColor: Colors.black,
-                      indicatorColor: Colors.deepOrange,
                     ),
                   ),
                 ],
@@ -206,7 +209,8 @@ class _UserPageState extends State<UserPage>
                                     itemBuilder: (context, index) {
                                       return PostListCarousel(
                                         postList: postlists[index],
-                                        onTap: ()=>goPostList(postlists[index]),
+                                        onTapPostList: goPostList,
+                                        onTapPost: goPost,
                                       );
                                     },
                                   );

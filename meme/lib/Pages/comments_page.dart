@@ -54,7 +54,6 @@ class _CommentsPageState extends State<CommentsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepOrange,
         title: Text('Comentarios'),
       ),
       body: Column(
@@ -65,6 +64,7 @@ class _CommentsPageState extends State<CommentsPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
+                    if(widget.post.description!='')
                     StreamBuilder(
                       stream: db.getUser(widget.post.author),
                       builder: (context, snapshot) {
@@ -94,6 +94,7 @@ class _CommentsPageState extends State<CommentsPage> {
                     );
                       },
                     ),
+                    if(widget.post.description!='')
                     Divider(),
                     StreamBuilder(
                         stream:
