@@ -5,17 +5,18 @@ import 'package:meme/Models/PostList.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/new_post_list_button.dart';
 import 'package:meme/Widgets/post_list.dart';
+import '../Models/Post.dart';
 
 class SelectPostList extends StatelessWidget {
-  String postId;
+  Post post;
 
-  SelectPostList({@required this.postId});
-
+  SelectPostList({@required this.post});
 
   @override
   Widget build(BuildContext context) {
-    addPublicationAndGoBack(String userId, String postId, String postAuthorId, String postListId) {
-      db.addPostPathInPostList(userId, postId,postAuthorId, postListId);
+    addPublicationAndGoBack(
+        String userId, String postId, String postAuthorId, String postListId) {
+      db.addPostPathInPostList(userId, postId, postAuthorId, postListId);
       Navigator.pop(context);
     }
 
@@ -39,13 +40,16 @@ class SelectPostList extends StatelessWidget {
                       physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: postLists.length,
-                      separatorBuilder: (context, index) => SizedBox(height: 5,),
+                      separatorBuilder: (context, index) => SizedBox(
+                        height: 5,
+                      ),
                       itemBuilder: (context, index) {
                         return PostListWidget(
                           postList: postLists[index],
                           activeMoreOptions: false,
                           onTap: () {
-                            addPublicationAndGoBack(db.userId, postId,postLists[index].author, postLists[index].id);
+                            addPublicationAndGoBack(db.userId, post.id,
+                               post.author, postLists[index].id);
                           },
                         );
                       },

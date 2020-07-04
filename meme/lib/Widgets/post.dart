@@ -54,26 +54,21 @@ class _PostWidgetState extends State<PostWidget> {
                       author: author,
                     )),
               ),
-            Stack(
-              alignment: Alignment.center,
-              children: <Widget>[
-                AspectRatio(
-                  aspectRatio: 1,
-                  child: widget.post.mediaType == 'image'
-                      ? GestureDetector(
-                          child: Image.network(
-                            widget.post.media,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              print(error);
-                              return Container();
-                            },
-                          ),
-                          onDoubleTap: () => addOrRemoveFavourite(
-                              db.userId, widget.post.author, widget.post.id))
-                      : VideoPlayerWidget(url: widget.post.media),
-                ),
-              ],
+            AspectRatio(
+              aspectRatio: 1,
+              child: widget.post.mediaType == 'image'
+                  ? GestureDetector(
+                      child: Image.network(
+                        widget.post.media,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          print(error);
+                          return Container();
+                        },
+                      ),
+                      onDoubleTap: () => addOrRemoveFavourite(
+                          db.userId, widget.post.author, widget.post.id))
+                  : VideoPlayerWidget(url: widget.post.media),
             ),
             if (_isShowedComments || widget.activeAlwaysShowedComments)
               PostDescription(post: widget.post, author: author)

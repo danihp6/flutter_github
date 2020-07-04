@@ -30,7 +30,7 @@ class PostMenu extends StatelessWidget {
               ],
             ),
             value: () => Navigator.push(
-                context, SlideLeftRoute(page: SelectPostList(postId: post.id))),
+                context, SlideLeftRoute(page: SelectPostList(post: post))),
           ),
           if (postList == null && post.author == db.userId)
             PopupMenuItem(

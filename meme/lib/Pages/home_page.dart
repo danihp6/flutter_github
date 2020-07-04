@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/User.dart';
@@ -37,6 +38,7 @@ class _HomePageState extends State<HomePage> {
             if (snapshot.hasError) print(snapshot.error);
             if (!snapshot.hasData) return Loading();
             List<String> usersId = snapshot.data;
+            usersId.add(db.userId);
             return ListView.builder(
               itemCount: usersId.length,
               itemBuilder: (context, index) => StreamBuilder(
