@@ -44,6 +44,7 @@ dependencies:
   flutter_slidable: ^0.5.4
   carousel_slider: ^2.2.1
   flutter_widgets: ^0.1.12
+  firebase_dynamic_links: ^0.5.1
   flutter:
     sdk: flutter
 
