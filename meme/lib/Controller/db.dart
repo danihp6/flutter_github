@@ -98,12 +98,15 @@ class DataBase {
   }
 
   Future<String> userIdByUserName(String userName) async {
-    print(userName);
     QuerySnapshot query = await _firestore
         .collection('users')
         .where('userName', isEqualTo: userName)
         .getDocuments();
     return query.documents.first.documentID;
+  }
+
+  Future deleteUser(String userId){
+    _firestore.document('users/$userId').delete();
   }
 
 //---------------POST----------------//

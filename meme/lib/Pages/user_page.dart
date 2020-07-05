@@ -71,7 +71,7 @@ class _UserPageState extends State<UserPage>
                     children: <Widget>[
                       FlatButton(
                           onPressed: () => Navigator.push(
-                              context, SlideLeftRoute(page: SettingsPage())),
+                              context, SlideLeftRoute(page: SettingsPage(refresh:widget.refresh))),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[

@@ -61,6 +61,22 @@ class Auth implements BaseAuth {
     _authStatus = AuthStatus.notSignedIn;
     return _firebaseAuth.signOut();
   }
+
+  Future<FirebaseUser> reauthCurrentUser(String password) async {
+    FirebaseUser user = await _firebaseAuth.currentUser();
+    AuthCredential credential = EmailAuthProvider.getCredential(
+      email: user.email,
+      password: password
+    );
+
+    return (await user.reauthenticateWithCredential(credential)).user;
+
+  }
+
+  Future deleteUser(String password) async {
+    FirebaseUser user = await reauthCurrentUser(password);
+    user.delete();
+  }
 }
 
 Auth auth = new Auth();

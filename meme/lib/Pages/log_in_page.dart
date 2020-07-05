@@ -137,6 +137,7 @@ class _LogInPageState extends State<LogInPage> {
                                                     icon: Icon(Icons.clear),
                                                     onPressed: () {
                                                       setState(() {
+                                                        _password = '';
                                                         _passwordError = '';
                                                         _passwordController
                                                             .clear();

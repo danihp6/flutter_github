@@ -14,7 +14,7 @@ exports.onDeletePost = functions.region('europe-west2').firestore.document('user
 
   var usersSnapshot = await db.collection('users').orderBy('__name__').limit(batchSize).get()
 
-  usersSnapshot.docs.forEach(async(doc) => {
+  usersSnapshot.docs.forEach(async (doc) => {
     doc.ref.update({
       'favourites': admin.firestore.FieldValue.arrayRemove(path)
     })
@@ -99,45 +99,48 @@ exports.onDeleteUser = functions.region('europe-west2').firestore.document('user
   var userId = context.params.userId
 
   var mediaPath = snap.data()['avatarLocation']
-  var bucket = admin.storage().bucket()
-  bucket.file(mediaPath).delete()
+  if (mediaPath != '') {
+    var bucket = admin.storage().bucket()
+    bucket.file(mediaPath).delete()
+  }
+
 
   var notificationsRef = ref.collection('notifications')
 
-  deleteCollection(db,notificationsRef,batchSize)
+  deleteCollection(db, notificationsRef, batchSize)
 
   var postListsRef = ref.collection('postLists')
 
-  deleteCollection(db,postListsRef,batchSize)
+  deleteCollection(db, postListsRef, batchSize)
 
   var postsRef = ref.collection('posts')
 
-  deleteCollection(db,postsRef,batchSize)
+  deleteCollection(db, postsRef, batchSize)
 
   var usersSnapshot = await db.collection('users').orderBy('__name__').limit(batchSize).get()
 
-  usersSnapshot.docs.forEach(async(doc)=>{
+  usersSnapshot.docs.forEach(async (doc) => {
     doc.ref.update({
       'followed': admin.firestore.FieldValue.arrayRemove(userId),
-      'followers':admin.firestore.FieldValue.arrayRemove(userId)
+      'followers': admin.firestore.FieldValue.arrayRemove(userId)
     })
 
     var userNotifications = await doc.ref.collection('notifications').get()
 
-    userNotifications.docs.forEach((doc)=>{
+    userNotifications.docs.forEach((doc) => {
       var sender = doc.data()['sender']
       if (sender == userId) doc.ref.delete()
     })
 
     var userPostsSnapshot = await doc.ref.collection('posts').get()
 
-    userPostsSnapshot.docs.forEach(async(doc)=>{
+    userPostsSnapshot.docs.forEach(async (doc) => {
       var commentsSnapshot = await doc.ref.collection('comments').get()
 
-      commentsSnapshot.docs.forEach((doc)=>{
+      commentsSnapshot.docs.forEach((doc) => {
         var userCommentId = doc.data()['authorId']
 
-        if(userCommentId == userId)doc.ref.delete()
+        if (userCommentId == userId) doc.ref.delete()
       })
     })
   })
@@ -168,7 +171,7 @@ exports.newFollower = functions.region('europe-west2').firestore.document('users
 })
 
 exports.avoidTag = functions.region('europe-west2').firestore.document('tags/{tagId}').onUpdate(async (change, context) => {
-  if(change.after.data()['posts'].length == 0) change.after.ref.delete()
+  if (change.after.data()['posts'].length == 0) change.after.ref.delete()
 })
 
 exports.onCreateNotification = functions.region('europe-west2').firestore.document('users/{userId}/notifications/{notificationId}').onCreate(async (snap, context) => {
