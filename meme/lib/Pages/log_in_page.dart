@@ -5,9 +5,6 @@ import 'package:meme/Widgets/slide_left_route.dart';
 import '../Controller/auth.dart';
 
 class LogInPage extends StatefulWidget {
-  Function refresh;
-  LogInPage({@required this.refresh});
-
   @override
   _LogInPageState createState() => _LogInPageState();
 }
@@ -20,6 +17,7 @@ class _LogInPageState extends State<LogInPage> {
   String _passwordError = '';
   TextEditingController _emailController;
   TextEditingController _passwordController;
+  bool _isLogIn = false;
 
   @override
   void initState() {
@@ -178,24 +176,21 @@ class _LogInPageState extends State<LogInPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             RaisedButton(
-                              onPressed: () async {
+                              onPressed: !_isLogIn?() async {
                                 if (_formKey.currentState.validate()) {
+                                  _isLogIn = true;
+                                  setState(() {
+                                    _emailError = '';
+                                    _passwordError = '';
+                                  });
                                   try {
-                                    String userId =
-                                        await auth.signIn(_email, _password);
-                                    if (userId != null) {
-                                      
-                                      setState(() {
-                                        _emailError = '';
-                                        _passwordError = '';
-                                      });
-                                      widget.refresh();
-                                    }
+                                    await auth.signIn(_email, _password);
                                   } catch (error) {
                                     showError(error);
                                   }
+                                  _isLogIn = false;
                                 }
-                              },
+                              }:null,
                               color: Colors.deepOrange,
                               textColor: Colors.white,
                               child: Padding(
@@ -227,10 +222,7 @@ class _LogInPageState extends State<LogInPage> {
                             ),
                             FlatButton(
                               onPressed: () => Navigator.push(
-                                  context,
-                                  SlideLeftRoute(
-                                      page:
-                                          SignInPage(refresh: widget.refresh))),
+                                  context, SlideLeftRoute(page: SignInPage())),
                               child: Text(
                                 'Registrarse',
                                 style: TextStyle(
@@ -251,9 +243,8 @@ class _LogInPageState extends State<LogInPage> {
     );
   }
 
-
   void showError(error) {
-    return setState(() {
+    setState(() {
       _emailError = '';
       _passwordError = '';
       switch (error.code) {

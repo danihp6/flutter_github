@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/db.dart';
+import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/log_in_page.dart';
 import 'package:meme/Pages/main_page.dart';
 import 'package:meme/Widgets/loading.dart';
@@ -11,24 +14,27 @@ class RootPage extends StatefulWidget {
 }
 
 class _RootPageState extends State<RootPage> {
-  refresh() {
-    setState(() {});
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: auth.initAuth(),
+    return StreamBuilder(
+      stream: auth.getAuthStatus,
       builder: (context, snapshot) {
         if (snapshot.hasError) print(snapshot.error);
-        if (!snapshot.hasData) return Loading();
-        AuthStatus authStatus = snapshot.data;
-        switch (authStatus) {
-          case AuthStatus.notSignedIn:
-            return LogInPage(refresh: refresh);
-          case AuthStatus.signedIn:
-            return MainPage(refresh: refresh);
-        }
+        if (!snapshot.hasData) return LogInPage();
+        FirebaseUser firebaseUser = snapshot.data;
+        return FutureBuilder(
+            future: db.getUserByEmail(firebaseUser.email),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) print(snapshot.error);
+              if (!snapshot.hasData) return Loading();
+              db.userId = snapshot.data;
+              return MainPage();
+            });
       },
     );
   }

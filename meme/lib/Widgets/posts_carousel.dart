@@ -57,7 +57,6 @@ class _PostsCarouselState extends State<PostsCarousel> {
     return VisibilityDetector(
       key: UniqueKey(),
       onVisibilityChanged: (info) {
-        print(info.visibleFraction.toString());
         if (info.visibleFraction < 0.8 &&
             info.visibleFraction > 0.1 &&
             _visible == true &&

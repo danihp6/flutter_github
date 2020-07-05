@@ -6,9 +6,6 @@ import '../Controller/db.dart';
 import '../Controller/push_notification_provider.dart';
 
 class SignInPage extends StatefulWidget {
-  Function refresh;
-  SignInPage({@required this.refresh});
-
   @override
   _SignInPageState createState() => _SignInPageState();
 }
@@ -24,6 +21,7 @@ class _SignInPageState extends State<SignInPage> {
   TextEditingController _userNameController;
   TextEditingController _emailController;
   TextEditingController _passwordController;
+  bool _isSignIn = false;
 
   @override
   void initState() {
@@ -200,39 +198,41 @@ class _SignInPageState extends State<SignInPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             RaisedButton(
-                              onPressed: () async {
-                                if (_formKey.currentState.validate() &&
-                                    await validateUserName()) {
-                                  try {
-                                    String token =
-                                        await pushProvider.getToken();
-                                    String userId = await auth.registerUser(
-                                        new User(
-                                            _userName,
-                                            '',
-                                            '',
-                                            <String>[],
-                                            <String>[],
-                                            <String>[],
-                                            '',
-                                            DateTime.now(),
-                                            _email,
-                                            [token]),
-                                        _password);
-                                    if (userId != null) {
+                              onPressed: !_isSignIn
+                                  ? () async {
+                                      _isSignIn = true;
                                       setState(() {
                                         _userNameError = '';
                                         _emailError = '';
                                         _passwordError = '';
                                       });
-                                      widget.refresh();
-                                      Navigator.pop(context);
+                                      if (_formKey.currentState.validate() &&
+                                          await validateUserName()) {
+                                        try {
+                                          String token =
+                                              await pushProvider.getToken();
+                                          await auth.registerUser(
+                                              new User(
+                                                  _userName,
+                                                  '',
+                                                  '',
+                                                  <String>[],
+                                                  <String>[],
+                                                  <String>[],
+                                                  '',
+                                                  DateTime.now(),
+                                                  _email,
+                                                  [token]),
+                                              _password);
+
+                                          Navigator.pop(context);
+                                        } catch (error) {
+                                          showError(error);
+                                        }
+                                      }
+                                      _isSignIn = false;
                                     }
-                                  } catch (error) {
-                                    showError(error);
-                                  }
-                                }
-                              },
+                                  : null,
                               color: Colors.deepOrange,
                               textColor: Colors.white,
                               child: Padding(

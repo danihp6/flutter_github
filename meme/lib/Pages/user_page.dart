@@ -6,7 +6,7 @@ import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/post_list_page.dart';
 import 'package:meme/Pages/post_page.dart';
-import 'package:meme/Pages/settings_page.dart';
+import 'package:meme/Pages/account_page.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/new_post_list_button.dart';
 import 'package:meme/Widgets/post.dart';
@@ -18,8 +18,7 @@ import 'package:meme/Widgets/user_page_header.dart';
 class UserPage extends StatefulWidget {
   String userId;
   bool activeAppBar;
-  Function refresh;
-  UserPage({@required this.userId, this.activeAppBar = true, this.refresh});
+  UserPage({@required this.userId, this.activeAppBar = true});
 
   @override
   _UserPageState createState() => _UserPageState();
@@ -45,14 +44,11 @@ class _UserPageState extends State<UserPage>
 
   @override
   Widget build(BuildContext context) {
+    goPostList(PostList postList) => Navigator.of(context)
+        .push(SlideLeftRoute(page: PostListPage(postList: postList)));
 
-      goPostList(PostList postList)=>
-    Navigator.of(context)
-          .push(SlideLeftRoute(page: PostListPage(postList: postList)));
-
-          goPost(Post post)=>
-    Navigator.of(context)
-          .push(SlideLeftRoute(page: PostPage(post: post)));
+    goPost(Post post) =>
+        Navigator.of(context).push(SlideLeftRoute(page: PostPage(post: post)));
 
     return SafeArea(
       child: StreamBuilder(
@@ -70,31 +66,46 @@ class _UserPageState extends State<UserPage>
                   child: Column(
                     children: <Widget>[
                       FlatButton(
-                          onPressed: () => Navigator.push(
-                              context, SlideLeftRoute(page: SettingsPage(refresh:widget.refresh))),
+                          onPressed: () {},
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
                               Icon(Icons.settings),
+                              SizedBox(width: 10,),
                               Text('Configuración'),
                             ],
                           )),
                       FlatButton(
                           onPressed: () {},
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
                               Icon(Icons.mail),
+                              SizedBox(width: 10,),
                               Text('Contactar'),
                             ],
                           )),
                       FlatButton(
-                          onPressed: () =>
-                              auth.signOut().then((_) => widget.refresh()),
+                          onPressed: () => Navigator.push(
+                              context,
+                              SlideLeftRoute(
+                                  page: AccountPage())),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Icon(Icons.person),
+                              SizedBox(width: 10,),
+                              Text('Cuenta'),
+                            ],
+                          )),
+                      FlatButton(
+                          onPressed: () =>
+                              auth.signOut(),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
                               Icon(Icons.exit_to_app),
+                              SizedBox(width: 10,),
                               Text('Cerrar sesión'),
                             ],
                           ))

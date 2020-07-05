@@ -9,8 +9,6 @@ import 'package:meme/Widgets/upload_button.dart';
 import '../Controller/db.dart';
 
 class MainPage extends StatefulWidget {
-  Function refresh;
-  MainPage({this.refresh});
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -31,8 +29,7 @@ class _MainPageState extends State<MainPage> {
           NotificationsPage(userId: userId,),
           UserPage(
             userId: userId,
-            activeAppBar: false,
-            refresh:widget.refresh
+            activeAppBar: false
           ),
         ]),
         floatingActionButton: UploadButton(
