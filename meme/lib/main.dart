@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meme/Controller/configuration.dart';
 import 'package:meme/Controller/push_notification_provider.dart';
+import 'package:meme/Pages/post_page.dart';
 import 'package:meme/Pages/root_page.dart';
 import 'package:meme/Pages/settings_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
@@ -27,10 +28,11 @@ class _MyAppState extends State<MyApp> {
         GlobalKey<NavigatorState>();
     pushProvider.initNotifications();
     storage.initStorage();
-    dynamicLinks.initDynamicLinks((link) {
-      print(link);
+    dynamicLinks.initDynamicLinks((Uri link) {
+      Map linkParameters = link.queryParameters;
+      
       configuration.navigatorKey.currentState
-          .push(SlideLeftRoute(page: SettingsPage()));
+          .push(SlideLeftRoute(page: PostPage(authorId: linkParameters['author'],postId: linkParameters['id'],)));
     });
   }
 

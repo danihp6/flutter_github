@@ -83,7 +83,7 @@ class NotificationWidget extends StatelessWidget {
                       GestureDetector(
                         child: Image.network(post.media),
                         onTap: () => Navigator.push(context,
-                            SlideLeftRoute(page: PostPage(post: post))),
+                            SlideLeftRoute(page: PostPage(authorId: post.author,postId: post.id))),
                       )
                     ]),
                   );

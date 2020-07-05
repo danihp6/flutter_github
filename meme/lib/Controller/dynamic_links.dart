@@ -25,10 +25,10 @@ class DynamicLinks {
     });
   }
 
-  Future<String> _createDynamicLink(bool short) async {
+  Future<String> createDynamicLink(bool short,String authorId,String postId) async {
     final DynamicLinkParameters parameters = DynamicLinkParameters(
-      uriPrefix: 'meme-56742.web.app',
-      link: Uri.parse('https://meme56742.page.link/465477'),
+      uriPrefix: 'https://meme56742.page.link',
+      link: Uri.parse('https://meme56742.page.link/post?id=$postId&author=$authorId'),
       androidParameters: AndroidParameters(
         packageName: 'com.example.meme',
         minimumVersion: 0,
@@ -41,19 +41,19 @@ class DynamicLinks {
         minimumVersion: '0',
       ),
       socialMetaTagParameters: SocialMetaTagParameters(
-        title: 'Prueba',
-        description: 'This link works whether app is installed or not!',
+        title: 'Publicación',
+        description: 'Link a la publicación',
       ),
     );
 
     Uri url;
     if (short) {
       final ShortDynamicLink shortLink = await parameters.buildShortLink();
-      url = shortLink.shortUrl;
+      url =  shortLink.shortUrl;
     } else {
       url = await parameters.buildUrl();
     }
-    return url.path;
+    return parameters.uriPrefix +url.path;
   }
 }
 

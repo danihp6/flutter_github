@@ -28,7 +28,7 @@ class PostHeader extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              ShareButton(),
+              ShareButton(authorId: post.author,postId: post.id,),
               SizedBox(
                 width: 35,
                 child: PostMenu(

@@ -48,7 +48,7 @@ class _UserPageState extends State<UserPage>
         .push(SlideLeftRoute(page: PostListPage(postList: postList)));
 
     goPost(Post post) =>
-        Navigator.of(context).push(SlideLeftRoute(page: PostPage(post: post)));
+        Navigator.of(context).push(SlideLeftRoute(page: PostPage(authorId: post.author,postId: post.id)));
 
     return SafeArea(
       child: StreamBuilder(

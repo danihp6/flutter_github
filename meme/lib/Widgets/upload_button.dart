@@ -13,8 +13,7 @@ class UploadButton extends StatefulWidget {
 }
 
 class _UploadButtonState extends State<UploadButton> {
-  bool _isShowedTools, _isOpenTools = false, _isOpenPublicationOptions = false;
-  List<Widget> widgets;
+  bool _isShowedTools;
 
   @override
   Widget build(BuildContext context) {

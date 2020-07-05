@@ -221,7 +221,8 @@ class _SearchPageState extends State<SearchPage>
       context,
       SlideLeftRoute(
           page: PostPage(
-        post: post,
+        authorId: post.author,
+        postId: post.id,
       )));
 
     return WillPopScope(
