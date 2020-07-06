@@ -18,7 +18,8 @@ import 'package:meme/Widgets/user_page_header.dart';
 class UserPage extends StatefulWidget {
   String userId;
   bool activeAppBar;
-  UserPage({@required this.userId, this.activeAppBar = true});
+  GlobalKey<ScaffoldState> scaffoldState;
+  UserPage({@required this.userId, this.activeAppBar = true,this.scaffoldState});
 
   @override
   _UserPageState createState() => _UserPageState();
@@ -27,13 +28,14 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage>
     with SingleTickerProviderStateMixin {
   TabController tabController;
-  GlobalKey<ScaffoldState> scaffoldKey;
+  GlobalKey<ScaffoldState> _scaffoldState;
 
   @override
   void initState() {
     super.initState();
     tabController = new TabController(length: 3, vsync: this);
-    scaffoldKey = GlobalKey<ScaffoldState>();
+    if(widget.scaffoldState == null) _scaffoldState = GlobalKey<ScaffoldState>();
+    else _scaffoldState = widget.scaffoldState;
   }
 
   @override
@@ -48,7 +50,7 @@ class _UserPageState extends State<UserPage>
         .push(SlideLeftRoute(page: PostListPage(postList: postList)));
 
     goPost(Post post) =>
-        Navigator.of(context).push(SlideLeftRoute(page: PostPage(authorId: post.author,postId: post.id)));
+        Navigator.of(context).push(SlideLeftRoute(page: PostPage(authorId: post.author,postId: post.id,)));
 
     return SafeArea(
       child: StreamBuilder(
@@ -59,7 +61,7 @@ class _UserPageState extends State<UserPage>
             User user = snap.data;
             List<String> favourites = user.favourites;
             return Scaffold(
-              key: scaffoldKey,
+              key: widget.scaffoldState==null?_scaffoldState:null,
               endDrawer: Container(
                 width: 170,
                 child: Drawer(
@@ -126,7 +128,7 @@ class _UserPageState extends State<UserPage>
                 headerSliverBuilder: (context, _) => [
                   SliverToBoxAdapter(
                       child:
-                          UserPageHeader(user: user, scaffoldKey: scaffoldKey)),
+                          UserPageHeader(user: user, scaffoldState:_scaffoldState )),
                   SliverToBoxAdapter(
                     child: TabBar(
                       controller: tabController,
@@ -173,7 +175,7 @@ class _UserPageState extends State<UserPage>
                             itemCount: posts.length,
                             physics: NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
-                              return PostWidget(post: posts[index]);
+                              return PostWidget(post: posts[index],scaffoldState: widget.scaffoldState,);
                             },
                           );
                         },
@@ -192,7 +194,7 @@ class _UserPageState extends State<UserPage>
                                         print(snapshot.error);
                                       if (!snapshot.hasData) return Loading();
                                       Post post = snapshot.data;
-                                      return PostWidget(post: post);
+                                      return PostWidget(post: post,scaffoldState: widget.scaffoldState,);
                                     });
                               },
                             ),

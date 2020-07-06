@@ -12,8 +12,8 @@ import 'package:meme/Widgets/user_avatar.dart';
 
 class UserPageHeader extends StatelessWidget {
   User user;
-  GlobalKey<ScaffoldState> scaffoldKey;
-  UserPageHeader({@required this.user, this.scaffoldKey});
+  GlobalKey<ScaffoldState> scaffoldState;
+  UserPageHeader({@required this.user, this.scaffoldState});
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +84,7 @@ class UserPageHeader extends StatelessWidget {
                         icon: Icon(Icons.menu),
                         iconSize: 30,
                         onPressed: () {
-                          scaffoldKey.currentState.openEndDrawer();
+                          scaffoldState.currentState.openEndDrawer();
                         })
                   ],
                 ),

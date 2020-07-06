@@ -6,17 +6,23 @@ import 'package:meme/Controller/dynamic_links.dart';
 class ShareButton extends StatelessWidget {
   String authorId;
   String postId;
-  ShareButton({@required this.postId,@required this.authorId});
+  GlobalKey<ScaffoldState> scaffoldState;
+  ShareButton({@required this.postId,@required this.authorId, @required this.scaffoldState});
+  
+  GlobalKey<ScaffoldState> _scaffoldState;
   @override
   Widget build(BuildContext context) {
+    if(scaffoldState==null)_scaffoldState=configuration.mainScaffoldState;
+    else _scaffoldState = scaffoldState;
+
     return IconButton(
       icon: Icon(Icons.share),
       onPressed: () async {
         String link = await dynamicLinks.createDynamicLink(true,authorId,postId);
-        configuration.scaffoldState.currentState.showBottomSheet(
+        _scaffoldState.currentState.showBottomSheet(
           (context) {
             return Container(
-              height: 200,
+              height: 100,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -37,7 +43,7 @@ class ShareButton extends StatelessWidget {
                           onPressed: () {
                             Clipboard.setData(new ClipboardData(text: link));
                             Navigator.pop(context);
-                            configuration.scaffoldState.currentState
+                            _scaffoldState.currentState
                                 .showSnackBar(SnackBar(
                                     duration: Duration(seconds: 1),
                                     content:

@@ -24,15 +24,17 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    configuration.navigatorKey =
-        GlobalKey<NavigatorState>();
+    configuration.mainNavigatorKey = GlobalKey<NavigatorState>();
     pushProvider.initNotifications();
     storage.initStorage();
     dynamicLinks.initDynamicLinks((Uri link) {
       Map linkParameters = link.queryParameters;
-      
-      configuration.navigatorKey.currentState
-          .push(SlideLeftRoute(page: PostPage(authorId: linkParameters['author'],postId: linkParameters['id'],)));
+
+      configuration.mainNavigatorKey.currentState.push(SlideLeftRoute(
+          page: PostPage(
+        authorId: linkParameters['author'],
+        postId: linkParameters['id'],
+      )));
     });
   }
 
@@ -44,15 +46,18 @@ class _MyAppState extends State<MyApp> {
     ]);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      navigatorKey: configuration.navigatorKey,
+      navigatorKey: configuration.mainNavigatorKey,
       theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-        accentColor: Colors.deepOrangeAccent,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        bottomSheetTheme: BottomSheetThemeData(
-          backgroundColor: Color(0xFF323232)
-        )
-      ),
+          primarySwatch: Colors.deepOrange,
+          accentColor: Colors.deepOrangeAccent,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          bottomSheetTheme: BottomSheetThemeData(
+            backgroundColor: Color(0xFF323232),
+            
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top:Radius.circular(10)),
+            ),
+          )),
       home: RootPage(),
     );
   }

@@ -59,7 +59,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
 
     editAvatar(Media media) async {
-      File cropedImage = await cropImage(await media.getFile());
+      File cropedImage = null;///////////
       if (cropedImage != null) _file = cropedImage;
       setState(() {});
       Navigator.pop(context);

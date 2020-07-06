@@ -4,34 +4,19 @@ import 'tabs_page.dart';
 import 'package:meme/Widgets/upload_button.dart';
 import '../Controller/db.dart';
 
-class MainPage extends StatefulWidget {
-  @override
-  _MainPageState createState() => _MainPageState();
-}
+class MainPage extends StatelessWidget {
 
-class _MainPageState extends State<MainPage> {
-
-  bool _isTabBarVisible = true;
-
-  @override
-  void initState() {
-    
-    configuration.scaffoldState =GlobalKey<ScaffoldState>();
-    super.initState();
-  }
-
+  GlobalKey<ScaffoldState> scaffoldState= GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
+    configuration.mainScaffoldState = GlobalKey<ScaffoldState>();
     
     return Scaffold(
-      key: configuration.scaffoldState,
-      body: TabsPage(),
-      floatingActionButton: UploadButton(
-        refresh: () {
-          setState(() {});
-        },
+      key: configuration.mainScaffoldState,
+      body: TabsPage(
       ),
+      
     );
   }
 }

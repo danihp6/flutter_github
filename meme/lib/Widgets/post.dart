@@ -13,10 +13,12 @@ class PostWidget extends StatefulWidget {
   Post post;
   PostList postList;
   bool activeAlwaysShowedComments;
+  GlobalKey<ScaffoldState> scaffoldState;
   PostWidget(
       {@required this.post,
       this.postList,
-      this.activeAlwaysShowedComments = false});
+      this.activeAlwaysShowedComments = false,
+      this.scaffoldState});
 
   @override
   _PostWidgetState createState() => _PostWidgetState();
@@ -52,6 +54,7 @@ class _PostWidgetState extends State<PostWidget> {
                       post: widget.post,
                       postList: widget.postList,
                       author: author,
+                      scaffoldState:widget.scaffoldState
                     )),
               ),
             AspectRatio(

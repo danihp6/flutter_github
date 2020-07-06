@@ -4,16 +4,17 @@ class Configuration {
   bool _isShowedComments = true;
   bool _isShowedTools = true;
   double _volume = 0;
-  GlobalKey<NavigatorState> _navigatorKey;
-  GlobalKey<ScaffoldState> _scaffoldState;
+  GlobalKey<NavigatorState> _mainNavigatorKey;
+  GlobalKey<ScaffoldState> _mainScaffoldState;
+  
 
-  GlobalKey<NavigatorState> get navigatorKey => this._navigatorKey;
+  GlobalKey<NavigatorState> get mainNavigatorKey => this._mainNavigatorKey;
 
-  set navigatorKey(navigatorKey) => this._navigatorKey = navigatorKey;
+  set mainNavigatorKey(mainNavigatorKey) => this._mainNavigatorKey = mainNavigatorKey;
 
-  GlobalKey<ScaffoldState> get scaffoldState => this._scaffoldState;
+  GlobalKey<ScaffoldState> get mainScaffoldState => this._mainScaffoldState;
 
-  set scaffoldState(scaffoldState) => this._scaffoldState = scaffoldState;
+  set mainScaffoldState(mainScaffoldState) => this._mainScaffoldState = mainScaffoldState;
 
   getIsShowedComments() {
     return this._isShowedComments;

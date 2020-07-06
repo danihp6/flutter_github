@@ -7,12 +7,17 @@ import 'package:meme/Widgets/post.dart';
 class PostPage extends StatelessWidget {
   String postId;
   String authorId;
+  
   PostPage({@required this.authorId,@required this.postId});
+
+  GlobalKey<ScaffoldState> scaffoldState = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
+
     return SafeArea(
       child: Scaffold(
+        key: scaffoldState,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(50),
           child: AppBar(
@@ -26,7 +31,7 @@ class PostPage extends StatelessWidget {
                 if (snapshot.hasError) print(snapshot.error);
                 if (!snapshot.hasData) return Loading();
                 Post post = snapshot.data;
-                return PostWidget(post: post,activeAlwaysShowedComments: true,);
+                return PostWidget(post: post,activeAlwaysShowedComments: true,scaffoldState: scaffoldState,);
               }),
         ),
       ),

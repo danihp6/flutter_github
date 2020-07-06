@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-class SlideLeftRoute extends PageRouteBuilder {
+class SlideLeftRoute<T> extends PageRouteBuilder {
   final Widget page;
   SlideLeftRoute({@required this.page})
       : super(

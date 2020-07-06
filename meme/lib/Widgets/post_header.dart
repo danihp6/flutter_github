@@ -10,9 +10,8 @@ class PostHeader extends StatelessWidget {
   Post post;
   PostList postList;
   User author;
-  PostHeader({@required this.post, this.postList, @required this.author});
-
-  PersistentBottomSheetController bottomSheetController;
+  GlobalKey<ScaffoldState> scaffoldState;
+  PostHeader({@required this.post, this.postList, @required this.author,@required this.scaffoldState});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +27,7 @@ class PostHeader extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              ShareButton(authorId: post.author,postId: post.id,),
+              ShareButton(authorId: post.author,postId: post.id,scaffoldState:scaffoldState),
               SizedBox(
                 width: 35,
                 child: PostMenu(

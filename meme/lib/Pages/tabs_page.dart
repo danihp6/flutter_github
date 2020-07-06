@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Pages/home_page.dart';
 import 'package:meme/Pages/notifications_page.dart';
 import 'package:meme/Pages/search_page.dart';
 import 'package:meme/Pages/user_page.dart';
+import 'package:meme/Widgets/upload_button.dart';
 
 class TabsPage extends StatefulWidget {
   @override
@@ -13,6 +15,7 @@ class TabsPage extends StatefulWidget {
 class _TabsPageState extends State<TabsPage>
     with SingleTickerProviderStateMixin {
   TabController tabController;
+  
 
   @override
   void initState() {
@@ -23,6 +26,11 @@ class _TabsPageState extends State<TabsPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: UploadButton(
+        refresh: () {
+          setState(() {});
+        },
+      ),
         body: TabBarView(
           physics: NeverScrollableScrollPhysics(),
           controller: tabController,
@@ -32,7 +40,7 @@ class _TabsPageState extends State<TabsPage>
             NotificationsPage(
               userId: db.userId,
             ),
-            UserPage(userId: db.userId, activeAppBar: false),
+            UserPage(userId: db.userId, activeAppBar: false,scaffoldState: configuration.mainScaffoldState,),
           ],
         ),
         bottomNavigationBar: Container(

@@ -8,6 +8,8 @@ import 'package:meme/Pages/gallery_page.dart';
 import 'package:meme/Pages/upload_publication_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import '../Controller/gallery.dart';
+import 'package:image_editor/image_editor.dart';
+import 'image_editor_page.dart';
 
 class SelectMediaPage extends StatefulWidget {
   @override
@@ -25,9 +27,9 @@ class _SelectMediaPageState extends State<SelectMediaPage>
     super.initState();
     tabController = TabController(length: 2, vsync: this);
     gallery.getMediaGallery().then((_) {
-       setState(() {
-         page = gallery.imagePage;
-       });
+      setState(() {
+        page = gallery.imagePage;
+      });
     });
   }
 
@@ -43,7 +45,8 @@ class _SelectMediaPageState extends State<SelectMediaPage>
     onSelectMedia(Media media) async {
       File file = await media.getFile();
       if (media.mediaType == MediaType.image) {
-        File cropedImage = await cropImage(file);
+        File cropedImage = await Navigator.push(context, MaterialPageRoute(builder: (context) => ImageEditorPage(image: file,),));
+
         if (cropedImage != null)
           Navigator.push(
               context,

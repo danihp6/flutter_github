@@ -17,15 +17,12 @@ class PostListPage extends StatefulWidget {
 }
 
 class _PostListPageState extends State<PostListPage> {
+  GlobalKey<ScaffoldState> scaffoldState = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     PostList _postList = widget.postList;
     return Scaffold(
-        floatingActionButton: UploadButton(
-          refresh: () {
-            setState(() {});
-          },
-        ),
+        key: scaffoldState,
         body: StreamBuilder(
             stream: db.getPostList(_postList.author, _postList.id),
             builder: (context, snapshot) {
@@ -73,6 +70,7 @@ class _PostListPageState extends State<PostListPage> {
                           PostWidget(
                             post: post,
                             postList: _postList,
+                            scaffoldState: scaffoldState,
                           )
                         ]);
                       });

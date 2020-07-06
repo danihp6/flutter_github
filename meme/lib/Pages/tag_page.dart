@@ -10,6 +10,8 @@ class TagPage extends StatelessWidget {
   String tagId;
   TagPage({@required this.tagId});
 
+  GlobalKey<ScaffoldState> scaffoldState = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -31,7 +33,7 @@ class TagPage extends StatelessWidget {
                   if (snapshot.hasError) print(snapshot.error);
                   if (!snapshot.hasData) return Loading();
                   Post post = snapshot.data;
-                  return PostWidget(post: post);
+                  return PostWidget(post: post,scaffoldState: scaffoldState,);
                 },
               ),
             ),
