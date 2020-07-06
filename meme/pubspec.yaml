@@ -47,6 +47,8 @@ dependencies:
   firebase_dynamic_links: ^0.5.1
   image_editor: ^0.7.0
   extended_image: ^0.9.0
+  oktoast: ^2.3.2
+  image_gallery_saver: ^1.5.0
   flutter:
     sdk: flutter
 

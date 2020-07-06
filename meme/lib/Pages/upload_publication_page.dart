@@ -30,12 +30,13 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
   @override
   void initState() {
     activedUpload = true;
+    _file = widget.file;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    _file = widget.file;
+    
     uploadPublication() async {
       setState(() {
         activedUpload = false;
@@ -68,6 +69,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
     }
 
     print(widget.mediaType);
+    print(_file.path);
 
     return SafeArea(
       child: Scaffold(

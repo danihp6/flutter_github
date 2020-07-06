@@ -46,6 +46,8 @@ class _SelectMediaPageState extends State<SelectMediaPage>
       File file = await media.getFile();
       if (media.mediaType == MediaType.image) {
         File cropedImage = await Navigator.push(context, MaterialPageRoute(builder: (context) => ImageEditorPage(image: file,),));
+        print('------------------croped');
+        print(cropedImage);
 
         if (cropedImage != null)
           Navigator.push(
@@ -53,7 +55,8 @@ class _SelectMediaPageState extends State<SelectMediaPage>
               SlideLeftRoute(
                   page: UploadPublicationPage(
                       file: cropedImage, mediaType: 'image')));
-      } else
+      } 
+      else
         Navigator.push(
             context,
             SlideLeftRoute(
