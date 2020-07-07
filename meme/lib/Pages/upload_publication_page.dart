@@ -10,6 +10,7 @@ import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/media_storage.dart';
 import '../Models/Post.dart';
+import 'package:path_provider/path_provider.dart';
 
 class UploadPublicationPage extends StatefulWidget {
   File file;
@@ -67,9 +68,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
         tags.removeAt(index);
       });
     }
-
-    print(widget.mediaType);
-    print(_file.path);
+    
 
     return SafeArea(
       child: Scaffold(

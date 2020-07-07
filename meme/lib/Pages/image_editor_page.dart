@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:image_editor/image_editor.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:meme/Pages/upload_publication_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import '../Widgets/scaling_gesture_detector.dart';
 
 class ImageEditorPage<File> extends StatefulWidget {
   File image;
@@ -22,28 +25,61 @@ class _ImageEditorPageState extends State<ImageEditorPage>
     with SingleTickerProviderStateMixin {
   File _image;
   TabController tabController;
-  ImageProvider provider;
-  GlobalKey<ExtendedImageEditorState> editorKey;
+  
   double sat;
   double bright;
   double con;
-  double _scale;
+  GlobalKey _globalKey = new GlobalKey();
+  TextEditingController textController;
+  bool inside = false;
+  Uint8List imageInMemory;
+  Offset textOffset = Offset.zero;
+  Offset textPoint = Offset.zero;
+  double _scaleFactor = 40.0;
+double _baseScaleFactor = 1.0;
+
+  Future<Uint8List> _capturePng() async {
+    try {
+      print('inside');
+      inside = true;
+      RenderRepaintBoundary boundary =
+          _globalKey.currentContext.findRenderObject();
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      Uint8List pngBytes = byteData.buffer.asUint8List();
+//      String bs64 = base64Encode(pngBytes);
+//      print(pngBytes);
+//      print(bs64);
+      print('png done');
+      setState(() {
+        imageInMemory = pngBytes;
+        inside = false;
+      });
+      ImageGallerySaver.saveImage(pngBytes);
+      return pngBytes;
+    } catch (e) {
+      print(e);
+    }
+  }
+
   @override
   void initState() {
     _image = widget.image;
     tabController = TabController(length: 3, vsync: this);
-    editorKey = editorKey = GlobalKey<ExtendedImageEditorState>();
-    provider = ExtendedFileImageProvider(_image);
+    
+    
     sat = 1;
     bright = 1;
     con = 1;
-    _scale = 2;
+    textController = TextEditingController(text: 'Texto');
     super.initState();
   }
 
   @override
   void dispose() {
     tabController.dispose();
+    textController.dispose();
     super.dispose();
   }
 
@@ -55,30 +91,17 @@ class _ImageEditorPageState extends State<ImageEditorPage>
       return ExtendedImage(
         image: provider,
         extendedImageEditorKey: editorKey,
-        mode: ExtendedImageMode.editor,
-        fit: BoxFit.contain,
+        mode: editorMode,
+        fit: editorFit,
         initEditorConfigHandler: (ExtendedImageState state) {
           return EditorConfig(
-            maxScale: 3.0,
-            cropRectPadding: const EdgeInsets.all(10),
-            hitTestSize: 20.0,
-            cropAspectRatio: 1,
-            initCropRectType: InitCropRectType.layoutRect,
-          );
-        },
-        initGestureConfigHandler: (state) {
-          return GestureConfig(
-            cacheGesture: true,
-            minScale: 0.8,
-            animationMinScale: 0.7,
-            maxScale: 3.0,
-            animationMaxScale: 3.5,
-            speed: 1.0,
-            inertialSpeed: 100.0,
-            initialScale: 1.0,
-            inPageView: false,
-            initialAlignment: InitialAlignment.center,
-          );
+              maxScale: 3.0,
+              cropRectPadding: const EdgeInsets.all(0),
+              hitTestSize: 20.0,
+              cropAspectRatio: 1,
+              initCropRectType: InitCropRectType.layoutRect,
+              cornerSize: Size.zero,
+              );
         },
       );
     }
@@ -165,14 +188,14 @@ class _ImageEditorPageState extends State<ImageEditorPage>
 
       option.outputFormat = const OutputFormat.png(88);
 
-      print(const JsonEncoder.withIndent('  ').convert(option.toJson()));
-
       final Uint8List result = await ImageEditor.editImage(
         image: img,
         imageEditorOption: option,
       );
 
-      return File(await ImageGallerySaver.saveImage(result));
+      String path = await ImageGallerySaver.saveImage(result);
+      File file = File(path.substring(7));
+      return file;
     }
 
     return Scaffold(
@@ -198,22 +221,52 @@ class _ImageEditorPageState extends State<ImageEditorPage>
       ),
       body: Column(
         children: <Widget>[
-          Stack(
-            alignment: Alignment.center,
-            children: <Widget>[
-              AspectRatio(
-                  aspectRatio: 1,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      print(constraints.maxHeight);
-                      return buildImage();
+          RepaintBoundary(
+            key: _globalKey,
+            child: Stack(
+              children: <Widget>[
+                AspectRatio(aspectRatio: 1, child: buildImage()),
+                Positioned(
+                  left: textOffset.dx,
+                  top: textOffset.dy,
+                  child: ScalingGestureDetector(
+                    child: SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: TextField(
+                        controller: textController,
+                        style: TextStyle(
+                          fontSize: _scaleFactor,
+                          color: Colors.white
+                        ),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    onPanStart: (initialPoint) {
+                      setState(() {
+                        textPoint = initialPoint;
+                      });
                     },
-                  )),
-              Text(
-                'holaaa',
-                style: TextStyle(color: Colors.white, fontSize: 40),
-              )
-            ],
+                    onPanUpdate: (details,delta) {
+                      setState(() {
+                        textOffset = textPoint + delta;
+                      });
+                    },
+                    onScaleStart: (details) {
+                      print('scalestart');
+                      _baseScaleFactor = _scaleFactor;
+                    },
+                    onScaleUpdate: (details,scale) {
+                      
+                      setState(() {
+                        _scaleFactor = _baseScaleFactor * scale;
+                      });
+                    },
+                  ),
+                )
+              ],
+            ),
           ),
           Expanded(
             child: TabBarView(controller: tabController, children: [
@@ -261,22 +314,23 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                   RaisedButton(
                     child: Text('Añadir texto'),
                     onPressed: () async {
-                      AddTextOption addTextOption = AddTextOption();
-                      addTextOption.addText(
-                        EditorText(
-                          offset: const Offset(1000, 0),
-                          text: 'hola',
-                          fontSizePx: 100,
-                          textColor: Colors.white,
-                        ),
-                      );
-                      editorOption.addOption(addTextOption);
-                      _image = await ImageEditor.editFileImageAndGetFile(
-                        file: _image,
-                        imageEditorOption: editorOption,
-                      );
-                      provider = ExtendedFileImageProvider(_image);
-                      setState(() {});
+                      _capturePng();
+                      // AddTextOption addTextOption = AddTextOption();
+                      // addTextOption.addText(
+                      //   EditorText(
+                      //     offset: const Offset(283.0, 280.0),
+                      //     text: 'hola',
+                      //     fontSizePx: 40,
+                      //     textColor: Colors.white,
+                      //   ),
+                      // );
+                      // editorOption.addOption(addTextOption);
+                      // _image = await ImageEditor.editFileImageAndGetFile(
+                      //   file: _image,
+                      //   imageEditorOption: editorOption,
+                      // );
+                      // provider = ExtendedFileImageProvider(_image);
+                      // setState(() {});
                     },
                   )
                 ],
