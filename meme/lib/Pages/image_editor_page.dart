@@ -23,16 +23,14 @@ class ImageEditorPage<File> extends StatefulWidget {
 
 class _ImageEditorPageState extends State<ImageEditorPage>
     with SingleTickerProviderStateMixin {
-  File _image;
+  Uint8List _image;
   TabController tabController;
-  
   double sat;
   double bright;
   double con;
   GlobalKey _globalKey = new GlobalKey();
   TextEditingController textController;
   bool inside = false;
-  Uint8List imageInMemory;
   Offset textOffset = Offset.zero;
   Offset textPoint = Offset.zero;
   double _scaleFactor = 40.0;
@@ -53,10 +51,9 @@ double _baseScaleFactor = 1.0;
 //      print(bs64);
       print('png done');
       setState(() {
-        imageInMemory = pngBytes;
+        _image = pngBytes;
         inside = false;
       });
-      ImageGallerySaver.saveImage(pngBytes);
       return pngBytes;
     } catch (e) {
       print(e);
@@ -85,41 +82,23 @@ double _baseScaleFactor = 1.0;
 
   @override
   Widget build(BuildContext context) {
-    final editorOption = ImageEditorOption();
 
-    Widget buildImage() {
-      return ExtendedImage(
-        image: provider,
-        extendedImageEditorKey: editorKey,
-        mode: editorMode,
-        fit: editorFit,
-        initEditorConfigHandler: (ExtendedImageState state) {
-          return EditorConfig(
-              maxScale: 3.0,
-              cropRectPadding: const EdgeInsets.all(0),
-              hitTestSize: 20.0,
-              cropAspectRatio: 1,
-              initCropRectType: InitCropRectType.layoutRect,
-              cornerSize: Size.zero,
-              );
-        },
-      );
-    }
+    
 
-    void flip() {
-      editorKey.currentState.flip();
-    }
+    // void flip() {
+    //   editorKey.currentState.flip();
+    // }
 
-    void rotate(bool right) {
-      editorKey.currentState.rotate(right: right);
-    }
+    // void rotate(bool right) {
+    //   editorKey.currentState.rotate(right: right);
+    // }
 
-    restore() {
-      editorKey.currentState.reset();
-      _image = widget.image;
-      provider = ExtendedFileImageProvider(_image);
-      setState(() {});
-    }
+    // restore() {
+    //   editorKey.currentState.reset();
+    //   _image = widget.image;
+    //   provider = ExtendedFileImageProvider(_image);
+    //   setState(() {});
+    // }
 
     Widget _buildSat() {
       return Slider(
@@ -162,41 +141,41 @@ double _baseScaleFactor = 1.0;
       );
     }
 
-    Future<File> save() async {
-      final ExtendedImageEditorState state = editorKey.currentState;
-      final Rect rect = state.getCropRect();
-      final EditActionDetails action = state.editAction;
-      final double radian = action.rotateAngle;
+    // Future<File> save() async {
+    //   final ExtendedImageEditorState state = editorKey.currentState;
+    //   final Rect rect = state.getCropRect();
+    //   final EditActionDetails action = state.editAction;
+    //   final double radian = action.rotateAngle;
 
-      final bool flipHorizontal = action.flipY;
-      final bool flipVertical = action.flipX;
-      // final img = await getImageFromEditorKey(editorKey);
-      final Uint8List img = state.rawImageData;
+    //   final bool flipHorizontal = action.flipY;
+    //   final bool flipVertical = action.flipX;
+    //   // final img = await getImageFromEditorKey(editorKey);
+    //   final Uint8List img = state.rawImageData;
 
-      final ImageEditorOption option = ImageEditorOption();
+    //   final ImageEditorOption option = ImageEditorOption();
 
-      option.addOption(ClipOption.fromRect(rect));
-      option.addOption(
-          FlipOption(horizontal: flipHorizontal, vertical: flipVertical));
-      if (action.hasRotateAngle) {
-        option.addOption(RotateOption(radian.toInt()));
-      }
+    //   option.addOption(ClipOption.fromRect(rect));
+    //   option.addOption(
+    //       FlipOption(horizontal: flipHorizontal, vertical: flipVertical));
+    //   if (action.hasRotateAngle) {
+    //     option.addOption(RotateOption(radian.toInt()));
+    //   }
 
-      option.addOption(ColorOption.saturation(sat));
-      option.addOption(ColorOption.brightness(bright));
-      option.addOption(ColorOption.contrast(con));
+    //   option.addOption(ColorOption.saturation(sat));
+    //   option.addOption(ColorOption.brightness(bright));
+    //   option.addOption(ColorOption.contrast(con));
 
-      option.outputFormat = const OutputFormat.png(88);
+    //   option.outputFormat = const OutputFormat.png(88);
 
-      final Uint8List result = await ImageEditor.editImage(
-        image: img,
-        imageEditorOption: option,
-      );
+    //   final Uint8List result = await ImageEditor.editImage(
+    //     image: img,
+    //     imageEditorOption: option,
+    //   );
 
-      String path = await ImageGallerySaver.saveImage(result);
-      File file = File(path.substring(7));
-      return file;
-    }
+    //   String path = await ImageGallerySaver.saveImage(result);
+    //   File file = File(path.substring(7));
+    //   return file;
+    // }
 
     return Scaffold(
       appBar: PreferredSize(
@@ -208,13 +187,13 @@ double _baseScaleFactor = 1.0;
                 color: Colors.white,
               ),
               onPressed: () => Navigator.pop(context)),
-          title: IconButton(icon: Icon(Icons.restore), onPressed: restore),
+          title: IconButton(icon: Icon(Icons.restore), onPressed: null),
           centerTitle: true,
           actions: <Widget>[
             IconButton(
                 icon: Icon(Icons.done),
                 onPressed: () async {
-                  Navigator.pop(context, await save());
+                  // Navigator.pop(context, await save());
                 })
           ],
         ),
@@ -225,7 +204,7 @@ double _baseScaleFactor = 1.0;
             key: _globalKey,
             child: Stack(
               children: <Widget>[
-                AspectRatio(aspectRatio: 1, child: buildImage()),
+                AspectRatio(aspectRatio: 1, child: Image.memory(_image)),
                 Positioned(
                   left: textOffset.dx,
                   top: textOffset.dy,
@@ -279,21 +258,21 @@ double _baseScaleFactor = 1.0;
                         color: Colors.black,
                         size: 50,
                       ),
-                      onPressed: flip),
+                      onPressed: null),
                   IconButton(
                       icon: Icon(
                         Icons.rotate_right,
                         color: Colors.black,
                         size: 50,
                       ),
-                      onPressed: () => rotate(true)),
+                      onPressed: () => null),
                   IconButton(
                       icon: Icon(
                         Icons.rotate_left,
                         color: Colors.black,
                         size: 50,
                       ),
-                      onPressed: () => rotate(false)),
+                      onPressed: () => null),
                 ],
               ),
               SliderTheme(
@@ -315,22 +294,6 @@ double _baseScaleFactor = 1.0;
                     child: Text('Añadir texto'),
                     onPressed: () async {
                       _capturePng();
-                      // AddTextOption addTextOption = AddTextOption();
-                      // addTextOption.addText(
-                      //   EditorText(
-                      //     offset: const Offset(283.0, 280.0),
-                      //     text: 'hola',
-                      //     fontSizePx: 40,
-                      //     textColor: Colors.white,
-                      //   ),
-                      // );
-                      // editorOption.addOption(addTextOption);
-                      // _image = await ImageEditor.editFileImageAndGetFile(
-                      //   file: _image,
-                      //   imageEditorOption: editorOption,
-                      // );
-                      // provider = ExtendedFileImageProvider(_image);
-                      // setState(() {});
                     },
                   )
                 ],
