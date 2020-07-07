@@ -94,8 +94,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         context,
                         SlideLeftRoute(
                             page: GalleryPage(
-                          onTap: editAvatar,
-                          page: gallery.imagePage,
+                          onMediaSelected: editAvatar
                         )))
                     : null,
               ),

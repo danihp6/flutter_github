@@ -14,8 +14,8 @@ import 'package:image_gallery_saver/image_gallery_saver.dart';
 import '../Widgets/scaling_gesture_detector.dart';
 
 class ImageEditorPage<File> extends StatefulWidget {
-  File image;
-  ImageEditorPage({@required this.image});
+  Uint8List bytes;
+  ImageEditorPage({@required this.bytes});
 
   @override
   _ImageEditorPageState createState() => _ImageEditorPageState();
@@ -62,7 +62,7 @@ double _baseScaleFactor = 1.0;
 
   @override
   void initState() {
-    _image = widget.image;
+    _image = widget.bytes;
     tabController = TabController(length: 3, vsync: this);
     
     

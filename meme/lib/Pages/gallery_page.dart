@@ -4,15 +4,20 @@ import 'dart:typed_data';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_editor/image_editor.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:media_gallery/media_gallery.dart';
+import 'package:meme/Controller/gallery.dart';
+import 'package:meme/Pages/image_editor_page.dart';
+import 'package:meme/Pages/upload_publication_page.dart';
 import 'package:meme/Widgets/loading.dart';
+import 'package:meme/Widgets/media_provider.dart';
+import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class GalleryPage extends StatefulWidget {
-  Function onTap;
-  MediaPage page;
+  Function onMediaSelected;
 
-  GalleryPage({@required this.onTap, @required this.page});
+  GalleryPage({@required this.onMediaSelected});
 
   @override
   _GalleryPageState createState() => _GalleryPageState();
@@ -20,83 +25,112 @@ class GalleryPage extends StatefulWidget {
 
 class _GalleryPageState extends State<GalleryPage> {
   Media selectedMedia;
+  MediaPage page;
   List<Media> mediaList;
   ImageProvider provider;
   GlobalKey<ExtendedImageEditorState> editorKey =
       GlobalKey<ExtendedImageEditorState>();
   ImageEditorOption editorOption = ImageEditorOption();
+  IconData icon = Icons.image;
 
-  Future<Uint8List> imageFromMedia(Media media) async {
-    return (await media.getFile()).readAsBytesSync();
-  }
-
-  void setProvider(ExtendedMemoryImageProvider newProvider){
-    setState(() {
-      provider = newProvider;
-    });
+  Future<Uint8List> bytesFromMedia(Media media) async {
+    return await (await media.getFile()).readAsBytes();
   }
 
   @override
   void initState() {
-    print('holaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
-    print(widget.page);
-    if (widget.page != null) {
-      mediaList = widget.page.items;
+    gallery.getMediaGallery().then((_) {
+      page = gallery.imagePage;
+      mediaList = page.items;
       print(mediaList);
       selectedMedia = mediaList.first;
-      imageFromMedia(selectedMedia).then((bytes) {
+      bytesFromMedia(selectedMedia).then((bytes) {
         provider = ExtendedMemoryImageProvider(bytes);
         setState(() {});
       });
-    }
+    });
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('weeeeeeeeeeeeeeeeeeeee');
-    print(widget.page);
-    if (widget.page == null) return Scaffold(body: Loading());
+    if (page == null) return Scaffold(body: Loading());
 
-    Widget _buildImage() {
-      return ExtendedImage(
-        image: provider,
-        extendedImageEditorKey: editorKey,
-        mode: ExtendedImageMode.editor,
-        fit: BoxFit.contain,
-        initEditorConfigHandler: (ExtendedImageState state) {
-          return EditorConfig(
-            maxScale: 3.0,
-            cropRectPadding: const EdgeInsets.all(0),
-            hitTestSize: 20.0,
-            cropAspectRatio: 1,
-            initCropRectType: InitCropRectType.layoutRect,
-            cornerSize: Size.zero,
-          );
-        },
-      );
+    Future<Widget> _buildPreview() async {
+      if (selectedMedia.mediaType == MediaType.image) {
+        Uint8List bytes = await bytesFromMedia(selectedMedia);
+        provider = ExtendedMemoryImageProvider(bytes);
+        return Stack(
+          alignment: Alignment.bottomRight,
+          children: <Widget>[
+            ExtendedImage(
+              image: provider,
+              extendedImageEditorKey: editorKey,
+              mode: ExtendedImageMode.editor,
+              fit: BoxFit.contain,
+              initEditorConfigHandler: (ExtendedImageState state) {
+                return EditorConfig(
+                  maxScale: 3.0,
+                  cropRectPadding: const EdgeInsets.all(8),
+                  hitTestSize: 20.0,
+                  cropAspectRatio: 1,
+                  initCropRectType: InitCropRectType.layoutRect,
+                );
+              },
+            ),
+            Padding(
+              padding: const EdgeInsets.all(15),
+              child: SizedBox(
+                width: 50,
+                              child: RawMaterialButton(
+                  onPressed: () async => Navigator.push(
+                      context,
+                      SlideLeftRoute(
+                          page: ImageEditorPage(
+                              bytes: await bytesFromMedia(selectedMedia)))),
+                  elevation: 1,
+                  fillColor: Colors.white.withOpacity(0.9),
+                  child: Icon(
+                    Icons.edit,
+                    size: 20,
+                  ),
+                  shape: CircleBorder(),
+                ),
+              ),
+            )
+          ],
+        );
+      } else {
+        return FadeInImage(
+          fit: BoxFit.cover,
+          placeholder: MemoryImage(kTransparentImage),
+          image: MediaThumbnailProvider(
+            media: selectedMedia,
+          ),
+        );
+      }
     }
 
     Future<Uint8List> save() async {
       final ExtendedImageEditorState state = editorKey.currentState;
       final Rect rect = state.getCropRect();
-      final EditActionDetails action = state.editAction;
-      final double radian = action.rotateAngle;
+      // final EditActionDetails action = state.editAction;
+      // final double radian = action.rotateAngle;
 
-      final bool flipHorizontal = action.flipY;
-      final bool flipVertical = action.flipX;
+      // final bool flipHorizontal = action.flipY;
+      // final bool flipVertical = action.flipX;
       // final img = await getImageFromEditorKey(editorKey);
       final Uint8List img = state.rawImageData;
 
       final ImageEditorOption option = ImageEditorOption();
 
       option.addOption(ClipOption.fromRect(rect));
-      option.addOption(
-          FlipOption(horizontal: flipHorizontal, vertical: flipVertical));
-      if (action.hasRotateAngle) {
-        option.addOption(RotateOption(radian.toInt()));
-      }
+      // option.addOption(
+      //     FlipOption(horizontal: flipHorizontal, vertical: flipVertical));
+      // if (action.hasRotateAngle) {
+      //   option.addOption(RotateOption(radian.toInt()));
+      // }
 
       option.outputFormat = const OutputFormat.png(88);
 
@@ -109,50 +143,65 @@ class _GalleryPageState extends State<GalleryPage> {
     }
 
     return Scaffold(
-        body: Column(
-      children: <Widget>[
-        AspectRatio(aspectRatio: 1, child: _buildImage()),
-        GridView.builder(
-          shrinkWrap: true,
-            itemCount: mediaList.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4, crossAxisSpacing: 1, mainAxisSpacing: 1),
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                  child: MediaProvider(media: mediaList[index]),
-                  onTap: () {
-                    Uint8List bytes = mediaList[index]
-                    setState(() {
-                      
-                    });
-                  });
-            }),
-      ],
-    ));
-  }
-}
-
-class MediaProvider extends StatelessWidget {
-  Media media;
-  MediaProvider({@required this.media});
-
-  @override
-  Widget build(BuildContext context) {
-    if (media.mediaType == MediaType.image)
-      return FadeInImage(
-        fit: BoxFit.cover,
-        placeholder: MemoryImage(kTransparentImage),
-        image: MediaImageProvider(
-          media: media,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(40),
+          child: AppBar(
+            centerTitle: true,
+            title: IconButton(
+              icon: Icon(icon),
+              onPressed: () {
+                setState(() {
+                  page = page == gallery.imagePage
+                      ? gallery.videoPage
+                      : gallery.imagePage;
+                  icon = icon == Icons.image ? Icons.slideshow : Icons.image;
+                });
+              },
+            ),
+            actions: <Widget>[
+              IconButton(
+                  icon: Icon(Icons.arrow_forward),
+                  onPressed: () async {
+                    String path = await ImageGallerySaver.saveImage(await save());
+                    print(path);
+                    File file = File(path.substring(7));
+                    // var sink = imageFile.openWrite();
+                    // sink.write(await save());
+                    // await sink.flush();
+                    // await sink.close();
+                    widget.onMediaSelected(file,selectedMedia.mediaType);
+                  })
+            ],
+          ),
         ),
-      );
+        body: Column(
+          children: <Widget>[
+            AspectRatio(
+                aspectRatio: 1,
+                child: FutureBuilder(
+                  future: _buildPreview(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) print(snapshot.error.toString());
+                    if (!snapshot.hasData)
+                      return Image.memory(kTransparentImage);
+                    return snapshot.data;
+                  },
+                )),
+            GridView.builder(
+                shrinkWrap: true,
+                itemCount: mediaList.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 4, crossAxisSpacing: 1, mainAxisSpacing: 1),
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                      child: MediaProvider(media: mediaList[index]),
+                      onTap: () {
+                        selectedMedia = mediaList[index];
 
-    return FadeInImage(
-      fit: BoxFit.cover,
-      placeholder: MemoryImage(kTransparentImage),
-      image: MediaThumbnailProvider(
-        media: media,
-      ),
-    );
+                        setState(() {});
+                      });
+                }),
+          ],
+        ));
   }
 }

@@ -1,21 +1,19 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:media_gallery/media_gallery.dart';
+import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Tag.dart';
 import 'package:meme/Widgets/loading.dart';
-import 'package:meme/Widgets/video_player.dart';
-import '../Widgets/tag_selector.dart';
-import 'package:meme/Controller/Configuration.dart';
-import 'package:meme/Controller/db.dart';
-import 'package:meme/Controller/media_storage.dart';
+import 'package:meme/Widgets/media_provider.dart';
+import '../Widgets/video_player.dart';
+
 import '../Models/Post.dart';
-import 'package:path_provider/path_provider.dart';
+import '../Widgets/tag_selector.dart';
 
 class UploadPublicationPage extends StatefulWidget {
   File file;
-  String mediaType;
-
+  MediaType mediaType;
   UploadPublicationPage({@required this.file, @required this.mediaType});
 
   @override
@@ -23,8 +21,9 @@ class UploadPublicationPage extends StatefulWidget {
 }
 
 class _UploadPublicationPageState extends State<UploadPublicationPage> {
-  File _file;
   String _description = '';
+  File _file;
+  MediaType _mediaType;
   List<Tag> tags = <Tag>[];
   bool activedUpload;
 
@@ -32,12 +31,12 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
   void initState() {
     activedUpload = true;
     _file = widget.file;
+    _mediaType = widget.mediaType;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    
     uploadPublication() async {
       setState(() {
         activedUpload = false;
@@ -46,11 +45,11 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
       List<String> tagsId = await db.createTags(tags);
       String postId = await db.newPost(
           db.userId,
-          new Post('', _description, widget.mediaType, <String>[],
+          new Post('', _description, _mediaType.toString(), <String>[],
               DateTime.now(), '', db.userId, tagsId, Map<String, dynamic>()),
           _file);
       tagsId.forEach((id) {
-        db.addPostToTag(id,db.userId,postId );
+        db.addPostToTag(id, db.userId, postId);
       });
       Navigator.pop(context);
       Navigator.pop(context);
@@ -68,17 +67,14 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
         tags.removeAt(index);
       });
     }
-    
 
     return SafeArea(
       child: Scaffold(
         body: SingleChildScrollView(
           child: Column(
             children: [
-              widget.mediaType == 'image'
-                  ? AspectRatio(
-                      aspectRatio: 1,
-                      child: Image.file(_file, fit: BoxFit.cover))
+              _mediaType == MediaType.image
+                  ? AspectRatio(aspectRatio: 1, child: Image.file(_file,fit: BoxFit.cover,))
                   : VideoPlayerWidget(file: _file),
               SizedBox(height: 20),
               SizedBox(

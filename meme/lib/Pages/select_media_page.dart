@@ -20,17 +20,12 @@ class _SelectMediaPageState extends State<SelectMediaPage>
     with SingleTickerProviderStateMixin {
   TabController tabController;
   MediaPage page;
-  IconData icon = Icons.image;
+  
 
   @override
   void initState() {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
-    gallery.getMediaGallery().then((_) {
-      setState(() {
-        page = gallery.imagePage;
-      });
-    });
   }
 
   @override
@@ -42,53 +37,21 @@ class _SelectMediaPageState extends State<SelectMediaPage>
   @override
   Widget build(BuildContext context) {
     
-    onSelectMedia(Media media) async {
-      File file = await media.getFile();
-      if (media.mediaType == MediaType.image) {
-        File cropedImage = await Navigator.push(context, MaterialPageRoute(builder: (context) => ImageEditorPage(image: file,),));
-
-        if (cropedImage != null)
-          Navigator.push(
-              context,
-              SlideLeftRoute(
-                  page: UploadPublicationPage(
-                      file: cropedImage, mediaType: 'image')));
-      } 
-      else
+    onSelectMedia(File file,MediaType mediaType) async {
         Navigator.push(
             context,
             SlideLeftRoute(
-                page: UploadPublicationPage(file: file, mediaType: 'video')));
+                page: UploadPublicationPage(file: file,mediaType: mediaType)));
     }
 
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(40),
-        child: AppBar(
-          title: Text('Nuevo post'),
-          actions: <Widget>[
-            if (tabController.index == 0)
-              IconButton(
-                icon: Icon(icon),
-                onPressed: () {
-                  setState(() {
-                    page = page == gallery.imagePage
-                        ? gallery.videoPage
-                        : gallery.imagePage;
-                    icon = icon == Icons.image ? Icons.slideshow : Icons.image;
-                    print(icon);
-                  });
-                },
-              )
-          ],
-        ),
-      ),
+
       body: TabBarView(
         controller: tabController,
+        physics: NeverScrollableScrollPhysics(),
         children: [
           GalleryPage(
-            onTap: onSelectMedia,
-            page: page,
+            onMediaSelected: onSelectMedia
           ),
           CameraPage()
         ],
@@ -105,7 +68,7 @@ class _SelectMediaPageState extends State<SelectMediaPage>
             tabs: [
               Tab(
                 icon: Icon(
-                  icon,
+                  Icons.image,
                   size: 30,
                   color: Colors.black,
                 ),

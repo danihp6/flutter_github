@@ -84,7 +84,7 @@ class _NewPostListPageState extends State<NewPostListPage> {
                     context,
                     SlideLeftRoute(
                         page: GalleryPage(
-                            onTap: selectImage, page: gallery.imagePage))),
+                            onMediaSelected: selectImage))),
               ),
               Text('Selecciona una imagen'),
               SizedBox(height: 30),

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Pages/upload_publication_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:path_provider/path_provider.dart';
@@ -63,7 +64,7 @@ class _CameraPageState extends State<CameraPage> {
     Navigator.push(
         context,
         SlideLeftRoute(
-            page: UploadPublicationPage(file: file, mediaType: 'image')));
+            page: UploadPublicationPage(file: file, mediaType:MediaType.image)));
   }
 
   Future<String> startVideoRecording() async {
@@ -150,7 +151,7 @@ class _CameraPageState extends State<CameraPage> {
       Navigator.push(
           context,
           SlideLeftRoute(
-              page: UploadPublicationPage(file: file, mediaType: 'video')));
+              page: UploadPublicationPage(file: file, mediaType:MediaType.video)));
     });
   }
 
