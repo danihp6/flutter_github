@@ -1,21 +1,20 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_editor/image_editor.dart';
-import 'package:extended_image/extended_image.dart';
-import 'package:meme/Pages/upload_publication_page.dart';
-import 'package:meme/Widgets/slide_left_route.dart';
-import 'package:oktoast/oktoast.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import '../Widgets/scaling_gesture_detector.dart';
+import 'package:media_gallery/media_gallery.dart';
+
+import 'package:fitted_text_field_container/fitted_text_field_container.dart';
 
 class ImageEditorPage<File> extends StatefulWidget {
   Uint8List bytes;
-  ImageEditorPage({@required this.bytes});
+  Function onMediaSelected;
+  ImageEditorPage({@required this.bytes, @required this.onMediaSelected});
 
   @override
   _ImageEditorPageState createState() => _ImageEditorPageState();
@@ -34,7 +33,20 @@ class _ImageEditorPageState extends State<ImageEditorPage>
   Offset textOffset = Offset.zero;
   Offset textPoint = Offset.zero;
   double _scaleFactor = 40.0;
-double _baseScaleFactor = 1.0;
+  double _baseScaleFactor = 1.0;
+  GlobalKey<ExtendedImageEditorState> editorKey =
+      GlobalKey<ExtendedImageEditorState>();
+  FocusNode focusNode = FocusNode();
+  String text = 'Texto';
+  GlobalKey<FittedTextFieldContainerState> _keyText = GlobalKey<FittedTextFieldContainerState>();
+
+  // _getTextSize(_) {
+  //   final RenderBox renderBox = _keyText.currentContext.findRenderObject();
+  //   final size = renderBox.size;
+  //   print("SIZE $size");
+  //   _textSize = size;
+  //   setState(() {});
+  // }
 
   Future<Uint8List> _capturePng() async {
     try {
@@ -64,12 +76,12 @@ double _baseScaleFactor = 1.0;
   void initState() {
     _image = widget.bytes;
     tabController = TabController(length: 3, vsync: this);
-    
-    
+
     sat = 1;
     bright = 1;
     con = 1;
-    textController = TextEditingController(text: 'Texto');
+    textController = TextEditingController(text: text);
+    // WidgetsBinding.instance.addPostFrameCallback(_getTextSize);
     super.initState();
   }
 
@@ -77,28 +89,26 @@ double _baseScaleFactor = 1.0;
   void dispose() {
     tabController.dispose();
     textController.dispose();
+    focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // _getTextSize('');
+    void flip() {
+      editorKey.currentState.flip();
+    }
 
-    
+    void rotate(bool right) {
+      editorKey.currentState.rotate(right: right);
+    }
 
-    // void flip() {
-    //   editorKey.currentState.flip();
-    // }
-
-    // void rotate(bool right) {
-    //   editorKey.currentState.rotate(right: right);
-    // }
-
-    // restore() {
-    //   editorKey.currentState.reset();
-    //   _image = widget.image;
-    //   provider = ExtendedFileImageProvider(_image);
-    //   setState(() {});
-    // }
+    restore() {
+      editorKey.currentState.reset();
+      _image = widget.bytes;
+      setState(() {});
+    }
 
     Widget _buildSat() {
       return Slider(
@@ -141,41 +151,36 @@ double _baseScaleFactor = 1.0;
       );
     }
 
-    // Future<File> save() async {
-    //   final ExtendedImageEditorState state = editorKey.currentState;
-    //   final Rect rect = state.getCropRect();
-    //   final EditActionDetails action = state.editAction;
-    //   final double radian = action.rotateAngle;
+    Future<Uint8List> save() async {
+      final ExtendedImageEditorState state = editorKey.currentState;
+      final EditActionDetails action = state.editAction;
+      final double radian = action.rotateAngle;
 
-    //   final bool flipHorizontal = action.flipY;
-    //   final bool flipVertical = action.flipX;
-    //   // final img = await getImageFromEditorKey(editorKey);
-    //   final Uint8List img = state.rawImageData;
+      final bool flipHorizontal = action.flipY;
+      final bool flipVertical = action.flipX;
+      final Uint8List img = state.rawImageData;
 
-    //   final ImageEditorOption option = ImageEditorOption();
+      final ImageEditorOption option = ImageEditorOption();
 
-    //   option.addOption(ClipOption.fromRect(rect));
-    //   option.addOption(
-    //       FlipOption(horizontal: flipHorizontal, vertical: flipVertical));
-    //   if (action.hasRotateAngle) {
-    //     option.addOption(RotateOption(radian.toInt()));
-    //   }
+      option.addOption(
+          FlipOption(horizontal: flipHorizontal, vertical: flipVertical));
+      if (action.hasRotateAngle) {
+        option.addOption(RotateOption(radian.toInt()));
+      }
 
-    //   option.addOption(ColorOption.saturation(sat));
-    //   option.addOption(ColorOption.brightness(bright));
-    //   option.addOption(ColorOption.contrast(con));
+      option.addOption(ColorOption.saturation(sat));
+      option.addOption(ColorOption.brightness(bright));
+      option.addOption(ColorOption.contrast(con));
 
-    //   option.outputFormat = const OutputFormat.png(88);
+      option.outputFormat = const OutputFormat.png(88);
 
-    //   final Uint8List result = await ImageEditor.editImage(
-    //     image: img,
-    //     imageEditorOption: option,
-    //   );
+      final Uint8List result = await ImageEditor.editImage(
+        image: img,
+        imageEditorOption: option,
+      );
 
-    //   String path = await ImageGallerySaver.saveImage(result);
-    //   File file = File(path.substring(7));
-    //   return file;
-    // }
+      return result;
+    }
 
     return Scaffold(
       appBar: PreferredSize(
@@ -193,7 +198,9 @@ double _baseScaleFactor = 1.0;
             IconButton(
                 icon: Icon(Icons.done),
                 onPressed: () async {
-                  // Navigator.pop(context, await save());
+                  String path = await ImageGallerySaver.saveImage(await save());
+                  File file = File(path.substring(7));
+                  widget.onMediaSelected(file, MediaType.image);
                 })
           ],
         ),
@@ -204,44 +211,89 @@ double _baseScaleFactor = 1.0;
             key: _globalKey,
             child: Stack(
               children: <Widget>[
-                AspectRatio(aspectRatio: 1, child: Image.memory(_image)),
+                AspectRatio(
+                    aspectRatio: 1,
+                    child: ExtendedImage(
+                      image: ExtendedMemoryImageProvider(_image),
+                      extendedImageEditorKey: editorKey,
+                      mode: ExtendedImageMode.editor,
+                      fit: BoxFit.contain,
+                      initEditorConfigHandler: (ExtendedImageState state) {
+                        return EditorConfig(
+                          maxScale: 3.0,
+                          cropRectPadding: const EdgeInsets.all(8),
+                          hitTestSize: 20.0,
+                          cropAspectRatio: 1,
+                          initCropRectType: InitCropRectType.layoutRect,
+                        );
+                      },
+                    )),
                 Positioned(
                   left: textOffset.dx,
                   top: textOffset.dy,
-                  child: ScalingGestureDetector(
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child: TextField(
-                        controller: textController,
-                        style: TextStyle(
-                          fontSize: _scaleFactor,
-                          color: Colors.white
+                  child: Column(
+                    children: <Widget>[
+                      // GestureDetector(
+                      //   child: Container(
+                      //     color: Colors.red,
+                      //     width: _textSize != null?_textSize.width + 50:100,
+                      //     height: _textSize != null?_textSize.height + 50:100,
+                      //   ),
+                      //   onScaleStart: (details) {
+                      //     print('scalestart');
+                      //     _baseScaleFactor = _scaleFactor;
+                      //   },
+                      //   onScaleUpdate: (details) {
+                      //     setState(() {
+                      //       _scaleFactor = _baseScaleFactor * details.scale;
+                      //     });
+                      //   },
+                      // ),
+                      GestureDetector(
+                        child: Container(
+                          color: Colors.yellow,
+                          child: FittedTextFieldContainer(
+                            key: _keyText,
+                            child: TextField(
+                              controller: textController,
+                              focusNode: focusNode,
+                              key: _keyText,
+                              style: TextStyle(
+                                  fontSize: _scaleFactor, color: Colors.white),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
                         ),
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                        ),
+                        onPanStart: (initialPoint) {
+                          focusNode.unfocus();
+                        },
+                        onPanUpdate: (details) {
+                          setState(() {
+                            textOffset = textOffset + details.delta;
+                          });
+                        },
                       ),
-                    ),
-                    onPanStart: (initialPoint) {
-                      setState(() {
-                        textPoint = initialPoint;
-                      });
-                    },
-                    onPanUpdate: (details,delta) {
-                      setState(() {
-                        textOffset = textPoint + delta;
-                      });
-                    },
-                    onScaleStart: (details) {
-                      print('scalestart');
-                      _baseScaleFactor = _scaleFactor;
-                    },
-                    onScaleUpdate: (details,scale) {
-                      
-                      setState(() {
-                        _scaleFactor = _baseScaleFactor * scale;
-                      });
-                    },
+                      GestureDetector(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Material(
+                            color: Colors.white.withOpacity(0.8),
+                            elevation: 2,
+                            child: Padding(
+                              padding: const EdgeInsets.all(2),
+                              child: Icon(Icons.format_size),
+                            ),
+                          ),
+                        ),
+                        onPanUpdate: (details) {
+                          setState(() {
+                            _scaleFactor += details.delta.dy;
+                          });
+                        },
+                      )
+                    ],
                   ),
                 )
               ],
@@ -258,21 +310,21 @@ double _baseScaleFactor = 1.0;
                         color: Colors.black,
                         size: 50,
                       ),
-                      onPressed: null),
+                      onPressed: flip),
                   IconButton(
                       icon: Icon(
                         Icons.rotate_right,
                         color: Colors.black,
                         size: 50,
                       ),
-                      onPressed: () => null),
+                      onPressed: () => rotate(true)),
                   IconButton(
                       icon: Icon(
                         Icons.rotate_left,
                         color: Colors.black,
                         size: 50,
                       ),
-                      onPressed: () => null),
+                      onPressed: () => rotate(false)),
                 ],
               ),
               SliderTheme(

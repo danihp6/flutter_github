@@ -88,6 +88,7 @@ class _GalleryPageState extends State<GalleryPage> {
                       context,
                       SlideLeftRoute(
                           page: ImageEditorPage(
+                            onMediaSelected: widget.onMediaSelected,
                               bytes: await bytesFromMedia(selectedMedia)))),
                   elevation: 1,
                   fillColor: Colors.white.withOpacity(0.9),
@@ -115,22 +116,11 @@ class _GalleryPageState extends State<GalleryPage> {
     Future<Uint8List> save() async {
       final ExtendedImageEditorState state = editorKey.currentState;
       final Rect rect = state.getCropRect();
-      // final EditActionDetails action = state.editAction;
-      // final double radian = action.rotateAngle;
-
-      // final bool flipHorizontal = action.flipY;
-      // final bool flipVertical = action.flipX;
-      // final img = await getImageFromEditorKey(editorKey);
       final Uint8List img = state.rawImageData;
 
       final ImageEditorOption option = ImageEditorOption();
 
       option.addOption(ClipOption.fromRect(rect));
-      // option.addOption(
-      //     FlipOption(horizontal: flipHorizontal, vertical: flipVertical));
-      // if (action.hasRotateAngle) {
-      //   option.addOption(RotateOption(radian.toInt()));
-      // }
 
       option.outputFormat = const OutputFormat.png(88);
 
@@ -165,10 +155,6 @@ class _GalleryPageState extends State<GalleryPage> {
                     String path = await ImageGallerySaver.saveImage(await save());
                     print(path);
                     File file = File(path.substring(7));
-                    // var sink = imageFile.openWrite();
-                    // sink.write(await save());
-                    // await sink.flush();
-                    // await sink.close();
                     widget.onMediaSelected(file,selectedMedia.mediaType);
                   })
             ],
@@ -187,20 +173,21 @@ class _GalleryPageState extends State<GalleryPage> {
                     return snapshot.data;
                   },
                 )),
-            GridView.builder(
-                shrinkWrap: true,
-                itemCount: mediaList.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4, crossAxisSpacing: 1, mainAxisSpacing: 1),
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                      child: MediaProvider(media: mediaList[index]),
-                      onTap: () {
-                        selectedMedia = mediaList[index];
+            Expanded(
+                          child: GridView.builder(
+                  itemCount: mediaList.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4, crossAxisSpacing: 1, mainAxisSpacing: 1),
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                        child: MediaProvider(media: mediaList[index]),
+                        onTap: () {
+                          selectedMedia = mediaList[index];
 
-                        setState(() {});
-                      });
-                }),
+                          setState(() {});
+                        });
+                  }),
+            ),
           ],
         ));
   }
