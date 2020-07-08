@@ -28,17 +28,15 @@ class _ImageEditorPageState extends State<ImageEditorPage>
   double bright;
   double con;
   GlobalKey _globalKey = new GlobalKey();
-  TextEditingController textController;
+  List<FloatingText> floatingTexts = [];
+  bool isTextOptionsVisible = true;
+
   bool inside = false;
-  Offset textOffset = Offset.zero;
-  Offset textPoint = Offset.zero;
-  double _scaleFactor = 40.0;
-  double _baseScaleFactor = 1.0;
+
   GlobalKey<ExtendedImageEditorState> editorKey =
       GlobalKey<ExtendedImageEditorState>();
-  FocusNode focusNode = FocusNode();
-  String text = 'Texto';
-  GlobalKey<FittedTextFieldContainerState> _keyText = GlobalKey<FittedTextFieldContainerState>();
+
+  Color textColor = Colors.white;
 
   // _getTextSize(_) {
   //   final RenderBox renderBox = _keyText.currentContext.findRenderObject();
@@ -80,7 +78,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
     sat = 1;
     bright = 1;
     con = 1;
-    textController = TextEditingController(text: text);
     // WidgetsBinding.instance.addPostFrameCallback(_getTextSize);
     super.initState();
   }
@@ -88,9 +85,31 @@ class _ImageEditorPageState extends State<ImageEditorPage>
   @override
   void dispose() {
     tabController.dispose();
-    textController.dispose();
-    focusNode.dispose();
     super.dispose();
+  }
+
+  removeFloatingButton(FloatingText floatingText) {
+    setState(() {
+      floatingTexts.remove(floatingText);
+    });
+  }
+
+  addFloatingButton() {
+    if (floatingTexts.length < 5)
+      setState(() {
+        floatingTexts.add(FloatingText(
+          remove: removeFloatingButton,
+          key: UniqueKey(),
+          isTextOptionsVisible: isTextOptionsVisible,
+        ));
+      });
+  }
+
+  showTextOptions(){
+    setState(() {
+      isTextOptionsVisible = !isTextOptionsVisible;
+      print(isTextOptionsVisible);
+    });
   }
 
   @override
@@ -220,80 +239,18 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                       fit: BoxFit.contain,
                       initEditorConfigHandler: (ExtendedImageState state) {
                         return EditorConfig(
-                          maxScale: 3.0,
-                          cropRectPadding: const EdgeInsets.all(8),
-                          hitTestSize: 20.0,
-                          cropAspectRatio: 1,
-                          initCropRectType: InitCropRectType.layoutRect,
-                        );
+                            maxScale: 3.0,
+                            cropRectPadding: const EdgeInsets.all(0),
+                            hitTestSize: 20.0,
+                            cropAspectRatio: 1,
+                            initCropRectType: InitCropRectType.layoutRect,
+                            lineColor: Colors.transparent,
+                            cornerSize: Size.zero);
                       },
                     )),
-                Positioned(
-                  left: textOffset.dx,
-                  top: textOffset.dy,
-                  child: Column(
-                    children: <Widget>[
-                      // GestureDetector(
-                      //   child: Container(
-                      //     color: Colors.red,
-                      //     width: _textSize != null?_textSize.width + 50:100,
-                      //     height: _textSize != null?_textSize.height + 50:100,
-                      //   ),
-                      //   onScaleStart: (details) {
-                      //     print('scalestart');
-                      //     _baseScaleFactor = _scaleFactor;
-                      //   },
-                      //   onScaleUpdate: (details) {
-                      //     setState(() {
-                      //       _scaleFactor = _baseScaleFactor * details.scale;
-                      //     });
-                      //   },
-                      // ),
-                      GestureDetector(
-                        child: Container(
-                          color: Colors.yellow,
-                          child: FittedTextFieldContainer(
-                            key: _keyText,
-                            child: TextField(
-                              controller: textController,
-                              focusNode: focusNode,
-                              key: _keyText,
-                              style: TextStyle(
-                                  fontSize: _scaleFactor, color: Colors.white),
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                              ),
-                            ),
-                          ),
-                        ),
-                        onPanStart: (initialPoint) {
-                          focusNode.unfocus();
-                        },
-                        onPanUpdate: (details) {
-                          setState(() {
-                            textOffset = textOffset + details.delta;
-                          });
-                        },
-                      ),
-                      GestureDetector(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Material(
-                            color: Colors.white.withOpacity(0.8),
-                            elevation: 2,
-                            child: Padding(
-                              padding: const EdgeInsets.all(2),
-                              child: Icon(Icons.format_size),
-                            ),
-                          ),
-                        ),
-                        onPanUpdate: (details) {
-                          setState(() {
-                            _scaleFactor += details.delta.dy;
-                          });
-                        },
-                      )
-                    ],
+                Positioned.fill(
+                  child: Stack(
+                    children: floatingTexts,
                   ),
                 )
               ],
@@ -340,14 +297,30 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                   ],
                 ),
               ),
-              Column(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  RaisedButton(
-                    child: Text('Añadir texto'),
-                    onPressed: () async {
-                      _capturePng();
-                    },
-                  )
+                                    IconButton(
+                      icon: Icon(
+                        Icons.delete_forever,
+                        color: Colors.black,
+                        size: 50,
+                      ),
+                      onPressed: (){}),
+                  IconButton(
+                      icon: Icon(
+                        Icons.visibility,
+                        color: Colors.black,
+                        size: 50,
+                      ),
+                      onPressed: showTextOptions),
+                  IconButton(
+                      icon: Icon(
+                        Icons.add,
+                        color: Colors.black,
+                        size: 50,
+                      ),
+                      onPressed: addFloatingButton),
                 ],
               ),
             ]),
@@ -366,6 +339,216 @@ class _ImageEditorPageState extends State<ImageEditorPage>
             Tab(icon: Icon(Icons.brightness_6)),
             Tab(icon: Icon(Icons.text_fields)),
           ]),
+    );
+  }
+}
+
+class FloatingText extends StatefulWidget {
+  Function remove;
+  Key key;
+  bool isTextOptionsVisible;
+  FloatingText(
+      {@required this.remove, this.key, this.isTextOptionsVisible = true});
+  @override
+  _FloatingTextState createState() => _FloatingTextState();
+}
+
+class _FloatingTextState extends State<FloatingText> {
+  Offset textOffset = Offset.zero;
+  double scaleFactor = 40.0;
+  double baseScaleFactor = 1.0;
+  FocusNode focusNode = FocusNode();
+  TextEditingController textController = TextEditingController(text: 'Texto');
+  GlobalKey<FittedTextFieldContainerState> keyText =
+      GlobalKey<FittedTextFieldContainerState>();
+  Color textColor = Colors.white;
+
+  @override
+  void dispose() {
+    focusNode.dispose();
+    textController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    changeColor(Color color) {
+      setState(() {
+        textColor = color;
+      });
+    }
+
+    return Positioned(
+      left: textOffset.dx,
+      top: textOffset.dy,
+      child: Column(
+        children: <Widget>[
+          GestureDetector(
+            child: FittedTextFieldContainer(
+              key: keyText,
+              child: TextField(
+                keyboardType: TextInputType.multiline,
+                scrollPhysics: NeverScrollableScrollPhysics(),
+                maxLines: null,
+                controller: textController,
+                focusNode: focusNode,
+                style: TextStyle(fontSize: scaleFactor, color: textColor),
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                ),
+                onChanged: (value) {
+                  keyText.currentState.resize();
+                },
+              ),
+            ),
+            onPanStart: (initialPoint) {
+              focusNode.unfocus();
+            },
+            onPanUpdate: (details) {
+              setState(() {
+                textOffset = textOffset + details.delta;
+              });
+            },
+          ),
+          if (widget.isTextOptionsVisible)
+            Row(
+              children: <Widget>[
+                GestureDetector(
+                  child: SizedBox(
+                    width: scaleFactor < 40 ? 20 : scaleFactor * 0.5,
+                    child: FittedBox(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Material(
+                          color: Colors.white.withOpacity(0.8),
+                          elevation: 2,
+                          child: Padding(
+                              padding: const EdgeInsets.all(2),
+                              child: Icon(Icons.delete)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  onTap: () => widget.remove(this.widget),
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                GestureDetector(
+                  child: SizedBox(
+                    width: scaleFactor < 40 ? 20 : scaleFactor * 0.5,
+                    child: FittedBox(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Material(
+                          color: Colors.white.withOpacity(0.8),
+                          elevation: 2,
+                          child: Padding(
+                              padding: const EdgeInsets.all(2),
+                              child: Icon(Icons.format_size)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  onPanUpdate: (details) {
+                    focusNode.unfocus();
+
+                    if (scaleFactor > 10 || details.delta.dy > 0)
+                      setState(() {
+                        scaleFactor += details.delta.dy;
+                      });
+                    keyText.currentState.resize();
+                  },
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                TextColorButton(
+                  scaleFactor: scaleFactor,
+                  textColor: textColor,
+                  changeColor: changeColor,
+                ),
+              ],
+            )
+        ],
+      ),
+    );
+  }
+}
+
+class TextColorButton extends StatelessWidget {
+  TextColorButton(
+      {@required this.scaleFactor,
+      @required this.textColor,
+      @required this.changeColor});
+
+  double scaleFactor;
+  Color textColor;
+  Function changeColor;
+
+  @override
+  Widget build(BuildContext context) {
+    List<Color> colors = [
+      Colors.white,
+      Colors.black,
+      Colors.red,
+      Colors.yellow,
+      Colors.orange,
+      Colors.blue,
+      Colors.green,
+      Colors.pink,
+      Colors.purple,
+      Colors.lime
+    ];
+
+    return GestureDetector(
+      child: SizedBox(
+        width: scaleFactor < 40 ? 20 : scaleFactor * 0.5,
+        child: FittedBox(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(40),
+            child: Material(
+              color: textColor.withOpacity(0.8),
+              elevation: 2,
+              child:
+                  Padding(padding: const EdgeInsets.all(2), child: Container()),
+            ),
+          ),
+        ),
+      ),
+      onTap: () {
+        showBottomSheet(
+          context: context,
+          builder: (context) {
+            return Container(
+              height: 50,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListView.separated(
+                  itemCount: colors.length,
+                  scrollDirection: Axis.horizontal,
+                  separatorBuilder: (context, index) => SizedBox(width: 5),
+                  itemBuilder: (context, index) => GestureDetector(
+                    child: FittedBox(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Material(
+                          color: colors[index],
+                          elevation: 2,
+                          child: Padding(
+                              padding: const EdgeInsets.all(2),
+                              child: Container()),
+                        ),
+                      ),
+                    ),
+                    onTap: () => changeColor(colors[index]),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

@@ -83,12 +83,12 @@ class _GalleryPageState extends State<GalleryPage> {
               padding: const EdgeInsets.all(15),
               child: SizedBox(
                 width: 50,
-                              child: RawMaterialButton(
+                child: RawMaterialButton(
                   onPressed: () async => Navigator.push(
                       context,
                       SlideLeftRoute(
                           page: ImageEditorPage(
-                            onMediaSelected: widget.onMediaSelected,
+                              onMediaSelected: widget.onMediaSelected,
                               bytes: await bytesFromMedia(selectedMedia)))),
                   elevation: 1,
                   fillColor: Colors.white.withOpacity(0.9),
@@ -152,10 +152,11 @@ class _GalleryPageState extends State<GalleryPage> {
               IconButton(
                   icon: Icon(Icons.arrow_forward),
                   onPressed: () async {
-                    String path = await ImageGallerySaver.saveImage(await save());
+                    String path =
+                        await ImageGallerySaver.saveImage(await save());
                     print(path);
                     File file = File(path.substring(7));
-                    widget.onMediaSelected(file,selectedMedia.mediaType);
+                    widget.onMediaSelected(file, selectedMedia.mediaType);
                   })
             ],
           ),
@@ -174,10 +175,12 @@ class _GalleryPageState extends State<GalleryPage> {
                   },
                 )),
             Expanded(
-                          child: GridView.builder(
+              child: GridView.builder(
                   itemCount: mediaList.length,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4, crossAxisSpacing: 1, mainAxisSpacing: 1),
+                      crossAxisCount: 4,
+                      crossAxisSpacing: 1,
+                      mainAxisSpacing: 1),
                   itemBuilder: (context, index) {
                     return GestureDetector(
                         child: MediaProvider(media: mediaList[index]),
