@@ -74,14 +74,11 @@ class _ImageEditorPageState extends State<ImageEditorPage>
   Matrix4Transform transform = Matrix4Transform();
   Size imageSize;
 
-  bool inside = false;
-
   Color textColor = Colors.white;
 
   Future<Uint8List> _capturePng() async {
     try {
-      print('inside');
-      inside = true;
+
       RenderRepaintBoundary boundary =
           _globalKey.currentContext.findRenderObject();
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
