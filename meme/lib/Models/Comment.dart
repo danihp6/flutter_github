@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:media_gallery/media_gallery.dart';
+import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/User.dart';
 
 class Comment {
@@ -12,7 +14,7 @@ class Comment {
   String _postId;
   String _userPostId;
   String _media;
-  String _mediaType;
+  MediaType _mediaType;
 
   Comment(text, likes, authorId, dateTime, comments, level, media, mediaType) {
     this._text = text;
@@ -36,8 +38,8 @@ class Comment {
         _postId = doc.reference.parent().parent().documentID,
         _userPostId =
             doc.reference.parent().parent().parent().parent().documentID,
-        _media = doc.data['media'],
-        _mediaType = doc.data['mediaType'];
+        _media =  doc.data['media'],
+        _mediaType = toMediaType(doc.data['mediaType']);
 
   Map<String, dynamic> toFirestore() => {
         'text': _text,
@@ -47,7 +49,7 @@ class Comment {
         'level': _level,
         'comments': _comments,
         'media': _media,
-        'mediaType': _mediaType
+        'mediaType': _mediaType.toString()
       };
 
   get id => this._id;

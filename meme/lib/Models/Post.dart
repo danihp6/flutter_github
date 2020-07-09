@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/User.dart';
 
 class Post {
   String _id;
   String _media;
-  String _mediaType;
+  MediaType _mediaType;
   String _description;
   List<String> _favourites;
   DateTime _dateTime;
@@ -30,7 +31,7 @@ class Post {
   Post.fromFirestore(DocumentSnapshot doc)
       : _id = doc.documentID,
         _media = doc.data['media'],
-        _mediaType = doc.data['mediaType'],
+        _mediaType = toMediaType(doc.data['mediaType']),
         _description = doc.data['description'],
         _favourites = List<String>.from(doc.data['favourites']),
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
@@ -41,7 +42,7 @@ class Post {
 
   Map<String, dynamic> toFirestore() => {
         'media': _media,
-        'mediaType': _mediaType,
+        'mediaType': _mediaType.toString(),
         'description': _description,
         'favourites': _favourites,
         'dateTime': _dateTime,
@@ -105,4 +106,10 @@ List<Post> toPosts(QuerySnapshot query) {
 
 void orderListPostByDateTime(List<Post> posts) {
   return posts.sort((a, b) => b._dateTime.compareTo(a._dateTime));
+}
+
+MediaType toMediaType(String string){
+  if(MediaType.image.toString() == string) return MediaType.image;
+  if(MediaType.video.toString() == string) return MediaType.video;
+  else throw Exception('Incorrect type');
 }

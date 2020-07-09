@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -7,9 +8,47 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_editor/image_editor.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:matrix4_transform/matrix4_transform.dart';
 import 'package:media_gallery/media_gallery.dart';
 
 import 'package:fitted_text_field_container/fitted_text_field_container.dart';
+
+import 'package:extended_image_library/extended_image_library.dart';
+
+List<Color> colors = [
+  Colors.black,
+  Colors.white,
+  Colors.red,
+  Colors.yellow,
+  Colors.orange,
+  Colors.blue,
+  Colors.green,
+  Colors.pink,
+  Colors.purple,
+  Colors.lime,
+  Colors.brown,
+  Colors.teal,
+];
+
+List<BlendMode> blendModes = [
+  BlendMode.color,
+  BlendMode.saturation,
+  BlendMode.difference,
+  BlendMode.plus,
+  BlendMode.modulate,
+  BlendMode.screen,
+  BlendMode.overlay,
+  BlendMode.darken,
+  BlendMode.lighten,
+  BlendMode.colorDodge,
+  BlendMode.colorBurn,
+  BlendMode.hardLight,
+  BlendMode.softLight,
+  BlendMode.exclusion,
+  BlendMode.multiply,
+  BlendMode.hue,
+  BlendMode.luminosity
+];
 
 class ImageEditorPage<File> extends StatefulWidget {
   Uint8List bytes;
@@ -28,23 +67,16 @@ class _ImageEditorPageState extends State<ImageEditorPage>
   double bright;
   double con;
   GlobalKey _globalKey = new GlobalKey();
-  List<FloatingText> floatingTexts = [];
   bool isTextOptionsVisible = true;
+  List<Key> floatingTexts = [];
+  Color colorFilter;
+  BlendMode blendMode = BlendMode.color;
+  Matrix4Transform transform = Matrix4Transform();
+  Size imageSize;
 
   bool inside = false;
 
-  GlobalKey<ExtendedImageEditorState> editorKey =
-      GlobalKey<ExtendedImageEditorState>();
-
   Color textColor = Colors.white;
-
-  // _getTextSize(_) {
-  //   final RenderBox renderBox = _keyText.currentContext.findRenderObject();
-  //   final size = renderBox.size;
-  //   print("SIZE $size");
-  //   _textSize = size;
-  //   setState(() {});
-  // }
 
   Future<Uint8List> _capturePng() async {
     try {
@@ -56,14 +88,7 @@ class _ImageEditorPageState extends State<ImageEditorPage>
       ByteData byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
       Uint8List pngBytes = byteData.buffer.asUint8List();
-//      String bs64 = base64Encode(pngBytes);
-//      print(pngBytes);
-//      print(bs64);
-      print('png done');
-      setState(() {
-        _image = pngBytes;
-        inside = false;
-      });
+
       return pngBytes;
     } catch (e) {
       print(e);
@@ -78,7 +103,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
     sat = 1;
     bright = 1;
     con = 1;
-    // WidgetsBinding.instance.addPostFrameCallback(_getTextSize);
     super.initState();
   }
 
@@ -88,117 +112,48 @@ class _ImageEditorPageState extends State<ImageEditorPage>
     super.dispose();
   }
 
-  removeFloatingButton(FloatingText floatingText) {
-    setState(() {
-      floatingTexts.remove(floatingText);
-    });
-  }
-
-  addFloatingButton() {
-    if (floatingTexts.length < 5)
-      setState(() {
-        floatingTexts.add(FloatingText(
-          remove: removeFloatingButton,
-          key: UniqueKey(),
-          isTextOptionsVisible: isTextOptionsVisible,
-        ));
-      });
-  }
-
-  showTextOptions(){
-    setState(() {
-      isTextOptionsVisible = !isTextOptionsVisible;
-      print(isTextOptionsVisible);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    // _getTextSize('');
+    removeFloatingButton(Key key) {
+      setState(() {
+        floatingTexts.remove(key);
+      });
+    }
+
+    removeAllFloatingButton() {
+      setState(() {
+        floatingTexts.clear();
+      });
+    }
+
+    addFloatingButton() {
+      if (floatingTexts.length < 5)
+        setState(() {
+          floatingTexts.add(UniqueKey());
+        });
+    }
+
+    showTextOptions() {
+      setState(() {
+        isTextOptionsVisible = !isTextOptionsVisible;
+        print(isTextOptionsVisible);
+      });
+    }
+
     void flip() {
-      editorKey.currentState.flip();
-    }
-
-    void rotate(bool right) {
-      editorKey.currentState.rotate(right: right);
-    }
-
-    restore() {
-      editorKey.currentState.reset();
-      _image = widget.bytes;
+      transform =
+          transform.flipHorizontally(origin: Offset(imageSize.width / 2, 0));
       setState(() {});
     }
 
-    Widget _buildSat() {
-      return Slider(
-        label: 'sat : ${sat.toStringAsFixed(2)}',
-        onChanged: (double value) {
-          sat = value;
-          setState(() {});
-        },
-        value: sat,
-        min: 0,
-        max: 2,
-      );
+    void rotate(double degrees) {
+      transform = transform.rotateByCenterDegrees(degrees, imageSize);
+      setState(() {});
     }
 
-    Widget _buildBrightness() {
-      return Slider(
-        label: 'brightness : ${bright.toStringAsFixed(2)}',
-        onChanged: (double value) {
-          setState(() {
-            bright = value;
-          });
-        },
-        value: bright,
-        min: 0,
-        max: 2,
-      );
-    }
-
-    Widget _buildCon() {
-      return Slider(
-        label: 'con : ${con.toStringAsFixed(2)}',
-        onChanged: (double value) {
-          setState(() {
-            con = value;
-          });
-        },
-        value: con,
-        min: 0,
-        max: 4,
-      );
-    }
-
-    Future<Uint8List> save() async {
-      final ExtendedImageEditorState state = editorKey.currentState;
-      final EditActionDetails action = state.editAction;
-      final double radian = action.rotateAngle;
-
-      final bool flipHorizontal = action.flipY;
-      final bool flipVertical = action.flipX;
-      final Uint8List img = state.rawImageData;
-
-      final ImageEditorOption option = ImageEditorOption();
-
-      option.addOption(
-          FlipOption(horizontal: flipHorizontal, vertical: flipVertical));
-      if (action.hasRotateAngle) {
-        option.addOption(RotateOption(radian.toInt()));
-      }
-
-      option.addOption(ColorOption.saturation(sat));
-      option.addOption(ColorOption.brightness(bright));
-      option.addOption(ColorOption.contrast(con));
-
-      option.outputFormat = const OutputFormat.png(88);
-
-      final Uint8List result = await ImageEditor.editImage(
-        image: img,
-        imageEditorOption: option,
-      );
-
-      return result;
+    restore() {
+      _image = widget.bytes;
+      setState(() {});
     }
 
     return Scaffold(
@@ -217,8 +172,13 @@ class _ImageEditorPageState extends State<ImageEditorPage>
             IconButton(
                 icon: Icon(Icons.done),
                 onPressed: () async {
-                  String path = await ImageGallerySaver.saveImage(await save());
+                  isTextOptionsVisible = false;
+                  setState(() {});
+                  await Future.delayed(const Duration(milliseconds: 10), () {});
+                  String path =
+                      await ImageGallerySaver.saveImage(await _capturePng());
                   File file = File(path.substring(7));
+                  Navigator.pop(context);
                   widget.onMediaSelected(file, MediaType.image);
                 })
           ],
@@ -232,25 +192,24 @@ class _ImageEditorPageState extends State<ImageEditorPage>
               children: <Widget>[
                 AspectRatio(
                     aspectRatio: 1,
-                    child: ExtendedImage(
-                      image: ExtendedMemoryImageProvider(_image),
-                      extendedImageEditorKey: editorKey,
-                      mode: ExtendedImageMode.editor,
-                      fit: BoxFit.contain,
-                      initEditorConfigHandler: (ExtendedImageState state) {
-                        return EditorConfig(
-                            maxScale: 3.0,
-                            cropRectPadding: const EdgeInsets.all(0),
-                            hitTestSize: 20.0,
-                            cropAspectRatio: 1,
-                            initCropRectType: InitCropRectType.layoutRect,
-                            lineColor: Colors.transparent,
-                            cornerSize: Size.zero);
-                      },
-                    )),
+                    child: LayoutBuilder(builder: (context, constraints) {
+                      imageSize = constraints.biggest;
+                      return Container(
+                          transform: transform.matrix4,
+                          child: Image.memory(_image,
+                              fit: BoxFit.cover,
+                              color: colorFilter,
+                              colorBlendMode: blendMode));
+                    })),
                 Positioned.fill(
                   child: Stack(
-                    children: floatingTexts,
+                    children: floatingTexts
+                        .map((key) => FloatingText(
+                              remove: removeFloatingButton,
+                              key: key,
+                              isTextOptionsVisible: isTextOptionsVisible,
+                            ))
+                        .toList(),
                   ),
                 )
               ],
@@ -261,66 +220,137 @@ class _ImageEditorPageState extends State<ImageEditorPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  IconButton(
-                      icon: Icon(
-                        Icons.flip,
-                        color: Colors.black,
-                        size: 50,
-                      ),
-                      onPressed: flip),
-                  IconButton(
-                      icon: Icon(
-                        Icons.rotate_right,
-                        color: Colors.black,
-                        size: 50,
-                      ),
-                      onPressed: () => rotate(true)),
-                  IconButton(
-                      icon: Icon(
-                        Icons.rotate_left,
-                        color: Colors.black,
-                        size: 50,
-                      ),
-                      onPressed: () => rotate(false)),
+                  Expanded(
+                    child: FittedBox(
+                      child: IconButton(
+                          icon: Icon(
+                            Icons.flip,
+                            color: Colors.black,
+                          ),
+                          onPressed: flip),
+                    ),
+                  ),
+                  Expanded(
+                    child: FittedBox(
+                      child: IconButton(
+                          icon: LayoutBuilder(
+                            builder: (context, constraints) => Container(
+                                transform: Matrix4Transform()
+                                    .rotateByCenterDegrees(
+                                        90, constraints.biggest)
+                                    .left(constraints.maxWidth / 4)
+                                    .matrix4,
+                                child: Icon(
+                                  Icons.flip,
+                                  color: Colors.black,
+                                )),
+                          ),
+                          onPressed: flip),
+                    ),
+                  ),
+                  Expanded(
+                    child: FittedBox(
+                      child: IconButton(
+                          icon: Icon(
+                            Icons.rotate_right,
+                            color: Colors.black,
+                          ),
+                          onPressed: () => rotate(90)),
+                    ),
+                  ),
+                  Expanded(
+                    child: FittedBox(
+                      child: IconButton(
+                          icon: Icon(
+                            Icons.rotate_left,
+                            color: Colors.black,
+                          ),
+                          onPressed: () => rotate(-90)),
+                    ),
+                  ),
                 ],
-              ),
-              SliderTheme(
-                data: const SliderThemeData(
-                  showValueIndicator: ShowValueIndicator.always,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    _buildSat(),
-                    _buildBrightness(),
-                    _buildCon(),
-                  ],
-                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                                    IconButton(
-                      icon: Icon(
-                        Icons.delete_forever,
-                        color: Colors.black,
-                        size: 50,
-                      ),
-                      onPressed: (){}),
-                  IconButton(
-                      icon: Icon(
-                        Icons.visibility,
-                        color: Colors.black,
-                        size: 50,
-                      ),
-                      onPressed: showTextOptions),
-                  IconButton(
-                      icon: Icon(
-                        Icons.add,
-                        color: Colors.black,
-                        size: 50,
-                      ),
-                      onPressed: addFloatingButton),
+                  Expanded(
+                    child: FittedBox(
+                      child: IconButton(
+                          icon: Icon(
+                            Icons.delete_forever,
+                            color: Colors.black,
+                          ),
+                          onPressed: removeAllFloatingButton),
+                    ),
+                  ),
+                  Expanded(
+                    child: FittedBox(
+                      child: IconButton(
+                          icon: Icon(
+                            isTextOptionsVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Colors.black,
+                          ),
+                          onPressed: showTextOptions),
+                    ),
+                  ),
+                  Expanded(
+                    child: FittedBox(
+                      child: IconButton(
+                          icon: Icon(
+                            Icons.add,
+                            color: Colors.black,
+                          ),
+                          onPressed: addFloatingButton),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  SizedBox(
+                    width: 120,
+                    height: 200,
+                    child: ListWheelScrollView(
+                      itemExtent: 50,
+                      diameterRatio: 2,
+                      squeeze: 0.9,
+                      physics: FixedExtentScrollPhysics(),
+                      children: _buildColors(),
+                      onSelectedItemChanged: (index) {
+                        setState(() {
+                          if (index == 0)
+                            colorFilter = null;
+                          else
+                            colorFilter = colors[index - 1];
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: 120,
+                    height: 200,
+                    child: ListWheelScrollView(
+                      itemExtent: 50,
+                      diameterRatio: 2,
+                      physics: FixedExtentScrollPhysics(),
+                      squeeze: 0.9,
+                      children: blendModes
+                          .map((blendMode) => Center(
+                              child: Text(
+                                  blendMode.toString()[10].toUpperCase() +
+                                      blendMode.toString().substring(11),
+                                  style: TextStyle(fontSize: 20))))
+                          .toList(),
+                      onSelectedItemChanged: (index) {
+                        setState(() {
+                          blendMode = blendModes[index];
+                        });
+                      },
+                    ),
+                  )
                 ],
               ),
             ]),
@@ -333,13 +363,30 @@ class _ImageEditorPageState extends State<ImageEditorPage>
           indicator: UnderlineTabIndicator(borderSide: BorderSide(width: 0)),
           controller: tabController,
           tabs: [
-            Tab(
-              icon: Icon(Icons.flip),
-            ),
-            Tab(icon: Icon(Icons.brightness_6)),
+            Tab(icon: Icon(Icons.flip)),
             Tab(icon: Icon(Icons.text_fields)),
+            Tab(icon: Icon(Icons.brightness_6)),
           ]),
     );
+  }
+
+  List<Widget> _buildColors() {
+    List<Widget> colorWidgets = colors
+        .map((color) => Container(
+              decoration: BoxDecoration(
+                  border: color == Colors.white ? Border.all(width: 1) : null,
+                  color: color,
+                  shape: BoxShape.circle),
+            ))
+        .toList();
+    colorWidgets.insert(
+        0,
+        Container(
+          decoration: BoxDecoration(
+              border: Border.all(width: 1), shape: BoxShape.circle),
+          child: FittedBox(child: Icon(Icons.clear)),
+        ));
+    return colorWidgets;
   }
 }
 
@@ -347,8 +394,7 @@ class FloatingText extends StatefulWidget {
   Function remove;
   Key key;
   bool isTextOptionsVisible;
-  FloatingText(
-      {@required this.remove, this.key, this.isTextOptionsVisible = true});
+  FloatingText({@required this.remove, this.key, this.isTextOptionsVisible});
   @override
   _FloatingTextState createState() => _FloatingTextState();
 }
@@ -362,6 +408,7 @@ class _FloatingTextState extends State<FloatingText> {
   GlobalKey<FittedTextFieldContainerState> keyText =
       GlobalKey<FittedTextFieldContainerState>();
   Color textColor = Colors.white;
+  bool _isTextOptionsVisible;
 
   @override
   void dispose() {
@@ -372,6 +419,8 @@ class _FloatingTextState extends State<FloatingText> {
 
   @override
   Widget build(BuildContext context) {
+    _isTextOptionsVisible = widget.isTextOptionsVisible;
+    print(_isTextOptionsVisible);
     changeColor(Color color) {
       setState(() {
         textColor = color;
@@ -410,7 +459,7 @@ class _FloatingTextState extends State<FloatingText> {
               });
             },
           ),
-          if (widget.isTextOptionsVisible)
+          if (_isTextOptionsVisible)
             Row(
               children: <Widget>[
                 GestureDetector(
@@ -429,7 +478,7 @@ class _FloatingTextState extends State<FloatingText> {
                       ),
                     ),
                   ),
-                  onTap: () => widget.remove(this.widget),
+                  onTap: () => widget.remove(widget.key),
                 ),
                 SizedBox(
                   width: 5,
@@ -488,19 +537,6 @@ class TextColorButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Color> colors = [
-      Colors.white,
-      Colors.black,
-      Colors.red,
-      Colors.yellow,
-      Colors.orange,
-      Colors.blue,
-      Colors.green,
-      Colors.pink,
-      Colors.purple,
-      Colors.lime
-    ];
-
     return GestureDetector(
       child: SizedBox(
         width: scaleFactor < 40 ? 20 : scaleFactor * 0.5,
@@ -516,39 +552,46 @@ class TextColorButton extends StatelessWidget {
           ),
         ),
       ),
-      onTap: () {
-        showBottomSheet(
-          context: context,
-          builder: (context) {
-            return Container(
-              height: 50,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListView.separated(
-                  itemCount: colors.length,
-                  scrollDirection: Axis.horizontal,
-                  separatorBuilder: (context, index) => SizedBox(width: 5),
-                  itemBuilder: (context, index) => GestureDetector(
-                    child: FittedBox(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Material(
-                          color: colors[index],
-                          elevation: 2,
-                          child: Padding(
-                              padding: const EdgeInsets.all(2),
-                              child: Container()),
-                        ),
-                      ),
-                    ),
-                    onTap: () => changeColor(colors[index]),
-                  ),
-                ),
-              ),
-            );
-          },
-        );
+      onTap: () async {
+        Color color = await buildColorsBottomSheet(context);
+        print(color);
+        if (color != null) changeColor(color);
       },
     );
   }
+}
+
+Future<Color> buildColorsBottomSheet(BuildContext context) {
+  return showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return Container(
+        height: 50,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.separated(
+            itemCount: colors.length,
+            scrollDirection: Axis.horizontal,
+            separatorBuilder: (context, index) => SizedBox(width: 5),
+            itemBuilder: (context, index) => GestureDetector(
+                child: FittedBox(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Material(
+                      color: colors[index],
+                      elevation: 2,
+                      child: Padding(
+                          padding: const EdgeInsets.all(2), child: Container()),
+                    ),
+                  ),
+                ),
+                onTap: () {
+                  print(colors[index]);
+                  Navigator.pop(context, colors[index]);
+                }),
+          ),
+        ),
+      );
+    },
+  );
 }

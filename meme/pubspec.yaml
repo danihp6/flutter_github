@@ -49,7 +49,9 @@ dependencies:
   extended_image: ^0.9.0
   oktoast: ^2.3.2
   image_gallery_saver: ^1.5.0
-  fitted_text_field_container: ^1.2.1
+  fitted_text_field_container: 
+    path: ./fitted_text_field_container-1.2.1/
+  matrix4_transform: ^1.1.4
   flutter:
     sdk: flutter
 

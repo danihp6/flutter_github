@@ -64,7 +64,8 @@ class _CameraPageState extends State<CameraPage> {
     Navigator.push(
         context,
         SlideLeftRoute(
-            page: UploadPublicationPage(file: file, mediaType:MediaType.image)));
+            page:
+                UploadPublicationPage(file: file, mediaType: MediaType.image)));
   }
 
   Future<String> startVideoRecording() async {
@@ -151,7 +152,8 @@ class _CameraPageState extends State<CameraPage> {
       Navigator.push(
           context,
           SlideLeftRoute(
-              page: UploadPublicationPage(file: file, mediaType:MediaType.video)));
+              page: UploadPublicationPage(
+                  file: file, mediaType: MediaType.video)));
     });
   }
 
@@ -214,47 +216,65 @@ class _CameraPageState extends State<CameraPage> {
           ),
           Expanded(
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.camera_alt),
-                  color: Colors.blue,
-                  onPressed: controller != null &&
-                          controller.value.isInitialized &&
-                          !controller.value.isRecordingVideo
-                      ? onTakePictureButtonPressed
-                      : null,
+                Expanded(
+                  child: FittedBox(
+                    child: IconButton(
+                      icon: Icon(Icons.camera_alt),
+                      color: Theme.of(context).accentColor,
+                      onPressed: controller != null &&
+                              controller.value.isInitialized &&
+                              !controller.value.isRecordingVideo
+                          ? onTakePictureButtonPressed
+                          : null,
+                    ),
+                  ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.videocam),
-                  color: Colors.blue,
-                  onPressed: controller != null &&
-                          controller.value.isInitialized &&
-                          !controller.value.isRecordingVideo
-                      ? onVideoRecordButtonPressed
-                      : null,
+                Expanded(
+                  child: FittedBox(
+                    child: IconButton(
+                      icon: const Icon(Icons.videocam),
+                      color: Theme.of(context).accentColor,
+                      onPressed: controller != null &&
+                              controller.value.isInitialized &&
+                              !controller.value.isRecordingVideo
+                          ? onVideoRecordButtonPressed
+                          : null,
+                    ),
+                  ),
                 ),
-                IconButton(
-                  icon: controller != null && controller.value.isRecordingPaused
-                      ? Icon(Icons.play_arrow)
-                      : Icon(Icons.pause),
-                  color: Colors.blue,
-                  onPressed: controller != null &&
-                          controller.value.isInitialized &&
-                          controller.value.isRecordingVideo
-                      ? (controller != null &&
+                Expanded(
+                  child: FittedBox(
+                    child: IconButton(
+                      icon: controller != null &&
                               controller.value.isRecordingPaused
-                          ? onResumeButtonPressed
-                          : onPauseButtonPressed)
-                      : null,
+                          ? Icon(Icons.play_arrow)
+                          : Icon(Icons.pause),
+                      color: Theme.of(context).accentColor,
+                      onPressed: controller != null &&
+                              controller.value.isInitialized &&
+                              controller.value.isRecordingVideo
+                          ? (controller != null &&
+                                  controller.value.isRecordingPaused
+                              ? onResumeButtonPressed
+                              : onPauseButtonPressed)
+                          : null,
+                    ),
+                  ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.stop),
-                  color: Colors.red,
-                  onPressed: controller != null &&
-                          controller.value.isInitialized &&
-                          controller.value.isRecordingVideo
-                      ? onStopButtonPressed
-                      : null,
+                Expanded(
+                  child: FittedBox(
+                    child: IconButton(
+                      icon: const Icon(Icons.stop),
+                      color: Colors.red,
+                      onPressed: controller != null &&
+                              controller.value.isInitialized &&
+                              controller.value.isRecordingVideo
+                          ? onStopButtonPressed
+                          : null,
+                    ),
+                  ),
                 )
               ],
             ),

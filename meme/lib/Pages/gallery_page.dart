@@ -10,7 +10,6 @@ import 'package:meme/Controller/gallery.dart';
 import 'package:meme/Pages/image_editor_page.dart';
 import 'package:meme/Pages/upload_publication_page.dart';
 import 'package:meme/Widgets/loading.dart';
-import 'package:meme/Widgets/media_provider.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:transparent_image/transparent_image.dart';
 
@@ -56,6 +55,8 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   Widget build(BuildContext context) {
     if (page == null) return Scaffold(body: Loading());
+
+    print(page.items);
 
     Future<Widget> _buildPreview() async {
       if (selectedMedia.mediaType == MediaType.image) {
@@ -132,6 +133,13 @@ class _GalleryPageState extends State<GalleryPage> {
       return result;
     }
 
+    Future goUploadMedia() async {
+      String path = await ImageGallerySaver.saveImage(await save());
+      print(path);
+      File file = File(path.substring(7));
+      widget.onMediaSelected(file, selectedMedia.mediaType);
+    }
+
     return Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(40),
@@ -141,6 +149,7 @@ class _GalleryPageState extends State<GalleryPage> {
               icon: Icon(icon),
               onPressed: () {
                 setState(() {
+                  print(page == gallery.imagePage);
                   page = page == gallery.imagePage
                       ? gallery.videoPage
                       : gallery.imagePage;
@@ -151,47 +160,72 @@ class _GalleryPageState extends State<GalleryPage> {
             actions: <Widget>[
               IconButton(
                   icon: Icon(Icons.arrow_forward),
-                  onPressed: () async {
-                    String path =
-                        await ImageGallerySaver.saveImage(await save());
-                    print(path);
-                    File file = File(path.substring(7));
-                    widget.onMediaSelected(file, selectedMedia.mediaType);
-                  })
+                  onPressed: page.items.isNotEmpty
+                      ? () {
+                          goUploadMedia();
+                        }
+                      : null)
             ],
           ),
         ),
-        body: Column(
-          children: <Widget>[
-            AspectRatio(
-                aspectRatio: 1,
-                child: FutureBuilder(
-                  future: _buildPreview(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) print(snapshot.error.toString());
-                    if (!snapshot.hasData)
-                      return Image.memory(kTransparentImage);
-                    return snapshot.data;
-                  },
-                )),
-            Expanded(
-              child: GridView.builder(
-                  itemCount: mediaList.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      crossAxisSpacing: 1,
-                      mainAxisSpacing: 1),
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                        child: MediaProvider(media: mediaList[index]),
-                        onTap: () {
-                          selectedMedia = mediaList[index];
+        body: page.items.isNotEmpty
+            ? Column(
+                children: <Widget>[
+                  AspectRatio(
+                      aspectRatio: 1,
+                      child: FutureBuilder(
+                        future: _buildPreview(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError)
+                            print(snapshot.error.toString());
+                          if (!snapshot.hasData)
+                            return Image.memory(kTransparentImage);
+                          return snapshot.data;
+                        },
+                      )),
+                  Expanded(
+                    child: GridView.builder(
+                        itemCount: mediaList.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            crossAxisSpacing: 1,
+                            mainAxisSpacing: 1),
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                              child: MediaProvider(media: mediaList[index]),
+                              onTap: () {
+                                selectedMedia = mediaList[index];
 
-                          setState(() {});
-                        });
-                  }),
-            ),
-          ],
-        ));
+                                setState(() {});
+                              });
+                        }),
+                  ),
+                ],
+              )
+            : Center(child: Text('No hay contenido disponible')));
+  }
+}
+
+class MediaProvider extends StatelessWidget {
+  Media media;
+  MediaProvider({@required this.media});
+
+  @override
+  Widget build(BuildContext context) {
+    if (media.mediaType == MediaType.image)
+      return FadeInImage(
+        fit: BoxFit.cover,
+        placeholder: MemoryImage(kTransparentImage),
+        image: MediaImageProvider(
+          media: media,
+        ),
+      );
+    return FadeInImage(
+      fit: BoxFit.cover,
+      placeholder: MemoryImage(kTransparentImage),
+      image: MediaThumbnailProvider(
+        media: media,
+      ),
+    );
   }
 }

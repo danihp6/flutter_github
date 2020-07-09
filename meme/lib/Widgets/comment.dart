@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/datetime_functions.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Comment.dart';
@@ -120,7 +121,7 @@ class _CommentWidgetState extends State<CommentWidget> {
             child: SizedBox(
                 width: 200,
                 child: AspectRatio(aspectRatio: 1,
-                child: _comment.mediaType == 'image'
+                child: _comment.mediaType == MediaType.image
                     ? Image.network(_comment.media)
                     : VideoPlayerWidget(
                         url: _comment.media,

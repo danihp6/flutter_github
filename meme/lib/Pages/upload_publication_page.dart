@@ -5,7 +5,6 @@ import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Tag.dart';
 import 'package:meme/Widgets/loading.dart';
-import 'package:meme/Widgets/media_provider.dart';
 import '../Widgets/video_player.dart';
 
 import '../Models/Post.dart';
@@ -45,7 +44,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
       List<String> tagsId = await db.createTags(tags);
       String postId = await db.newPost(
           db.userId,
-          new Post('', _description, _mediaType.toString(), <String>[],
+          new Post('', _description, _mediaType, <String>[],
               DateTime.now(), '', db.userId, tagsId, Map<String, dynamic>()),
           _file);
       tagsId.forEach((id) {

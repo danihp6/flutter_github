@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/string_functions.dart';
@@ -37,7 +38,7 @@ class _AddCommentFieldState extends State<AddCommentField> {
   List<String> userMentions = [];
   int startWordIndex;
   String media = '';
-  String mediaType = '';
+  MediaType mediaType;
 
   @override
   void initState() {
@@ -168,7 +169,7 @@ class _AddCommentFieldState extends State<AddCommentField> {
                     width: 200,
                     child: AspectRatio(
                       aspectRatio: 1,
-                      child: mediaType == 'image'
+                      child: mediaType == MediaType.image
                           ? Image.network(media)
                           : VideoPlayerWidget(
                               url: media,
@@ -179,7 +180,7 @@ class _AddCommentFieldState extends State<AddCommentField> {
                     onPressed: () {
                       setState(() {
                         media = '';
-                        mediaType = '';
+                        mediaType = null;
                       });
                     })
               ],

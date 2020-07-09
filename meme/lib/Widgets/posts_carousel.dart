@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
+import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Pages/post_page.dart';
@@ -38,7 +39,7 @@ class _PostsCarouselState extends State<PostsCarousel> {
             return GestureDetector(
                 child: AspectRatio(
                   aspectRatio: 1,
-                  child: post.mediaType == 'image'
+                  child: post.mediaType == MediaType.image
                       ? FadeInImage(
                         fit: BoxFit.cover,
                         placeholder: MemoryImage(kTransparentImage),

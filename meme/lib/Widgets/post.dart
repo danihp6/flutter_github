@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
@@ -59,7 +60,7 @@ class _PostWidgetState extends State<PostWidget> {
               ),
             AspectRatio(
               aspectRatio: 1,
-              child: widget.post.mediaType == 'image'
+              child: widget.post.mediaType == MediaType.image
                   ? GestureDetector(
                       child: Image.network(
                         widget.post.media,
