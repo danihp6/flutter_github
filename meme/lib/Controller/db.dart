@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:meme/Controller/gallery.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
@@ -34,10 +36,10 @@ class DataBase {
   }
 
   Future editUser(String userId, String name, String description, String avatar,
-      String avatarLocation, File file) async {
-    if (file != null) {
+      String avatarLocation, ImageMedia imageMedia) async {
+    if (imageMedia != null) {
       if (avatar != '') mediaStorage.deleteFile(avatarLocation);
-      Map map = await mediaStorage.uploadAvatar(file, userId);
+      Map map = await mediaStorage.uploadAvatar(imageMedia, userId);
       avatar = map['media'];
       avatarLocation = map['location'];
     }
@@ -167,8 +169,8 @@ class DataBase {
     });
   }
 
-  Future<String> newPost(String userId, Post post, File file) async {
-    Map map = await mediaStorage.uploadMedia(file, userId);
+  Future<String> newPost(String userId, Post post, MyMedia media) async {
+    Map map = await mediaStorage.uploadMedia(media, userId);
     post.media = map['media'];
     post.mediaLocation = map['location'];
     String id = (await _firestore
@@ -237,9 +239,9 @@ class DataBase {
       .snapshots()
       .map(toPostLists);
 
-  Future newPostList(String userId, PostList postList, File file) async {
-    if (file != null) {
-      Map map = await mediaStorage.uploadMedia(file, userId);
+  Future newPostList(String userId, PostList postList, ImageMedia imageMedia) async {
+    if (imageMedia != null) {
+      Map map = await mediaStorage.uploadMedia(imageMedia, userId);
       postList.image = map['media'];
       postList.imageLocation = map['location'];
     }

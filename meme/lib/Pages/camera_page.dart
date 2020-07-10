@@ -1,8 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:media_gallery/media_gallery.dart';
+import 'package:meme/Controller/gallery.dart';
 import 'package:meme/Pages/upload_publication_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:path_provider/path_provider.dart';
@@ -60,12 +62,12 @@ class _CameraPageState extends State<CameraPage> {
   }
 
   void onTakePictureButtonPressed() async {
-    File file = File(await takePicture());
+    Uint8List image = await File(await takePicture()).readAsBytes();
     Navigator.push(
         context,
         SlideLeftRoute(
             page:
-                UploadPublicationPage(file: file, mediaType: MediaType.image)));
+                UploadPublicationPage(media: ImageMedia(image,1),)));
   }
 
   Future<String> startVideoRecording() async {
@@ -153,7 +155,7 @@ class _CameraPageState extends State<CameraPage> {
           context,
           SlideLeftRoute(
               page: UploadPublicationPage(
-                  file: file, mediaType: MediaType.video)));
+                  media: VideoMedia(file, null,1),)));
     });
   }
 

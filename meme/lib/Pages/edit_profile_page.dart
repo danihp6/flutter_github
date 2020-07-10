@@ -1,10 +1,13 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/media_storage.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Widgets/loading.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'gallery_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
@@ -26,7 +29,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String _description;
   String _avatar;
   String _avatarLocation;
-  File _file;
+  Uint8List _file;
   TextEditingController _nameController, _descriptionController;
 
   @override
@@ -39,8 +42,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _descriptionController = new TextEditingController(text: _description);
     _avatar = _user.avatar;
     _avatarLocation = _user.avatarLocation;
-    gallery.getMediaGallery().then((_) {
-    });
+    gallery.getMediaGallery().then((_) {});
   }
 
   @override
@@ -53,23 +55,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     editUser() {
-      db.editUser(
-          _user.id, _userName, _description, _avatar, _avatarLocation, _file);
+      db.editUser(_user.id, _userName, _description, _avatar, _avatarLocation,
+          ImageMedia(_file, 1));
       Navigator.pop(context);
     }
 
     editAvatar(Media media) async {
-      File cropedImage = null;///////////
-      if (cropedImage != null) _file = cropedImage;
-      setState(() {});
-      Navigator.pop(context);
+      // File cropedImage = null;
+      // if (cropedImage != null) _file = cropedImage;
+      // setState(() {});
+      // Navigator.pop(context);
     }
 
     image() {
       if (_file == null && _avatar == '')
         return AssetImage('assets/images/user.png');
-      else if (_file == null) return NetworkImage(_avatar);
-      return FileImage(_file);
+      else if (_file == null)
+        return CachedNetworkImage(
+          imageUrl: _avatar,
+          placeholder: (context, url) => Loading(),
+          errorWidget: (context, url, error) => Container(),
+        );
+      return MemoryImage(_file);
     }
 
     return Scaffold(
@@ -93,9 +100,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ? Navigator.push(
                         context,
                         SlideLeftRoute(
-                            page: GalleryPage(
-                          onMediaSelected: editAvatar
-                        )))
+                            page: GalleryPage(onMediaSelected: editAvatar)))
                     : null,
               ),
               SizedBox(

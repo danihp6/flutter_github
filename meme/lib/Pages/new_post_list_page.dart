@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
@@ -18,7 +19,7 @@ class NewPostListPage extends StatefulWidget {
 
 class _NewPostListPageState extends State<NewPostListPage> {
   String _name = '';
-  File _file;
+  Uint8List _file;
   String _image = '';
   String _imageLocation = '';
 
@@ -36,12 +37,12 @@ class _NewPostListPageState extends State<NewPostListPage> {
             db.userId,
             new PostList(_name, _image, _imageLocation, <String>[], db.userId,
                 DateTime.now()),
-            _file);
+            ImageMedia(_file,1));
         Navigator.pop(context);
       }
     }
 
-    selectImage(File file) {
+    selectImage(Uint8List file) {
       setState(() {
         _file = file;
       });
@@ -76,7 +77,7 @@ class _NewPostListPageState extends State<NewPostListPage> {
                     height: 150,
                     color: Colors.grey[300],
                     child: _file != null
-                        ? Expanded(child: Image.file(_file))
+                        ? Expanded(child: Image.memory(_file))
                         : Container(),
                   ),
                 ),

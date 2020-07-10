@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/gallery.dart';
 import 'package:meme/Models/Tag.dart';
 import 'package:meme/Widgets/loading.dart';
 import '../Widgets/video_player.dart';
@@ -11,26 +12,23 @@ import '../Models/Post.dart';
 import '../Widgets/tag_selector.dart';
 
 class UploadPublicationPage extends StatefulWidget {
-  File file;
-  MediaType mediaType;
-  UploadPublicationPage({@required this.file, @required this.mediaType});
+  MyMedia media;
+  UploadPublicationPage({@required this.media});
 
   @override
   _UploadPublicationPageState createState() => _UploadPublicationPageState();
 }
 
 class _UploadPublicationPageState extends State<UploadPublicationPage> {
+  MyMedia _media;
   String _description = '';
-  File _file;
-  MediaType _mediaType;
   List<Tag> tags = <Tag>[];
   bool activedUpload;
 
   @override
   void initState() {
+    _media = widget.media;
     activedUpload = true;
-    _file = widget.file;
-    _mediaType = widget.mediaType;
     super.initState();
   }
 
@@ -44,9 +42,9 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
       List<String> tagsId = await db.createTags(tags);
       String postId = await db.newPost(
           db.userId,
-          new Post('', _description, _mediaType, <String>[],
-              DateTime.now(), '', db.userId, tagsId, Map<String, dynamic>()),
-          _file);
+          new Post('', _description, _media is ImageMedia?MediaType.image:MediaType.video, <String>[],
+              DateTime.now(), '', db.userId, tagsId, Map<String, dynamic>(),_media.aspectRatio),
+          _media);
       tagsId.forEach((id) {
         db.addPostToTag(id, db.userId, postId);
       });
@@ -72,9 +70,9 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
         body: SingleChildScrollView(
           child: Column(
             children: [
-              _mediaType == MediaType.image
-                  ? AspectRatio(aspectRatio: 1, child: Image.file(_file,fit: BoxFit.cover,))
-                  : VideoPlayerWidget(file: _file),
+              _media is ImageMedia
+                  ? AspectRatio(aspectRatio: _media.aspectRatio, child: Image.memory((_media as ImageMedia).image,fit: BoxFit.cover,))
+                  : VideoPlayerWidget(file: (_media as VideoMedia).video),
               SizedBox(height: 20),
               SizedBox(
                 width: 300,

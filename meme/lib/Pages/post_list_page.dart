@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Models/PostList.dart';
@@ -41,7 +42,11 @@ class _PostListPageState extends State<PostListPage> {
                     background: _postList.image != ''
                         ? Padding(
                             padding: const EdgeInsets.all(50),
-                            child: Image.network(postList.image),
+                            child: CachedNetworkImage(
+                              imageUrl: postList.image,
+                              placeholder: (context, url) => Loading(),
+                              errorWidget: (context, url, error) => Container(),
+                            ),
                           )
                         : Container(),
                   ),

@@ -37,11 +37,11 @@ class _SelectMediaPageState extends State<SelectMediaPage>
   @override
   Widget build(BuildContext context) {
     
-    onSelectMedia(File file,MediaType mediaType) async {
+    onMediaSelected(MyMedia media) async {
         Navigator.push(
             context,
             SlideLeftRoute(
-                page: UploadPublicationPage(file: file,mediaType: mediaType)));
+                page: UploadPublicationPage(media:media)));
     }
 
     return Scaffold(
@@ -51,7 +51,7 @@ class _SelectMediaPageState extends State<SelectMediaPage>
         physics: NeverScrollableScrollPhysics(),
         children: [
           GalleryPage(
-            onMediaSelected: onSelectMedia
+            onMediaSelected: onMediaSelected
           ),
           CameraPage()
         ],

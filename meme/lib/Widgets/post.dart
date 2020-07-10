@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/Configuration.dart';
@@ -59,14 +60,14 @@ class _PostWidgetState extends State<PostWidget> {
                     )),
               ),
             AspectRatio(
-              aspectRatio: 1,
+              aspectRatio: widget.post.aspectRatio,
               child: widget.post.mediaType == MediaType.image
                   ? GestureDetector(
-                      child: Image.network(
-                        widget.post.media,
+                      child: CachedNetworkImage(
+                        imageUrl:widget.post.media,
+                        placeholder: (context, url) => Loading(),
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          print(error);
+                        errorWidget: (context, url, error) {
                           return Container();
                         },
                       ),

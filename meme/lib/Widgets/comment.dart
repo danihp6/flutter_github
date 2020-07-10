@@ -11,6 +11,7 @@ import 'package:meme/Widgets/user_avatar.dart';
 import 'package:meme/Widgets/video_player.dart';
 import '../Controller/db.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class CommentWidget extends StatefulWidget {
   Comment comment;
@@ -115,17 +116,23 @@ class _CommentWidgetState extends State<CommentWidget> {
                 ),
               );
             }),
-            if(_comment.media != '')
-            Padding(
+        if (_comment.media != '')
+          Padding(
             padding: const EdgeInsets.all(8.0),
             child: SizedBox(
                 width: 200,
-                child: AspectRatio(aspectRatio: 1,
-                child: _comment.mediaType == MediaType.image
-                    ? Image.network(_comment.media)
-                    : VideoPlayerWidget(
-                        url: _comment.media,
-                      ),)),
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: _comment.mediaType == MediaType.image
+                      ? CachedNetworkImage(
+                          imageUrl: _comment.media,
+                          placeholder: (context, url) => Loading(),
+                          errorWidget: (context, url, error) => Container(),
+                        )
+                      : VideoPlayerWidget(
+                          url: _comment.media,
+                        ),
+                )),
           ),
         if (widget.activeInnerComments &&
             _innerCommentsId.length > 0 &&

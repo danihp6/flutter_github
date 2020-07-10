@@ -14,9 +14,10 @@ class Post {
   String _author;
   List<String> _tags;
   Map<String, dynamic> _hotPoints;
+  double _aspectRatio;
 
   Post(media, description, mediaType, favourites, dateTime, mediaLocation,
-      authorId, tags,hotPoints) {
+      authorId, tags,hotPoints,aspectRatio) {
     this._media = media;
     this._mediaType = mediaType;
     this._description = description;
@@ -26,6 +27,7 @@ class Post {
     this._author = authorId;
     this._tags = tags;
     this._hotPoints = hotPoints;
+    this._aspectRatio = aspectRatio;
   }
 
   Post.fromFirestore(DocumentSnapshot doc)
@@ -38,7 +40,8 @@ class Post {
         _mediaLocation = doc.data['mediaLocation'],
         _author = doc.reference.parent().parent().documentID,
         _tags = List<String>.from(doc.data['tags']),
-        _hotPoints = doc.data['hotPoints'];
+        _hotPoints = doc.data['hotPoints'],
+        _aspectRatio = doc.data['aspectRatio'].toDouble();
 
   Map<String, dynamic> toFirestore() => {
         'media': _media,
@@ -48,7 +51,8 @@ class Post {
         'dateTime': _dateTime,
         'mediaLocation': _mediaLocation,
         'tags': _tags,
-        'hotPoints': _hotPoints
+        'hotPoints': _hotPoints,
+        'aspectRatio':_aspectRatio
       };
 
   get id => this._id;
@@ -90,6 +94,10 @@ class Post {
   get hotPoints => this._hotPoints;
 
   set hotPoints(hotPoints) => this._hotPoints = hotPoints;
+
+    get aspectRatio => this._aspectRatio;
+
+  set aspectRatio(aspectRatio) => this._aspectRatio = aspectRatio;
 
   int getTotalHotPoints() {
     int res = 0;
