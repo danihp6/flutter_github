@@ -55,6 +55,8 @@ class _GalleryPageState extends State<GalleryPage> {
   Widget build(BuildContext context) {
     if (mediaList == null) return Scaffold(body: Loading());
 
+    if(mediaList.isEmpty) return Scaffold(body: Text('No hay contenido en la galeria'),);
+
     selectedMedia.aspectRatio = aspectRatio;
 
     changeAspectRatio() {

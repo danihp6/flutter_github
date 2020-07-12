@@ -45,7 +45,7 @@ class ShareButton extends StatelessWidget {
                             Navigator.pop(context);
                             _scaffoldState.currentState
                                 .showSnackBar(SnackBar(
-                                    duration: Duration(seconds: 1),
+                                    duration: Duration(seconds: 2),
                                     content:
                                         new Text("Copiado al portapapeles")));
                           },

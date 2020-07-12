@@ -1,9 +1,10 @@
 const functions = require('firebase-functions');
-
 const admin = require('firebase-admin');
+
 admin.initializeApp(functions.config().firebase);
 
 var db = admin.firestore()
+var auth = admin.auth()
 
 exports.onDeletePost = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onDelete(async (snap, context) => {
   var path = snap.ref.path
@@ -198,4 +199,24 @@ exports.onCreateNotification = functions.region('europe-west2').firestore.docume
   tokens.forEach(token => {
     admin.messaging().sendToDevice(token, payload);
   });
+})
+
+exports.onCreateReport = functions.region('europe-west2').firestore.document('users/{userId}/reports/{reportId}').onCreate(async (snap, context) => {
+  var userId = context.params.userId
+  var userRef = db.collection('users').doc(userId)
+  var userData = (await userRef.get()).data()
+  var userEmail = userData['email']
+  var userFollowers = userData['followers'].length
+  var minReports
+  if(userFollowers < 400) minReports = 100
+  else minReports = userFollowers * 0.25
+  var oneMonthAgo = new Date(Date.now())
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+  var reports = userRef.collection('reports').limit(50).where('dateTime', '>=', admin.firestore.Timestamp.fromDate(oneMonthAgo))
+  if ((await reports.get()).size > minReports) {
+    var uid = (await auth.getUserByEmail(userEmail)).uid
+    auth.updateUser(uid, {
+      disabled: true
+    })
+  }
 })

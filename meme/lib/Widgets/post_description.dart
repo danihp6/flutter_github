@@ -31,7 +31,7 @@ class PostDescription extends StatefulWidget {
 
 class _PostDescriptionState extends State<PostDescription> {
   double _min = 0;
-  double _max = 100;
+  double _max = 5;
   bool _isHotSliderActived = false;
   bool _isHandlerActived = true;
   double _value;

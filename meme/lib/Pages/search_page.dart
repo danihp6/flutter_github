@@ -217,13 +217,13 @@ class _SearchPageState extends State<SearchPage>
         );
     }
 
-      goPost(Post post) => Navigator.push(
-      context,
-      SlideLeftRoute(
-          page: PostPage(
-        authorId: post.author,
-        postId: post.id,
-      )));
+    goPost(Post post) => Navigator.push(
+        context,
+        SlideLeftRoute(
+            page: PostPage(
+          authorId: post.author,
+          postId: post.id,
+        )));
 
     return WillPopScope(
       onWillPop: onWillPop,
@@ -282,14 +282,10 @@ class _SearchPageState extends State<SearchPage>
                                             SizedBox(
                                               height: 5,
                                             ),
-                                            SizedBox(
-                                              height: 200,
-                                              child: 
-                                                     PostsCarousel(
-                                                      posts: posts,
-                                                      onTap: goPost,
-                                                    ))
-                                                  
+                                            PostsCarousel(
+                                              posts: posts,
+                                              onTap: goPost,
+                                            )
                                           ],
                                         ),
                                       );
@@ -411,4 +407,3 @@ class _SearchPageState extends State<SearchPage>
     );
   }
 }
-

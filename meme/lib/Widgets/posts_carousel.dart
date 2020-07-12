@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
@@ -11,10 +12,11 @@ import 'package:meme/Widgets/video_player.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class PostsCarousel extends StatefulWidget {
-  PostsCarousel({@required this.posts, @required this.onTap});
+  PostsCarousel({@required this.posts, @required this.onTap,this.height = 200});
 
   List<String> posts;
   Function onTap;
+  double height;
 
   @override
   _PostsCarouselState createState() => _PostsCarouselState();
@@ -43,7 +45,7 @@ class _PostsCarouselState extends State<PostsCarousel> {
                       ? FadeInImage(
                         fit: BoxFit.cover,
                         placeholder: MemoryImage(kTransparentImage),
-                        image: NetworkImage(post.media))
+                        image: CachedNetworkImageProvider(post.media))
                       : VideoPlayerWidget(
                           url: post.media,
                           isPausable: false,
@@ -84,9 +86,8 @@ class _PostsCarouselState extends State<PostsCarousel> {
               autoPlayAnimationDuration: Duration(seconds: 5),
               autoPlayInterval: Duration(seconds: 8),
               autoPlayCurve: Curves.decelerate,
-              height: 240,
               pauseAutoPlayOnManualNavigate: true,
-
+              height: widget.height
             ),
             items: carousel(widget.posts),
           ),

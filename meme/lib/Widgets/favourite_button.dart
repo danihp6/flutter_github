@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Models/Post.dart';
-import 'package:meme/Models/PostList.dart';
-import 'package:meme/Models/User.dart';
-import 'package:meme/Widgets/loading.dart';
+
 import '../Controller/db.dart';
 
 class FavouriteButton extends StatefulWidget {

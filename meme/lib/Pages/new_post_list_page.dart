@@ -19,9 +19,7 @@ class NewPostListPage extends StatefulWidget {
 
 class _NewPostListPageState extends State<NewPostListPage> {
   String _name = '';
-  Uint8List _file;
-  String _image = '';
-  String _imageLocation = '';
+  ImageMedia _media;
 
   @override
   void initState() {
@@ -35,16 +33,16 @@ class _NewPostListPageState extends State<NewPostListPage> {
       if (_name != '') {
         db.newPostList(
             db.userId,
-            new PostList(_name, _image, _imageLocation, <String>[], db.userId,
+            new PostList(_name, '', '', <String>[], db.userId,
                 DateTime.now()),
-            ImageMedia(_file,1));
+            _media);
         Navigator.pop(context);
       }
     }
 
-    selectImage(Uint8List file) {
+    selectImage(ImageMedia media) {
       setState(() {
-        _file = file;
+        _media = media;
       });
       Navigator.pop(context);
     }
@@ -76,8 +74,8 @@ class _NewPostListPageState extends State<NewPostListPage> {
                     width: 150,
                     height: 150,
                     color: Colors.grey[300],
-                    child: _file != null
-                        ? Expanded(child: Image.memory(_file))
+                    child: _media != null
+                        ? Expanded(child: Image.memory(_media.image))
                         : Container(),
                   ),
                 ),

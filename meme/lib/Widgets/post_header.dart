@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/User.dart';
-import 'package:meme/Widgets/post_menu.dart';
+import 'post_more_button.dart';
 import 'package:meme/Widgets/share_button.dart';
 import 'package:meme/Widgets/user_avatar.dart';
 
@@ -11,13 +11,17 @@ class PostHeader extends StatelessWidget {
   PostList postList;
   User author;
   GlobalKey<ScaffoldState> scaffoldState;
-  PostHeader({@required this.post, this.postList, @required this.author,@required this.scaffoldState});
+  PostHeader(
+      {@required this.post,
+      this.postList,
+      @required this.author,
+      @required this.scaffoldState});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        UserAvatar(user: author),
+        SizedBox(height: 40, child: UserAvatar(user: author)),
         SizedBox(width: 10),
         Text(
           author.userName,
@@ -27,12 +31,16 @@ class PostHeader extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              ShareButton(authorId: post.author,postId: post.id,scaffoldState:scaffoldState),
+              ShareButton(
+                  authorId: post.author,
+                  postId: post.id,
+                  scaffoldState: scaffoldState),
               SizedBox(
                 width: 35,
-                child: PostMenu(
+                child: PostMoreButton(
                   post: post,
                   postList: postList,
+                  scaffoldState: scaffoldState,
                 ),
               )
             ],
@@ -42,5 +50,3 @@ class PostHeader extends StatelessWidget {
     );
   }
 }
-
-

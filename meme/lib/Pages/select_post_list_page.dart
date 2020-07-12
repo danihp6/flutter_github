@@ -3,7 +3,7 @@ import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Widgets/loading.dart';
-import 'package:meme/Widgets/new_post_list_button.dart';
+import 'package:meme/Widgets/post_list_new_button.dart';
 import 'package:meme/Widgets/post_list.dart';
 import '../Models/Post.dart';
 
@@ -27,7 +27,7 @@ class SelectPostList extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            NewPostListButton(),
+            PostListNewButton(),
             StreamBuilder(
                 stream: db.getPostLists(db.userId),
                 builder: (context, snapshot) {

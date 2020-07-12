@@ -1,8 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/media_storage.dart';
 import 'package:meme/Pages/post_list_page.dart';
+import 'package:meme/Widgets/post_list_more_button.dart';
 import 'package:meme/Widgets/posts_carousel.dart';
 
 import '../Models/PostList.dart';
@@ -34,6 +36,18 @@ class _PostListCarouselState extends State<PostListCarousel> {
         GestureDetector(
           child: Row(
             children: [
+            //   if(_postList.image != '')
+            //   Container(
+            //   height: 60,
+            //   width: 60,
+            //   color: Colors.grey[300],
+            //   child:
+            //        CachedNetworkImage(imageUrl:_postList.image),
+            // ),
+            // if(_postList.image != '')
+            // SizedBox(
+            //   width: 10,
+            // ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -53,29 +67,7 @@ class _PostListCarouselState extends State<PostListCarousel> {
                         alignment: Alignment.centerRight,
                         child: SizedBox(
                           width: 30,
-                          child: PopupMenuButton(
-                            child: Icon(Icons.more_vert),
-                            itemBuilder: (context) {
-                              return [
-                                PopupMenuItem(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.delete),
-                                      Text('Eliminar categoria')
-                                    ],
-                                  ),
-                                  value: () {
-                                    if (_postList.imageLocation != '')
-                                      mediaStorage
-                                          .deleteFile(_postList.imageLocation);
-                                    db.deletePostList(db.userId, _postList.id);
-                                  },
-                                )
-                              ];
-                            },
-                            onSelected: (function) => function(),
-                          ),
+                          child: PostListMoreButton(postList: _postList),
                         ),
                       ),
                     )
@@ -89,9 +81,9 @@ class _PostListCarouselState extends State<PostListCarousel> {
         ),
         if (posts.length > 0)
           PostsCarousel(
-            posts: posts,
-            onTap: widget.onTapPost,
-          )
+              posts: posts,
+              onTap: widget.onTapPost,
+            )
       ],
     );
   }

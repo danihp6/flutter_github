@@ -100,6 +100,18 @@ class DataBase {
     });
   }
 
+  Future block(String userId,String blockedUser){
+    _firestore.document('users/$userId').updateData({
+      'blockedUsers':FieldValue.arrayUnion([blockedUser])
+    });
+  }
+
+    Future unblock(String userId,String blockedUser){
+    _firestore.document('users/$userId').updateData({
+      'blockedUsers':FieldValue.arrayRemove([blockedUser])
+    });
+  }
+
   Future<String> userIdByUserName(String userName) async {
     QuerySnapshot query = await _firestore
         .collection('users')
@@ -427,8 +439,8 @@ class DataBase {
   }
 
   //---------------REPORTS----------------//
-  Future newReport(String userId, Report report) =>
-      _firestore.collection('users/$userId/reports').add(report.toFirestore());
+  Future newReport(String reportedUserId, Report report) =>
+      _firestore.collection('users/$reportedUserId/reports').add(report.toFirestore());
 }
 
 DataBase db = new DataBase();

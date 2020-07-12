@@ -12,10 +12,10 @@ class HotSlider extends StatefulWidget {
   Color color;
   bool isHandlerActived;
   HotSlider(
-      {this.value = 50,
+      {this.value = 0,
       this.onDragCompleted,
       this.min = 0,
-      this.max = 100,
+      this.max = 5,
       this.isHotSliderActived = false,
       this.isHandlerActived = true,
       this.color = Colors.black});
@@ -73,20 +73,24 @@ class _HotSliderState extends State<HotSlider> {
       trackBar:
           FlutterSliderTrackBar(activeTrackBar: BoxDecoration(color: _color)),
       step: FlutterSliderStep(
-          step: 5, // default
+          step: 20, // default
           isPercentRange:
               true, // ranges are percents, 0% to 20% and so on... . default is true
           rangeList: [
-            FlutterSliderRangeStep(from: 1, to: 20, step: 20),
-            FlutterSliderRangeStep(from: 21, to: 39, step: 20),
-            FlutterSliderRangeStep(from: 40, to: 49, step: 10),
-            FlutterSliderRangeStep(from: 50, to: 50, step: 1),
-            FlutterSliderRangeStep(from: 51, to: 60, step: 10),
-            FlutterSliderRangeStep(from: 61, to: 80, step: 20),
-            FlutterSliderRangeStep(from: 81, to: 100, step: 20),
+            FlutterSliderRangeStep(from: 1, to: 20, step: 1),
+            FlutterSliderRangeStep(from: 21, to: 40, step: 2),
+            FlutterSliderRangeStep(from: 41, to: 60, step: 3),
+            FlutterSliderRangeStep(from: 61, to: 80, step: 4),
+            FlutterSliderRangeStep(from: 81, to: 99, step: 5),
+
           ]),
-      tooltip: FlutterSliderTooltip(disabled: true),
-      centeredOrigin: true,
+      tooltip: FlutterSliderTooltip(
+        format: (value) => double.parse(value).toInt().toString(),
+        textStyle: TextStyle(
+          color: Theme.of(context).accentColor,
+          fontSize: 16
+        )
+      ),
       onDragCompleted: (handlerIndex, lowerValue, upperValue) async {
         _isHandlerActived = false;
         await widget.onDragCompleted(lowerValue);

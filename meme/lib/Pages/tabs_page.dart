@@ -40,7 +40,7 @@ class _TabsPageState extends State<TabsPage>
             NotificationsPage(
               userId: db.userId,
             ),
-            UserPage(userId: db.userId, activeAppBar: false,scaffoldState: configuration.mainScaffoldState,),
+            UserPage(userId: db.userId, scaffoldState: configuration.mainScaffoldState,),
           ],
         ),
         bottomNavigationBar: Container(
