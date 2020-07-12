@@ -9,6 +9,7 @@ import 'package:meme/Widgets/edit_profile_button.dart';
 import 'package:meme/Widgets/follow_button.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/user_avatar.dart';
+import '../Models/Report.dart';
 
 class UserPageHeader extends StatelessWidget {
   User user;
@@ -80,12 +81,54 @@ class UserPageHeader extends StatelessWidget {
                           SlideLeftRoute(
                               page: FollowedListPage(userId: user.id))),
                     ),
-                    IconButton(
-                        icon: Icon(Icons.menu),
-                        iconSize: 30,
-                        onPressed: () {
-                          scaffoldState.currentState.openEndDrawer();
-                        })
+                    user.id == db.userId
+                        ? IconButton(
+                            icon: Icon(Icons.menu),
+                            iconSize: 30,
+                            onPressed: () {
+                              scaffoldState.currentState.openEndDrawer();
+                            })
+                        : IconButton(
+                            icon: Icon(Icons.more_vert),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => Dialog(
+                                  child: Container(
+                                    height: 200,
+                                    child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          FlatButton(
+                                            child: Row(
+                                              children: <Widget>[
+                                                Icon(
+                                                  Icons.report,
+                                                  color: Theme.of(context)
+                                                      .accentColor,
+                                                ),
+                                                SizedBox(width: 10),
+                                                Text(
+                                                  'Denunciar',
+                                                  style:
+                                                      TextStyle(fontSize: 16),
+                                                ),
+                                              ],
+                                            ),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              showModalBottomSheet(
+                                                  context: context,
+                                                  builder: (context) =>
+                                                      ReportModalBottomSheet());
+                                            },
+                                          )
+                                        ]),
+                                  ),
+                                ),
+                              );
+                            })
                   ],
                 ),
                 SizedBox(
@@ -108,6 +151,42 @@ class UserPageHeader extends StatelessWidget {
             ),
           )
         ],
+      ),
+    );
+  }
+}
+
+class ReportModalBottomSheet extends StatelessWidget {
+  const ReportModalBottomSheet({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 200,
+      child: Padding(
+        padding:
+            const EdgeInsets
+                .all(8.0),
+        child: Column(
+          children: <Widget>[
+            Text(
+              'Motivo',
+              style: TextStyle(
+                  fontSize:
+                      16,
+                  color: Colors
+                      .white),
+            ),
+            Expanded(
+              child: ListView.separated(
+                itemCount: mainReasons.length,
+                separatorBuilder: (context, index) => ,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

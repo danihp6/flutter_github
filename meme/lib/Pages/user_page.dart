@@ -63,7 +63,7 @@ class _UserPageState extends State<UserPage>
             List<String> favourites = user.favourites;
             return Scaffold(
               key: widget.scaffoldState==null?_scaffoldState:null,
-              endDrawer: Container(
+              endDrawer: user.id == db.userId? Container(
                 width: 170,
                 child: Drawer(
                   child: Column(
@@ -115,7 +115,7 @@ class _UserPageState extends State<UserPage>
                     ],
                   ),
                 ),
-              ),
+              ):null,
               appBar: widget.activeAppBar
                   ? PreferredSize(
                       preferredSize: Size.fromHeight(40),

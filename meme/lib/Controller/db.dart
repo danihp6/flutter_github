@@ -10,6 +10,7 @@ import 'package:meme/Models/Tag.dart';
 import 'package:meme/Models/User.dart';
 import '../Models/Notification.dart';
 import 'media_storage.dart';
+import '../Models/Report.dart';
 
 class DataBase {
   final _firestore = Firestore.instance;
@@ -107,7 +108,7 @@ class DataBase {
     return query.documents.first.documentID;
   }
 
-  Future deleteUser(String userId){
+  Future deleteUser(String userId) {
     _firestore.document('users/$userId').delete();
   }
 
@@ -239,7 +240,8 @@ class DataBase {
       .snapshots()
       .map(toPostLists);
 
-  Future newPostList(String userId, PostList postList, ImageMedia imageMedia) async {
+  Future newPostList(
+      String userId, PostList postList, ImageMedia imageMedia) async {
     if (imageMedia != null) {
       Map map = await mediaStorage.uploadMedia(imageMedia, userId);
       postList.image = map['media'];
@@ -423,6 +425,10 @@ class DataBase {
         .getDocuments();
     return query.documents.map((doc) => Tag.fromFirestore(doc)).toList();
   }
+
+  //---------------REPORTS----------------//
+  Future newReport(String userId, Report report) =>
+      _firestore.collection('users/$userId/reports').add(report.toFirestore());
 }
 
 DataBase db = new DataBase();
