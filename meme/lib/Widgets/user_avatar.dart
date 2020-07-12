@@ -14,15 +14,17 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    if(user.avatar == '') return Image.asset('assets/images/user.png');
+    if (user.avatar == '')
+      return SizedBox(width: 30, child: Image.asset('assets/images/user.png'));
 
     return GestureDetector(
-      child: CachedNetworkImage(
-        imageUrl: user.avatar,
-        placeholder: (context, url) => Loading(),
-        errorWidget: (context, url,error) => Container(),
-        
+      child: ClipRRect(
+        borderRadius: BorderRadius.all(Radius.circular(40)),
+              child: CachedNetworkImage(
+          imageUrl: user.avatar,
+          placeholder: (context, url) => Loading(),
+          errorWidget: (context, url, error) => Container(),
+        ),
       ),
       onTap: () => linked
           ? Navigator.push(

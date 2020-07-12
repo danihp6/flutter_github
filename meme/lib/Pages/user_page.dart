@@ -14,6 +14,7 @@ import 'package:meme/Widgets/post_list.dart';
 import 'package:meme/Widgets/post_list_carousel.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/user_page_header.dart';
+import 'contact_page.dart';
 
 class UserPage extends StatefulWidget {
   String userId;
@@ -78,7 +79,7 @@ class _UserPageState extends State<UserPage>
                             ],
                           )),
                       FlatButton(
-                          onPressed: () {},
+                          onPressed: () => Navigator.push(context, SlideLeftRoute(page: ContactPage())),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[

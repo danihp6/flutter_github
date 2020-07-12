@@ -54,6 +54,7 @@ dependencies:
     path: ./fitted_text_field_container-1.2.1/
   matrix4_transform: ^1.1.4
   cached_network_image: ^2.2.0+1
+  flutter_email_sender: ^3.0.1
   flutter:
     sdk: flutter
 

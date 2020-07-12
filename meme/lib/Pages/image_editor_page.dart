@@ -14,6 +14,7 @@ import 'package:media_gallery/media_gallery.dart';
 import 'package:fitted_text_field_container/fitted_text_field_container.dart';
 
 import 'package:extended_image_library/extended_image_library.dart';
+import '../Controller/gallery.dart';
 
 List<Color> colors = [
   Colors.black,
@@ -51,9 +52,9 @@ List<BlendMode> blendModes = [
 ];
 
 class ImageEditorPage<File> extends StatefulWidget {
-  Uint8List bytes;
+  ImageMedia imageMedia;
   Function onMediaSelected;
-  ImageEditorPage({@required this.bytes, @required this.onMediaSelected});
+  ImageEditorPage({@required this.imageMedia, @required this.onMediaSelected});
 
   @override
   _ImageEditorPageState createState() => _ImageEditorPageState();
@@ -61,7 +62,7 @@ class ImageEditorPage<File> extends StatefulWidget {
 
 class _ImageEditorPageState extends State<ImageEditorPage>
     with SingleTickerProviderStateMixin {
-  Uint8List _image;
+  ImageMedia _imageMedia;
   TabController tabController;
   double sat;
   double bright;
@@ -94,7 +95,8 @@ class _ImageEditorPageState extends State<ImageEditorPage>
 
   @override
   void initState() {
-    _image = widget.bytes;
+    _imageMedia = widget.imageMedia;
+    // _image = widget.imageMedia.image;
     tabController = TabController(length: 3, vsync: this);
 
     sat = 1;
@@ -149,7 +151,7 @@ class _ImageEditorPageState extends State<ImageEditorPage>
     }
 
     restore() {
-      _image = widget.bytes;
+      _imageMedia = widget.imageMedia;
       setState(() {});
     }
 
@@ -172,11 +174,9 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                   isTextOptionsVisible = false;
                   setState(() {});
                   await Future.delayed(const Duration(milliseconds: 10), () {});
-                  String path =
-                      await ImageGallerySaver.saveImage(await _capturePng());
-                  File file = File(path.substring(7));
+                  _imageMedia.image = await _capturePng();
                   Navigator.pop(context);
-                  widget.onMediaSelected(file, MediaType.image);
+                  widget.onMediaSelected(_imageMedia);
                 })
           ],
         ),
@@ -188,12 +188,12 @@ class _ImageEditorPageState extends State<ImageEditorPage>
             child: Stack(
               children: <Widget>[
                 AspectRatio(
-                    aspectRatio: 1,
+                    aspectRatio: widget.imageMedia.aspectRatio,
                     child: LayoutBuilder(builder: (context, constraints) {
                       imageSize = constraints.biggest;
                       return Container(
                           transform: transform.matrix4,
-                          child: Image.memory(_image,
+                          child: Image.memory(_imageMedia.image,
                               fit: BoxFit.cover,
                               color: colorFilter,
                               colorBlendMode: blendMode));

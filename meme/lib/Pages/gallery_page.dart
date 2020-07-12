@@ -117,7 +117,7 @@ class _GalleryPageState extends State<GalleryPage> {
                           SlideLeftRoute(
                               page: ImageEditorPage(
                                   onMediaSelected: widget.onMediaSelected,
-                                  bytes: media.image))),
+                                  imageMedia: media))),
                       elevation: 1,
                       fillColor: Colors.white.withOpacity(0.9),
                       child: Icon(
