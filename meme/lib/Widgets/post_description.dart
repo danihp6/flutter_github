@@ -174,35 +174,9 @@ class _PostDescriptionState extends State<PostDescription> {
                           comment: bestComment,
                           activeInnerComments: false,
                         ),
-                        // Align(
-                        //   alignment: Alignment.topLeft,
-                        //   child: SizedBox(
-                        //     height: 20,
-                        //     child: FlatButton(
-                        //         materialTapTargetSize:
-                        //             MaterialTapTargetSize.shrinkWrap,
-                        //         padding: EdgeInsets.all(0),
-                        //         onPressed: () =>
-                        //             Navigator.of(context).push(SlideLeftRoute(
-                        //                 page: CommentsPage(
-                        //               post: widget.post,
-                        //             ))),
-                        //         child: Text('Ver todos los comentarios')),
-                        //   ),
-                        // ),
                       ],
                     );
                   }),
-              // StreamBuilder(
-              //     stream: db.getUser(db.userId),
-              //     builder: (context, snapshot) {
-              //       if (snapshot.hasError) print(snapshot.error);
-              //       if (!snapshot.hasData) return Loading();
-              //       User user = snapshot.data;
-              //       return SizedBox(
-              //           height: 50,
-              //           child: AddCommentField(user: user, postId: post.id));
-              //     }),
               SizedBox(
                 height: 5,
               ),

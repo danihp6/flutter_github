@@ -8,11 +8,15 @@ import 'report_modal_bottom_sheet.dart';
 
 class UserMoreButton extends StatelessWidget {
   UserMoreButton(
-      {@required this.user, @required this.scaffoldState, this.blocked});
+      {@required this.user,
+      @required this.scaffoldState,
+      this.blocked,
+      this.youAreBlocked});
 
   User user;
   GlobalKey<ScaffoldState> scaffoldState;
   bool blocked;
+  bool youAreBlocked;
 
   @override
   Widget build(BuildContext context) {
@@ -27,28 +31,71 @@ class UserMoreButton extends StatelessWidget {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      FlatButton(
-                        child: Row(
-                          children: <Widget>[
-                            Icon(
-                              blocked ? Icons.remove : Icons.block,
-                              color: Theme.of(context).accentColor,
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              blocked ? 'Desbloquear' : 'Bloquear',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        onPressed: () {
-                          if (blocked)
-                            db.unblock(db.userId, user.id);
-                          else
-                            db.block(db.userId, user.id);
+                      if (!youAreBlocked)
+                        FlatButton(
+                          child: Row(
+                            children: <Widget>[
+                              Icon(
+                                blocked ? Icons.remove : Icons.block,
+                                color: Theme.of(context).accentColor,
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                blocked ? 'Desbloquear' : 'Bloquear',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          onPressed: () {
                             Navigator.pop(context);
-                        },
-                      ),
+                            if (blocked)
+                              db.unblock(db.userId, user.id);
+                            else
+                              showDialog(
+                                context: context,
+                                builder: (context) => Dialog(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      height: 150,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.block,
+                                            size: 30,
+                                            color:
+                                                Theme.of(context).accentColor,
+                                          ),
+                                          Text(
+                                              'Estas seguro? no podrás acceder a el perfil de ${user.userName} ni él al tuyo',
+                                              style: TextStyle(fontSize: 16)),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: <Widget>[
+                                              FlatButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                  child: Text('Cancelar')),
+                                              FlatButton(
+                                                  onPressed: () {
+                                                    db.block(
+                                                        db.userId, user.id);
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text('Bloquear'))
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                          },
+                        ),
                       FlatButton(
                         child: Row(
                           children: <Widget>[
@@ -58,22 +105,28 @@ class UserMoreButton extends StatelessWidget {
                             ),
                             SizedBox(width: 10),
                             Text(
-                              'Denunciar',
+                              'Reportar',
                               style: TextStyle(fontSize: 16),
                             ),
                           ],
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           Navigator.pop(context);
-                          showModalBottomSheet(
-                              context: context,
-                              builder: (context) => ReportModalBottomSheet(
-                                    reportedUserId: user.id,
-                                    scaffoldState: scaffoldState,
-                                    reportType: user is User
-                                        ? ReportType.User
-                                        : ReportType.Post,
-                                  ));
+                          if (!await db.reporter(user.id, db.userId))
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (context) => ReportModalBottomSheet(
+                                      reportedUserId: user.id,
+                                      scaffoldState: scaffoldState,
+                                      reportType: user is User
+                                          ? ReportType.User
+                                          : ReportType.Post,
+                                    ));
+                          else
+                            scaffoldState.currentState.showSnackBar(SnackBar(
+                                duration: Duration(seconds: 2),
+                                content: Text(
+                                    'Ya ha sido reportado')));
                         },
                       )
                     ]),

@@ -38,7 +38,7 @@ class UserPageHeader extends StatelessWidget {
                         user: user,
                       )
                     : FollowButton(
-                        userId: user.id,
+                        user: user,
                       ),
               )
             ],

@@ -6,6 +6,7 @@ import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/comments_button.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/post.dart';
+import 'package:rxdart/streams.dart';
 
 class HomePage extends StatefulWidget {
   String userId;
@@ -33,19 +34,20 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         body: StreamBuilder(
-          stream: db.getFollowed(widget.userId),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) print(snapshot.error);
-            if (!snapshot.hasData) return Loading();
-            List<String> usersId = snapshot.data;
-            usersId.add(db.userId);
-            return ListView.builder(
-              itemCount: usersId.length,
-              itemBuilder: (context, index) => StreamBuilder(
-                  stream: db.getLastlyPosts(usersId[index]),
+            stream: db.getUser(db.userId),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) print(snapshot.error);
+              if (!snapshot.hasData) return Loading();
+              User user = snapshot.data;
+              List<String> followedList = user.followed;
+              followedList.add(db.userId);
+              return StreamBuilder(
+                  stream: CombineLatestStream.list(
+                      followedList.map((followed) => db.getPosts(followed))).asBroadcastStream(),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) print(snapshot.error);
                     if (!snapshot.hasData) return Loading();
+                    print(snapshot.data);
                     List<Post> posts = snapshot.data;
                     orderListPostByDateTime(posts);
                     return ListView.builder(
@@ -54,9 +56,21 @@ class _HomePageState extends State<HomePage> {
                         itemCount: posts.length,
                         itemBuilder: (context, j) =>
                             PostWidget(post: posts[j]));
-                  }),
-            );
-          },
-        ));
+                  });
+            }));
+
+    // return StreamBuilder(
+    //     stream: db.getLastlyPosts(usersId[index]),
+    //     builder: (context, snapshot) {
+    //       if (snapshot.hasError) print(snapshot.error);
+    //       if (!snapshot.hasData) return Loading();
+    //       List<Post> posts = snapshot.data;
+    //       orderListPostByDateTime(posts);
+    //       return ListView.builder(
+    //           shrinkWrap: true,
+    //           physics: NeverScrollableScrollPhysics(),
+    //           itemCount: posts.length,
+    //           itemBuilder: (context, j) => PostWidget(post: posts[j]));
+    //     });
   }
 }

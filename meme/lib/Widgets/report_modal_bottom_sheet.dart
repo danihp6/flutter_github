@@ -30,7 +30,7 @@ class _ReportModalBottomSheetState extends State<ReportModalBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 200,
+      height: 260,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -52,7 +52,7 @@ class _ReportModalBottomSheetState extends State<ReportModalBottomSheet> {
                             reasons = inappropiateReasonAccount;
                             reasonTitle = 'Porque es inapropiada?';
                           });
-                        } if (reasons[index] == MainReason.Innapropiate && widget.reportType == ReportType.Post){
+                        } else if (reasons[index] == MainReason.Innapropiate && widget.reportType == ReportType.Post){
                           setState(() {
                             reasons = inappropiateReasonPost;
                             reasonTitle = 'Porque es inapropiado?';

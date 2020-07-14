@@ -100,15 +100,15 @@ class DataBase {
     });
   }
 
-  Future block(String userId,String blockedUser){
+  Future block(String userId, String blockedUser) {
     _firestore.document('users/$userId').updateData({
-      'blockedUsers':FieldValue.arrayUnion([blockedUser])
+      'blockedUsers': FieldValue.arrayUnion([blockedUser])
     });
   }
 
-    Future unblock(String userId,String blockedUser){
+  Future unblock(String userId, String blockedUser) {
     _firestore.document('users/$userId').updateData({
-      'blockedUsers':FieldValue.arrayRemove([blockedUser])
+      'blockedUsers': FieldValue.arrayRemove([blockedUser])
     });
   }
 
@@ -143,9 +143,7 @@ class DataBase {
       .map(toPosts);
 
   Stream<List<Post>> getLastlyPosts(String userId) => _firestore
-      .collection('users/$userId/posts')
-      .where('dateTime',
-          isGreaterThan: DateTime.now().subtract(Duration(days: 5)))
+      .collection('users/$userId/posts').orderBy('dateTime',descending: true).limit(100)
       .snapshots()
       .map(toPosts);
 
@@ -439,8 +437,18 @@ class DataBase {
   }
 
   //---------------REPORTS----------------//
-  Future newReport(String reportedUserId, Report report) =>
-      _firestore.collection('users/$reportedUserId/reports').add(report.toFirestore());
+  Future newReport(String reportedUserId, Report report) => _firestore
+      .collection('users/$reportedUserId/reports')
+      .add(report.toFirestore());
+
+  Future<bool> reporter(String reportedUserId, String reporterId) async =>
+      (await _firestore
+              .collection('users/$reportedUserId/reports')
+              .where('author', isEqualTo: reporterId)
+              .getDocuments())
+          .documents
+          .length >
+      0;
 }
 
 DataBase db = new DataBase();

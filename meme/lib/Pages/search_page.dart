@@ -225,185 +225,214 @@ class _SearchPageState extends State<SearchPage>
           postId: post.id,
         )));
 
-    return WillPopScope(
-      onWillPop: onWillPop,
-      child: SafeArea(
-        child: Scaffold(
-          body: Column(
-            children: [
-              Expanded(
-                  child: SearchBar(
-                      onSearch: search,
-                      searchBarController: searchBarController,
-                      focusNode: focusNode,
-                      icon: isRecentsView
-                          ? SizedBox(
-                              width: 25,
-                              child: IconButton(
-                                  icon: Icon(Icons.arrow_back),
-                                  padding: EdgeInsets.all(0),
-                                  onPressed: () {
-                                    focusNode.unfocus();
-                                  }),
-                            )
-                          : Icon(Icons.search),
-                      emptyWidget: Center(
-                          child: Text('No se han encontrado resultados')),
-                      hintText: 'Busca...',
-                      iconActiveColor: Theme.of(context).primaryColor,
-                      crossAxisSpacing: 20,
-                      searchBarPadding: EdgeInsets.only(left: 8, right: 8),
-                      minimumChars: 1,
-                      placeHolder: !isRecentsView
-                          ? StreamBuilder(
-                              stream: db.getTendTags(),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasError) print(snapshot.error);
-                                if (!snapshot.hasData) return Loading();
-                                List<Tag> tags = snapshot.data;
-                                return ListView.builder(
-                                    itemCount: tags.length,
-                                    itemBuilder: (context, index) {
-                                      Tag tag = tags[index];
-                                      List<String> posts = tag.posts;
-                                      return Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                          children: <Widget>[
-                                            TagWidget(
-                                              tag: tag,
-                                              onTap: () => Navigator.push(
-                                                  context,
-                                                  SlideLeftRoute(
-                                                      page: TagPage(
-                                                    tagId: tag.id,
-                                                  ))),
-                                            ),
-                                            SizedBox(
-                                              height: 5,
-                                            ),
-                                            PostsCarousel(
-                                              posts: posts,
-                                              onTap: goPost,
-                                            )
-                                          ],
-                                        ),
-                                      );
-                                    });
-                              })
-                          : Column(
-                              children: <Widget>[
-                                Text('Recientes'),
-                                Expanded(
-                                  child: recentsView(),
-                                ),
-                              ],
-                            ),
-                      onItemFound: (item, index) {
-                        if (typeSearched == 'users')
-                          return Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 8.0, right: 8),
-                              child: GestureDetector(
-                                  child: UserRow(
-                                user: item,
-                                onTap: () {
-                                  if (!storage.recentUsers.contains(item.id))
-                                    storage.recentUsers =
-                                        storage.recentUsers + [item.id];
-                                  setState(() {});
-                                  Navigator.push(
-                                      context,
-                                      SlideLeftRoute(
-                                          page: UserPage(
-                                        userId: item.id,
-                                      )));
-                                },
-                              )));
-                        if (typeSearched == 'tags')
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: TagWidget(
-                              tag: item,
-                              onTap: () {
-                                if (!storage.recentTags.contains(item.id))
-                                  storage.recentTags =
-                                      storage.recentTags + [item.id];
-                                setState(() {});
-                                Navigator.push(
-                                    context,
-                                    SlideLeftRoute(
-                                        page: TagPage(tagId: item.id)));
-                              },
-                            ),
-                          );
-
-                        if (typeSearched == 'postLists')
-                          return StreamBuilder(
-                              stream: db.getPostList(item.author, item.id),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasError) print(snapshot.error);
-                                if (!snapshot.hasData) return Loading();
-                                PostList postList = snapshot.data;
+    return StreamBuilder(
+        stream: db.getUser(db.userId),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+          if (!snapshot.hasData) return Loading();
+          User currentUser = snapshot.data;
+          List<String> yourBlockedUsers = currentUser.blockedUsers;
+          return WillPopScope(
+            onWillPop: onWillPop,
+            child: SafeArea(
+              child: Scaffold(
+                body: Column(
+                  children: [
+                    Expanded(
+                        child: SearchBar(
+                            onSearch: search,
+                            searchBarController: searchBarController,
+                            focusNode: focusNode,
+                            icon: isRecentsView
+                                ? SizedBox(
+                                    width: 25,
+                                    child: IconButton(
+                                        icon: Icon(Icons.arrow_back),
+                                        padding: EdgeInsets.all(0),
+                                        onPressed: () {
+                                          focusNode.unfocus();
+                                        }),
+                                  )
+                                : Icon(Icons.search),
+                            emptyWidget: Center(
+                                child: Text('No se han encontrado resultados')),
+                            hintText: 'Busca...',
+                            iconActiveColor: Theme.of(context).primaryColor,
+                            crossAxisSpacing: 20,
+                            searchBarPadding:
+                                EdgeInsets.only(left: 8, right: 8),
+                            minimumChars: 1,
+                            placeHolder: !isRecentsView
+                                ? StreamBuilder(
+                                    stream: db.getTendTags(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasError)
+                                        print(snapshot.error);
+                                      if (!snapshot.hasData) return Loading();
+                                      List<Tag> tags = snapshot.data;
+                                      return ListView.builder(
+                                          itemCount: tags.length,
+                                          itemBuilder: (context, index) {
+                                            Tag tag = tags[index];
+                                            List<String> posts = tag.posts;
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Column(
+                                                children: <Widget>[
+                                                  TagWidget(
+                                                    tag: tag,
+                                                    onTap: () => Navigator.push(
+                                                        context,
+                                                        SlideLeftRoute(
+                                                            page: TagPage(
+                                                          tagId: tag.id,
+                                                        ))),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  PostsCarousel(
+                                                    posts: posts,
+                                                    onTap: goPost,
+                                                  )
+                                                ],
+                                              ),
+                                            );
+                                          });
+                                    })
+                                : Column(
+                                    children: <Widget>[
+                                      Text('Recientes'),
+                                      Expanded(
+                                        child: recentsView(),
+                                      ),
+                                    ],
+                                  ),
+                            onItemFound: (item, index) {
+                              if (typeSearched == 'users'){
+                                bool blocked =
+                                  yourBlockedUsers.contains(item.id);
+                              List<String> blockedUsers =
+                                  item.blockedUsers;
+                              bool youAreBlocked =
+                                  blockedUsers.contains(db.userId);
+                                  return Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 8.0, right: 8),
+                                    child: GestureDetector(
+                                        child: UserRow(
+                                      user: item,
+                                      blocked: blocked,
+                                      youAreBlocked: youAreBlocked,
+                                      onTap: () {
+                                        if (!storage.recentUsers
+                                            .contains(item.id))
+                                          storage.recentUsers =
+                                              storage.recentUsers + [item.id];
+                                        setState(() {});
+                                        Navigator.push(
+                                            context,
+                                            SlideLeftRoute(
+                                                page: UserPage(
+                                              userId: item.id,
+                                            )));
+                                      },
+                                    )));
+                              }
+                                
+                              if (typeSearched == 'tags')
                                 return Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: PostListWidget(
-                                    postList: postList,
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TagWidget(
+                                    tag: item,
                                     onTap: () {
-                                      if (!storage.recentPostLists
-                                          .contains(item))
-                                        storage.recentPostLists =
-                                            storage.recentPostLists + [item];
+                                      if (!storage.recentTags.contains(item.id))
+                                        storage.recentTags =
+                                            storage.recentTags + [item.id];
                                       setState(() {});
                                       Navigator.push(
                                           context,
                                           SlideLeftRoute(
-                                              page: PostListPage(
-                                            postList: postList,
-                                          )));
+                                              page: TagPage(tagId: item.id)));
                                     },
                                   ),
                                 );
-                              });
-                      },
-                      header: isRecentsView
-                          ? Column(
-                              children: [
-                                SizedBox(
-                                  height: 30,
-                                  child: TabBar(
-                                      controller: tabController,
-                                      labelStyle: TextStyle(fontSize: 15),
-                                      labelColor: Colors.black,
-                                      onTap: (value) {
-                                        if (value == 0) typeSearched = 'users';
-                                        if (value == 1) typeSearched = 'tags';
-                                        if (value == 2)
-                                          typeSearched = 'postLists';
-                                        searchBarController.replayLastSearch();
-                                      },
-                                      tabs: [
-                                        Tab(
-                                          text: 'Usuarios',
+
+                              if (typeSearched == 'postLists')
+                                return StreamBuilder(
+                                    stream:
+                                        db.getPostList(item.author, item.id),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasError)
+                                        print(snapshot.error);
+                                      if (!snapshot.hasData) return Loading();
+                                      PostList postList = snapshot.data;
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 8.0),
+                                        child: PostListWidget(
+                                          postList: postList,
+                                          onTap: () {
+                                            if (!storage.recentPostLists
+                                                .contains(item))
+                                              storage.recentPostLists =
+                                                  storage.recentPostLists +
+                                                      [item];
+                                            setState(() {});
+                                            Navigator.push(
+                                                context,
+                                                SlideLeftRoute(
+                                                    page: PostListPage(
+                                                  postList: postList,
+                                                )));
+                                          },
                                         ),
-                                        Tab(
-                                          text: 'Tags',
-                                        ),
-                                        Tab(
-                                          text: 'Listas',
-                                        )
-                                      ]),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                )
-                              ],
-                            )
-                          : null)),
-            ],
-          ),
-        ),
-      ),
-    );
+                                      );
+                                    });
+                            },
+                            header: isRecentsView
+                                ? Column(
+                                    children: [
+                                      SizedBox(
+                                        height: 30,
+                                        child: TabBar(
+                                            controller: tabController,
+                                            labelStyle: TextStyle(fontSize: 15),
+                                            labelColor: Colors.black,
+                                            onTap: (value) {
+                                              if (value == 0)
+                                                typeSearched = 'users';
+                                              if (value == 1)
+                                                typeSearched = 'tags';
+                                              if (value == 2)
+                                                typeSearched = 'postLists';
+                                              searchBarController
+                                                  .replayLastSearch();
+                                            },
+                                            tabs: [
+                                              Tab(
+                                                text: 'Usuarios',
+                                              ),
+                                              Tab(
+                                                text: 'Tags',
+                                              ),
+                                              Tab(
+                                                text: 'Listas',
+                                              )
+                                            ]),
+                                      ),
+                                      SizedBox(
+                                        height: 10,
+                                      )
+                                    ],
+                                  )
+                                : null)),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
   }
 }

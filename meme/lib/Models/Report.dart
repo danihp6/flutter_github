@@ -47,4 +47,4 @@ String _inappropiateReasonUserToString(
 
 String _inappropiateReasonPostToString(
         InappropiateReasonPost inappropiateReason) =>
-    inappropiateReason.toString().substring(19);
+    inappropiateReason.toString().substring(23);

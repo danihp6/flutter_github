@@ -7,6 +7,7 @@ import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/post_list_page.dart';
 import 'package:meme/Pages/post_page.dart';
 import 'package:meme/Pages/account_page.dart';
+import 'package:meme/Widgets/Stream2Users.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/post_list_new_button.dart';
 import 'package:meme/Widgets/post.dart';
@@ -17,28 +18,54 @@ import 'package:meme/Widgets/user_more_button.dart';
 import 'package:meme/Widgets/user_page_header.dart';
 import 'contact_page.dart';
 
-class UserPage extends StatefulWidget {
+class UserPage extends StatelessWidget {
   String userId;
   GlobalKey<ScaffoldState> scaffoldState;
   UserPage({@required this.userId, this.scaffoldState});
 
   @override
-  _UserPageState createState() => _UserPageState();
+  Widget build(BuildContext context) {
+    return SafeArea(
+        child: Stream2Users(
+      userId: userId,
+      scaffoldState: scaffoldState,
+      childNotCurrentUser: (user, scaffoldState, blocked, youAreBlocked) =>
+          UserPageBody(
+              user: user,
+              scaffoldState: scaffoldState,
+              blocked: blocked,
+              youAreBlocked: youAreBlocked),
+      childCurrentUser: (currentUser, scaffoldState) => UserPageBody(
+        user: currentUser,
+        scaffoldState: scaffoldState,
+      ),
+    ));
+  }
 }
 
-class _UserPageState extends State<UserPage>
-    with SingleTickerProviderStateMixin {
-  TabController tabController;
-  GlobalKey<ScaffoldState> _scaffoldState;
+class UserPageBody extends StatefulWidget {
+  UserPageBody(
+      {@required this.user,
+      @required this.scaffoldState,
+      this.blocked,
+      this.youAreBlocked});
+
+  User user;
+  GlobalKey<ScaffoldState> scaffoldState;
+  bool blocked;
+  bool youAreBlocked;
 
   @override
+  _UserPageBodyState createState() => _UserPageBodyState();
+}
+
+class _UserPageBodyState extends State<UserPageBody>
+    with SingleTickerProviderStateMixin {
+  TabController tabController;
+  @override
   void initState() {
-    super.initState();
     tabController = new TabController(length: 3, vsync: this);
-    if (widget.scaffoldState == null)
-      _scaffoldState = GlobalKey<ScaffoldState>();
-    else
-      _scaffoldState = widget.scaffoldState;
+    super.initState();
   }
 
   @override
@@ -49,55 +76,9 @@ class _UserPageState extends State<UserPage>
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: StreamBuilder(
-            stream: db.getUser(widget.userId),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) print(snapshot.error);
-              if (!snapshot.hasData) return Loading();
-              User user = snapshot.data;
-              List<String> blockedUsers = user.blockedUsers;
-              bool blocked = blockedUsers.contains(db.userId);
-              if (widget.userId != db.userId)
-                return StreamBuilder(
-                    stream: db.getUser(db.userId),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) print(snapshot.error);
-                      if (!snapshot.hasData) return Loading();
-                      User currentUser = snapshot.data;
-                      List<String> yourBblockedUsers = currentUser.blockedUsers;
-                      if (blocked == false)
-                        blocked = yourBblockedUsers.contains(user.id);
-
-                      return UserPageBody(
-                          user: user,
-                          scaffoldState: _scaffoldState,
-                          tabController: tabController,
-                          blocked: blocked);
-                    });
-              return UserPageBody(
-                  user: user,
-                  scaffoldState: _scaffoldState,
-                  tabController: tabController);
-            }));
-  }
-}
-
-class UserPageBody extends StatelessWidget {
-  UserPageBody(
-      {@required this.user,
-      @required this.scaffoldState,
-      @required this.tabController,
-      this.blocked});
-
-  User user;
-  GlobalKey<ScaffoldState> scaffoldState;
-  TabController tabController;
-  bool blocked;
-
-  @override
-  Widget build(BuildContext context) {
-    List<String> favourites = user.favourites;
+    if (widget.scaffoldState == null)
+      widget.scaffoldState = GlobalKey<ScaffoldState>();
+    List<String> favourites = widget.user.favourites;
     goPostList(PostList postList) => Navigator.of(context)
         .push(SlideLeftRoute(page: PostListPage(postList: postList)));
 
@@ -107,8 +88,8 @@ class UserPageBody extends StatelessWidget {
           postId: post.id,
         )));
     return Scaffold(
-      key: scaffoldState == null ? scaffoldState : null,
-      endDrawer: user.id == db.userId
+      key: widget.scaffoldState,
+      endDrawer: widget.user.id == db.userId
           ? Container(
               width: 170,
               child: Drawer(
@@ -173,23 +154,24 @@ class UserPageBody extends StatelessWidget {
         preferredSize: Size.fromHeight(40),
         child: AppBar(
           backgroundColor: Colors.deepOrange,
-          title: Text(user.userName),
+          title: Text(widget.user.userName),
           actions: <Widget>[
-            if (blocked != null)
+            if (widget.blocked != null)
               UserMoreButton(
-                user: user,
-                scaffoldState: scaffoldState,
-                blocked: blocked,
-              )
+                  user: widget.user,
+                  scaffoldState: widget.scaffoldState,
+                  blocked: widget.blocked,
+                  youAreBlocked: widget.youAreBlocked)
           ],
         ),
       ),
-      body: blocked==null||!blocked
+      body: widget.blocked == null || !widget.blocked && !widget.youAreBlocked
           ? NestedScrollView(
               headerSliverBuilder: (context, _) => [
                 SliverToBoxAdapter(
                     child: UserPageHeader(
-                        user: user, scaffoldState: scaffoldState)),
+                        user: widget.user,
+                        scaffoldState: widget.scaffoldState)),
                 SliverToBoxAdapter(
                   child: TabBar(
                     controller: tabController,
@@ -223,7 +205,7 @@ class UserPageBody extends StatelessWidget {
                   physics: NeverScrollableScrollPhysics(),
                   children: [
                     StreamBuilder(
-                      stream: db.getPosts(user.id),
+                      stream: db.getPosts(widget.user.id),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) print(snapshot.error);
                         if (!snapshot.hasData) return Loading();
@@ -238,7 +220,7 @@ class UserPageBody extends StatelessWidget {
                           itemBuilder: (context, index) {
                             return PostWidget(
                               post: posts[index],
-                              scaffoldState: scaffoldState,
+                              scaffoldState: widget.scaffoldState,
                             );
                           },
                         );
@@ -260,7 +242,7 @@ class UserPageBody extends StatelessWidget {
                                     Post post = snapshot.data;
                                     return PostWidget(
                                       post: post,
-                                      scaffoldState: scaffoldState,
+                                      scaffoldState: widget.scaffoldState,
                                     );
                                   });
                             },
@@ -269,12 +251,12 @@ class UserPageBody extends StatelessWidget {
                       padding: const EdgeInsets.only(left: 8, right: 8),
                       child: Column(
                         children: [
-                          user.id == db.userId
+                          widget.user.id == db.userId
                               ? PostListNewButton()
                               : Container(),
                           Expanded(
                             child: StreamBuilder(
-                              stream: db.getPostLists(user.id),
+                              stream: db.getPostLists(widget.user.id),
                               builder: (context, snapshot) {
                                 if (snapshot.hasError) print(snapshot.error);
                                 if (!snapshot.hasData) return Loading();

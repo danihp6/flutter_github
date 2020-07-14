@@ -75,7 +75,7 @@ class Post {
 
   set favourites(favourites) => this._favourites = favourites;
 
-  get dateTime => this._dateTime;
+  DateTime get dateTime => this._dateTime;
 
   set dateTime(dateTime) => this._dateTime = dateTime;
 
@@ -112,9 +112,9 @@ List<Post> toPosts(QuerySnapshot query) {
   return query.documents.map((doc) => Post.fromFirestore(doc)).toList();
 }
 
-void orderListPostByDateTime(List<Post> posts) {
-  return posts.sort((a, b) => b._dateTime.compareTo(a._dateTime));
-}
+void orderListPostByDateTime(List<Post> posts) =>
+   posts.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+
 
 MediaType toMediaType(String string){
   if(MediaType.image.toString() == string) return MediaType.image;

@@ -55,6 +55,7 @@ dependencies:
   matrix4_transform: ^1.1.4
   cached_network_image: ^2.2.0+1
   flutter_email_sender: ^3.0.1
+  rxdart: ^0.24.1
   flutter:
     sdk: flutter
 

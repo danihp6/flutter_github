@@ -38,9 +38,9 @@ exports.onDeletePost = functions.region('europe-west2').firestore.document('user
 
   })
 
-  var mediaPath = snap.data()['mediaLocation']
-  var bucket = admin.storage().bucket()
-  bucket.file(mediaPath).delete()
+  // var mediaPath = snap.data()['mediaLocation']
+  // var bucket = admin.storage().bucket()
+  // bucket.file(mediaPath).delete()
 
   tagsSnapshot = await db.collection('tags').orderBy('__name__').limit(batchSize).get()
 
@@ -105,6 +105,9 @@ exports.onDeleteUser = functions.region('europe-west2').firestore.document('user
     bucket.file(mediaPath).delete()
   }
 
+  var reportsRef = ref.collection('reports')
+
+  deleteCollection(db, reportsRef, batchSize)
 
   var notificationsRef = ref.collection('notifications')
 

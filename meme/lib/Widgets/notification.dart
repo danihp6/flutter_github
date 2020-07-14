@@ -138,7 +138,7 @@ class NotificationWidget extends StatelessWidget {
                   ],
                 ),
               ),
-              FollowButton(userId: notification.sender)
+              FollowButton(user: user)
             ]),
           );
         });
