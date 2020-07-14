@@ -6,8 +6,9 @@ import 'package:meme/Controller/dynamic_links.dart';
 class ShareButton extends StatelessWidget {
   String authorId;
   String postId;
+  String userId;
   GlobalKey<ScaffoldState> scaffoldState;
-  ShareButton({@required this.postId,@required this.authorId, @required this.scaffoldState});
+  ShareButton({ this.postId, this.authorId, @required this.scaffoldState,this.userId});
   
   GlobalKey<ScaffoldState> _scaffoldState;
   @override
@@ -18,7 +19,11 @@ class ShareButton extends StatelessWidget {
     return IconButton(
       icon: Icon(Icons.share),
       onPressed: () async {
-        String link = await dynamicLinks.createDynamicLink(true,authorId,postId);
+        String link;
+        if(postId != null)
+        link = await dynamicLinks.postDynamicLink(true,authorId,postId);
+        else if(userId!=null)
+        link = await dynamicLinks.userDynamicLink(true,userId);
         _scaffoldState.currentState.showBottomSheet(
           (context) {
             return Container(

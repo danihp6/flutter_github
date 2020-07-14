@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/media_storage.dart';
+import 'package:meme/Models/Post.dart';
 import 'package:meme/Pages/post_list_page.dart';
+import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/post_list_more_button.dart';
 import 'package:meme/Widgets/posts_carousel.dart';
+import 'package:rxdart/streams.dart';
 
 import '../Models/PostList.dart';
 import 'slide_left_route.dart';
@@ -30,24 +33,23 @@ class _PostListCarouselState extends State<PostListCarousel> {
   @override
   Widget build(BuildContext context) {
     PostList _postList = widget.postList;
-    List<String> posts = _postList.posts;
+    List<String> postPaths = _postList.posts;
     return Column(
       children: <Widget>[
         GestureDetector(
           child: Row(
             children: [
-            //   if(_postList.image != '')
-            //   Container(
-            //   height: 60,
-            //   width: 60,
-            //   color: Colors.grey[300],
-            //   child:
-            //        CachedNetworkImage(imageUrl:_postList.image),
-            // ),
-            // if(_postList.image != '')
-            // SizedBox(
-            //   width: 10,
-            // ),
+              if (_postList.image != '') //
+                Container(
+                  height: 60,
+                  width: 60,
+                  color: Colors.grey[300],
+                  child: CachedNetworkImage(imageUrl: _postList.image),
+                ),
+              if (_postList.image != '')
+                SizedBox(
+                  width: 10,
+                ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -79,11 +81,19 @@ class _PostListCarouselState extends State<PostListCarousel> {
         SizedBox(
           height: 5,
         ),
-        if (posts.length > 0)
-          PostsCarousel(
-              posts: posts,
-              onTap: widget.onTapPost,
-            )
+        if (postPaths.length > 0)
+          StreamBuilder(
+              stream: CombineLatestStream.list(
+                  postPaths.map((post) => db.getPostByPath(post))),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) print(snapshot.error);
+                if (!snapshot.hasData) return Loading();
+                List<Post> posts = snapshot.data;
+                return PostsCarousel(
+                  posts: posts,
+                  onTap: widget.onTapPost,
+                );
+              })
       ],
     );
   }

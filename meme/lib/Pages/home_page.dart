@@ -20,57 +20,68 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(40),
-          child: AppBar(
-            title: Text('Meme'),
-            actions: [
-              CommentsButton(
-                refresh: () {
-                  setState(() {});
-                },
-              )
-            ],
-          ),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(40),
+        child: AppBar(
+          title: Text('Meme'),
+          actions: [
+            CommentsButton(
+              refresh: () {
+                setState(() {});
+              },
+            )
+          ],
         ),
-        body: StreamBuilder(
-            stream: db.getUser(db.userId),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) print(snapshot.error);
-              if (!snapshot.hasData) return Loading();
-              User user = snapshot.data;
-              List<String> followedList = user.followed;
-              followedList.add(db.userId);
-              return StreamBuilder(
-                  stream: CombineLatestStream.list(
-                      followedList.map((followed) => db.getPosts(followed))).asBroadcastStream(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) print(snapshot.error);
-                    if (!snapshot.hasData) return Loading();
-                    print(snapshot.data);
-                    List<Post> posts = snapshot.data;
-                    orderListPostByDateTime(posts);
-                    return ListView.builder(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: posts.length,
-                        itemBuilder: (context, j) =>
-                            PostWidget(post: posts[j]));
-                  });
-            }));
-
-    // return StreamBuilder(
-    //     stream: db.getLastlyPosts(usersId[index]),
-    //     builder: (context, snapshot) {
-    //       if (snapshot.hasError) print(snapshot.error);
-    //       if (!snapshot.hasData) return Loading();
-    //       List<Post> posts = snapshot.data;
-    //       orderListPostByDateTime(posts);
-    //       return ListView.builder(
-    //           shrinkWrap: true,
-    //           physics: NeverScrollableScrollPhysics(),
-    //           itemCount: posts.length,
-    //           itemBuilder: (context, j) => PostWidget(post: posts[j]));
-    //     });
+      ),
+      body: StreamBuilder(
+          stream: db.getUser(db.userId),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) print(snapshot.error);
+            if (!snapshot.hasData) return Loading();
+            User user = snapshot.data;
+            List<String> followed = user.followed;
+            followed.add(db.userId);
+            return StreamBuilder(
+              stream: db.getFollowedPosts(followed),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) print(snapshot.error);
+                if (!snapshot.hasData) return Loading();
+                List<Post> posts = snapshot.data;
+                print(posts);
+                return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: posts.length,
+                    itemBuilder: (context, index) =>
+                        PostWidget(post: posts[index]));
+              },
+            );
+          }),
+      // body: StreamBuilder(
+      //     stream: db.getUser(db.userId),
+      //     builder: (context, snapshot) {
+      //       if (snapshot.hasError) print(snapshot.error);
+      //       if (!snapshot.hasData) return Loading();
+      //       User user = snapshot.data;
+      //       List<String> followedList = user.followed;
+      //       followedList.add(db.userId);
+      //       return StreamBuilder(
+      //           stream: CombineLatestStream.list(
+      //               followedList.map((followed) => db.getPosts(followed))).asBroadcastStream(),
+      //           builder: (context, snapshot) {
+      //             if (snapshot.hasError) print(snapshot.error);
+      //             if (!snapshot.hasData) return Loading();
+      //             print(snapshot.data);
+      //             List<List<Post>> followedPosts = snapshot.data;
+      //             List<Post> posts = followedPosts.expand((post)=>post).toList();
+      //             orderListPostByDateTime(posts);
+      //             return ListView.builder(
+      //                 shrinkWrap: true,
+      //                 physics: NeverScrollableScrollPhysics(),
+      //                 itemCount: posts.length,
+      //                 itemBuilder: (context, index) =>
+      //                     PostWidget(post: posts[index]));
+      //           });
+      //     })
+    );
   }
 }

@@ -15,6 +15,7 @@ import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/tag.dart';
 import 'package:meme/Widgets/user_avatar.dart';
 import 'package:meme/Widgets/user_row.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../Controller/db.dart';
 import 'post_page.dart';
@@ -274,7 +275,7 @@ class _SearchPageState extends State<SearchPage>
                                           itemCount: tags.length,
                                           itemBuilder: (context, index) {
                                             Tag tag = tags[index];
-                                            List<String> posts = tag.posts;
+                                            List<String> postPaths = tag.posts;
                                             return Padding(
                                               padding:
                                                   const EdgeInsets.all(8.0),
@@ -292,10 +293,25 @@ class _SearchPageState extends State<SearchPage>
                                                   SizedBox(
                                                     height: 5,
                                                   ),
-                                                  PostsCarousel(
-                                                    posts: posts,
-                                                    onTap: goPost,
-                                                  )
+                                                  StreamBuilder(
+                                                      stream:
+                                                          CombineLatestStream
+                                                              .list(postPaths
+                                                                  .map((post) =>
+                                                                      null)),
+                                                      builder:
+                                                          (context, snapshot) {
+                                                        if (snapshot.hasError)
+                                                          print(snapshot.error);
+                                                        if (!snapshot.hasData)
+                                                          return Loading();
+                                                        List<Post> posts =
+                                                            snapshot.data;
+                                                        return PostsCarousel(
+                                                          posts: posts,
+                                                          onTap: goPost,
+                                                        );
+                                                      })
                                                 ],
                                               ),
                                             );
@@ -310,14 +326,13 @@ class _SearchPageState extends State<SearchPage>
                                     ],
                                   ),
                             onItemFound: (item, index) {
-                              if (typeSearched == 'users'){
+                              if (typeSearched == 'users') {
                                 bool blocked =
-                                  yourBlockedUsers.contains(item.id);
-                              List<String> blockedUsers =
-                                  item.blockedUsers;
-                              bool youAreBlocked =
-                                  blockedUsers.contains(db.userId);
-                                  return Padding(
+                                    yourBlockedUsers.contains(item.id);
+                                List<String> blockedUsers = item.blockedUsers;
+                                bool youAreBlocked =
+                                    blockedUsers.contains(db.userId);
+                                return Padding(
                                     padding: const EdgeInsets.only(
                                         left: 8.0, right: 8),
                                     child: GestureDetector(
@@ -340,7 +355,7 @@ class _SearchPageState extends State<SearchPage>
                                       },
                                     )));
                               }
-                                
+
                               if (typeSearched == 'tags')
                                 return Padding(
                                   padding: const EdgeInsets.all(8.0),

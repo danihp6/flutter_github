@@ -12,9 +12,10 @@ import 'package:meme/Widgets/video_player.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class PostsCarousel extends StatefulWidget {
-  PostsCarousel({@required this.posts, @required this.onTap,this.height = 200});
+  PostsCarousel(
+      {@required this.posts, @required this.onTap, this.height = 200});
 
-  List<String> posts;
+  List<Post> posts;
   Function onTap;
   double height;
 
@@ -31,28 +32,21 @@ class _PostsCarouselState extends State<PostsCarousel> {
     _visible = false;
   }
 
-  List<Widget> carousel(List<String> posts) => posts
-      .map((postPath) => StreamBuilder(
-          stream: db.getPostByPath(postPath),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) print(snapshot.error);
-            if (!snapshot.hasData) return Loading();
-            Post post = snapshot.data;
-            return GestureDetector(
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: post.mediaType == MediaType.image
-                      ? FadeInImage(
-                        fit: BoxFit.cover,
-                        placeholder: MemoryImage(kTransparentImage),
-                        image: CachedNetworkImageProvider(post.media))
-                      : VideoPlayerWidget(
-                          url: post.media,
-                          isPausable: false,
-                        ),
-                ),
-                onTap: () => widget.onTap(post));
-          }))
+  List<Widget> carousel(List<Post> posts) => posts
+      .map((post) => GestureDetector(
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: post.mediaType == MediaType.image
+                ? FadeInImage(
+                    fit: BoxFit.cover,
+                    placeholder: MemoryImage(kTransparentImage),
+                    image: CachedNetworkImageProvider(post.media))
+                : VideoPlayerWidget(
+                    url: post.media,
+                    isPausable: false,
+                  ),
+          ),
+          onTap: () => widget.onTap(post)))
       .toList();
 
   @override
@@ -79,16 +73,15 @@ class _PostsCarouselState extends State<PostsCarousel> {
         children: <Widget>[
           CarouselSlider(
             options: CarouselOptions(
-              enlargeCenterPage: false,
-              enableInfiniteScroll: false,
-              initialPage: 0,
-              autoPlay: _visible,
-              autoPlayAnimationDuration: Duration(seconds: 5),
-              autoPlayInterval: Duration(seconds: 8),
-              autoPlayCurve: Curves.decelerate,
-              pauseAutoPlayOnManualNavigate: true,
-              height: widget.height
-            ),
+                enlargeCenterPage: false,
+                enableInfiniteScroll: false,
+                initialPage: 0,
+                autoPlay: _visible,
+                autoPlayAnimationDuration: Duration(seconds: 5),
+                autoPlayInterval: Duration(seconds: 8),
+                autoPlayCurve: Curves.decelerate,
+                pauseAutoPlayOnManualNavigate: true,
+                height: widget.height),
             items: carousel(widget.posts),
           ),
           if (widget.posts.length > 1)

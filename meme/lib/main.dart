@@ -5,6 +5,7 @@ import 'package:meme/Controller/push_notification_provider.dart';
 import 'package:meme/Pages/post_page.dart';
 import 'package:meme/Pages/root_page.dart';
 import 'package:meme/Pages/settings_page.dart';
+import 'package:meme/Pages/user_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
 import 'Controller/gallery.dart';
@@ -29,11 +30,18 @@ class _MyAppState extends State<MyApp> {
     storage.initStorage();
     dynamicLinks.initDynamicLinks((Uri link) {
       Map linkParameters = link.queryParameters;
-
+      print('-----------------------------------');
+      String type = linkParameters['type'];
+      if(type == 'post')
       configuration.mainNavigatorKey.currentState.push(SlideLeftRoute(
           page: PostPage(
         authorId: linkParameters['author'],
         postId: linkParameters['id'],
+      )));
+      if(type == 'user')
+      configuration.mainNavigatorKey.currentState.push(SlideLeftRoute(
+          page: UserPage(
+        userId: linkParameters['id'],
       )));
     });
   }

@@ -13,9 +13,11 @@ import 'package:meme/Widgets/post_list_new_button.dart';
 import 'package:meme/Widgets/post.dart';
 import 'package:meme/Widgets/post_list.dart';
 import 'package:meme/Widgets/post_list_carousel.dart';
+import 'package:meme/Widgets/share_button.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/user_more_button.dart';
 import 'package:meme/Widgets/user_page_header.dart';
+import 'package:rxdart/streams.dart';
 import 'contact_page.dart';
 
 class UserPage extends StatelessWidget {
@@ -156,7 +158,7 @@ class _UserPageBodyState extends State<UserPageBody>
           backgroundColor: Colors.deepOrange,
           title: Text(widget.user.userName),
           actions: <Widget>[
-            if (widget.blocked != null)
+            ShareButton(userId: widget.user.id, scaffoldState: widget.scaffoldState),
               UserMoreButton(
                   user: widget.user,
                   scaffoldState: widget.scaffoldState,
@@ -228,23 +230,23 @@ class _UserPageBodyState extends State<UserPageBody>
                     ),
                     favourites.length == 0
                         ? Center(child: Text('Usuario sin favoritos'))
-                        : ListView.builder(
-                            itemCount: favourites.length,
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index) {
-                              return StreamBuilder(
-                                  stream: db.getPostByPath(favourites[index]),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasError)
-                                      print(snapshot.error);
-                                    if (!snapshot.hasData) return Loading();
-                                    Post post = snapshot.data;
-                                    return PostWidget(
-                                      post: post,
-                                      scaffoldState: widget.scaffoldState,
-                                    );
-                                  });
+                        : StreamBuilder(
+                            stream: CombineLatestStream.list(favourites.map(
+                                    (favourite) => db.getPostByPath(favourite)))
+                                .asBroadcastStream(),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasError) print(snapshot.error);
+                              if (!snapshot.hasData) return Loading();
+                              List<Post> posts = snapshot.data;
+                              return ListView.builder(
+                                itemCount: posts.length,
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemBuilder: (context, index) => PostWidget(
+                                  post: posts[index],
+                                  scaffoldState: widget.scaffoldState,
+                                ),
+                              );
                             },
                           ),
                     Padding(

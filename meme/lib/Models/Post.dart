@@ -52,7 +52,8 @@ class Post {
         'mediaLocation': _mediaLocation,
         'tags': _tags,
         'hotPoints': _hotPoints,
-        'aspectRatio':_aspectRatio
+        'aspectRatio':_aspectRatio,
+        'author':_author
       };
 
   get id => this._id;

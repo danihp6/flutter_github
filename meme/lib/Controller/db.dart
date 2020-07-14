@@ -1,3 +1,4 @@
+
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -230,6 +231,10 @@ class DataBase {
     Map<String, dynamic> hotPoints = snapshot.data['hotPoints'];
     hotPoints[userId] = hotPointsUser;
     ref.updateData({'hotPoints': hotPoints});
+  }
+
+  Stream<List<Post>> getFollowedPosts (List<String> followed) {
+    return _firestore.collectionGroup('posts').where('author',whereIn: followed).orderBy('dateTime').snapshots().map(toPosts);
   }
 
 //---------------POSTLIST----------------//
