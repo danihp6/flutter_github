@@ -297,8 +297,8 @@ class _SearchPageState extends State<SearchPage>
                                                       stream:
                                                           CombineLatestStream
                                                               .list(postPaths
-                                                                  .map((post) =>
-                                                                      null)),
+                                                                  .map((postPath) =>
+                                                                      db.getPostByPath(postPath))),
                                                       builder:
                                                           (context, snapshot) {
                                                         if (snapshot.hasError)

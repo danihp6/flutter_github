@@ -211,7 +211,7 @@ exports.onCreateReport = functions.region('europe-west2').firestore.document('us
   var userEmail = userData['email']
   var userFollowers = userData['followers'].length
   var minReports
-  if(userFollowers < 400) minReports = 100
+  if (userFollowers < 400) minReports = 100
   else minReports = userFollowers * 0.25
   var oneMonthAgo = new Date(Date.now())
   oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
@@ -223,3 +223,29 @@ exports.onCreateReport = functions.region('europe-west2').firestore.document('us
     })
   }
 })
+
+exports.onChangePostPoints = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onUpdate(async (change, context) => {
+  var newPoints = getTotalHotPoints(change.after.data()['points'])
+  var oldPoints = getTotalHotPoints(change.before.data()['points'])
+  console.log(oldPoints)
+  console.log(newPoints)
+  if (newPoints != oldPoints) {
+    var userId = context.params.userId
+    var postId = context.params.postId
+    var userRef = db.doc(`users/${userId}`)
+    var points = (await userRef.get()).data()['points']
+    points[postId] = newPoints
+    userRef.update({
+      points: points
+    })
+  }
+})
+
+function getTotalHotPoints(points) {
+  if (points == null) return 0;
+  res = 0;
+  for (const key in points) {
+      res += points[key];
+  }
+  return res;
+}

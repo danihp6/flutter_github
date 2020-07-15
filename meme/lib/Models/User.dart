@@ -14,6 +14,7 @@ class User {
   String _email;
   List<String> _tokens;
   List<String> _blockedUsers;
+  Map<String, dynamic> _points;
 
   User(userName, avatar, avatarLocation, followers, followed,favourites, description,
       dateTime, email,tokens) {
@@ -41,7 +42,8 @@ class User {
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
         _email = doc.data['email'],
         _tokens = List<String>.from(doc.data['tokens']),
-        _blockedUsers = List<String>.from(doc.data['blockedUsers']);
+        _blockedUsers = List<String>.from(doc.data['blockedUsers']),
+        _points = doc.data['points'];
 
   Map<String, dynamic> toFirestore() => {
         'userName': _userName,
@@ -55,7 +57,8 @@ class User {
         'keyWords': generateKeyWords(_userName),
         'email': _email,
         'tokens':_tokens,
-        'blokedUsers':[]
+        'blokedUsers':[],
+        'points': Map()
       };
 
   get id => this._id;
@@ -105,4 +108,16 @@ class User {
   get blockedUsers => this._blockedUsers;
 
   set blockedUsers(blockedUsers) => this._blockedUsers = blockedUsers;
+
+  get points => this._points;
+
+  set points(points) => this._points = points;
+
+  int getTotalHotPoints() {
+    int res = 0;
+    points.forEach((id,points) {
+      res += points;
+    });
+    return res;
+  }
 }

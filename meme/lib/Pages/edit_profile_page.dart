@@ -29,7 +29,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String _description;
   String _avatar;
   String _avatarLocation;
-  Uint8List _file;
+  ImageMedia _media;
   TextEditingController _nameController, _descriptionController;
 
   @override
@@ -55,28 +55,27 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     editUser() {
-      db.editUser(_user.id, _userName, _description, _avatar, _avatarLocation,
-          ImageMedia(_file, 1));
+      db.editUser(
+          _user.id, _userName, _description, _avatar, _avatarLocation, _media);
       Navigator.pop(context);
     }
 
-    editAvatar(Media media) async {
-      // File cropedImage = null;
-      // if (cropedImage != null) _file = cropedImage;
-      // setState(() {});
-      // Navigator.pop(context);
+    editAvatar(MyMedia media) async {
+      _media = media;
+      setState(() {});
+      Navigator.pop(context);
     }
 
-    image() {
-      if (_file == null && _avatar == '')
-        return AssetImage('assets/images/user.png');
-      else if (_file == null)
-        return CachedNetworkImage(
+    Widget _buildImage() {
+      print(_avatar);
+      if (_media != null) return Image.memory(_media.image);
+      if (_avatar != '')
+        CachedNetworkImage(
           imageUrl: _avatar,
           placeholder: (context, url) => Loading(),
           errorWidget: (context, url, error) => Container(),
         );
-      return MemoryImage(_file);
+      return Image.asset('assets/images/user.png');
     }
 
     return Scaffold(
@@ -89,12 +88,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
           child: Column(
             children: [
               GestureDetector(
-                child: SizedBox(
-                  width: 90,
-                  height: 90,
-                  child: CircleAvatar(
-                    backgroundImage: image(),
-                  ),
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(
+                        width: 120,
+                        height: 120,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: _buildImage(),
+                        )),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text('Cambiar foto del perfil'),
+                  ],
                 ),
                 onTap: () async => await Permission.storage.request().isGranted
                     ? Navigator.push(
@@ -103,10 +110,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             page: GalleryPage(onMediaSelected: editAvatar)))
                     : null,
               ),
-              SizedBox(
-                height: 10,
-              ),
-              Text('Cambiar foto del perfil'),
               SizedBox(
                 height: 10,
               ),

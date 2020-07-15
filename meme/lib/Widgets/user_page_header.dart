@@ -47,41 +47,7 @@ class UserPageHeader extends StatelessWidget {
           Expanded(
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    GestureDetector(
-                      child: Column(
-                        children: [
-                          Text('Seguidores'),
-                          Text(
-                            user.followers.length.toString(),
-                            style: TextStyle(fontSize: 20),
-                          )
-                        ],
-                      ),
-                      onTap: () => Navigator.push(
-                          context,
-                          SlideLeftRoute(
-                              page: FollowersListPage(userId: user.id))),
-                    ),
-                    GestureDetector(
-                      child: Column(
-                        children: [
-                          Text('Seguidos'),
-                          Text(
-                            user.followed.length.toString(),
-                            style: TextStyle(fontSize: 20),
-                          )
-                        ],
-                      ),
-                      onTap: () => Navigator.push(
-                          context,
-                          SlideLeftRoute(
-                              page: FollowedListPage(userId: user.id))),
-                    ),
-                  ],
-                ),
+                UserFollowedPoints(user: user),
                 SizedBox(
                   height: 10,
                 ),
@@ -103,6 +69,63 @@ class UserPageHeader extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class UserFollowedPoints extends StatelessWidget {
+  const UserFollowedPoints({
+    Key key,
+    @required this.user,
+  }) : super(key: key);
+
+  final User user;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        Column(
+          children: <Widget>[
+            Text('Reputación'),
+              Text(
+                user.getTotalHotPoints().toString(),
+                style: TextStyle(fontSize: 20),
+              )
+          ],
+        ),
+        GestureDetector(
+          child: Column(
+            children: [
+              Text('Seguidores'),
+              Text(
+                user.followers.length.toString(),
+                style: TextStyle(fontSize: 20),
+              )
+            ],
+          ),
+          onTap: () => Navigator.push(
+              context,
+              SlideLeftRoute(
+                  page: FollowersListPage(userId: user.id))),
+        ),
+        GestureDetector(
+          child: Column(
+            children: [
+              Text('Seguidos'),
+              Text(
+                user.followed.length.toString(),
+                style: TextStyle(fontSize: 20),
+              )
+            ],
+          ),
+          onTap: () => Navigator.push(
+              context,
+              SlideLeftRoute(
+                  page: FollowedListPage(userId: user.id))),
+        ),
+      ],
     );
   }
 }

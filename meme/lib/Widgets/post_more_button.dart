@@ -30,10 +30,13 @@ class PostMoreButton extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                         FlatButton(
-                          onPressed: () => Navigator.push(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.push(
                               context,
                               SlideLeftRoute(
-                                  page: SelectPostList(post: post))),
+                                  page: SelectPostList(post: post)));
+                          } ,
                           child: Row(
                             children: [
                               Icon(Icons.add,color: Theme.of(context).accentColor,),
@@ -48,7 +51,10 @@ class PostMoreButton extends StatelessWidget {
                           postList == null &&
                           post.author == db.userId)
                         FlatButton(
-                          onPressed: () => db.deletePost(db.userId, post.id),
+                          onPressed: () {
+                            db.deletePost(db.userId, post.id);
+                            Navigator.pop(context);
+                          } ,
                           child: Row(
                             children: [
                               Icon(Icons.delete,color: Theme.of(context).accentColor,),
@@ -63,8 +69,11 @@ class PostMoreButton extends StatelessWidget {
                           postList != null &&
                           postList.author == db.userId)
                         FlatButton(
-                          onPressed: () => db.deletePostPathInPostList(
-                              db.userId, postList.id, post.author, post.id),
+                          onPressed: () {
+                            db.deletePostPathInPostList(
+                              db.userId, postList.id, post.author, post.id);
+                              Navigator.pop(context);
+                          } ,
                           child: Row(
                             children: [
                               Icon(Icons.remove),

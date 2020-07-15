@@ -40,7 +40,7 @@ class _PostDescriptionState extends State<PostDescription> {
   @override
   void initState() {
     try {
-      _value = widget.post.hotPoints[db.userId].toDouble();
+      _value = widget.post.points[db.userId].toDouble();
       if (_value == _max)
         _color = Colors.yellowAccent[700];
       else if (_value > (_max - _min) / 2)
@@ -48,7 +48,7 @@ class _PostDescriptionState extends State<PostDescription> {
       else
         _color = Colors.blueAccent;
     } catch (e) {
-      _value = 50;
+      _value = 0;
       _color = Colors.black;
     }
 

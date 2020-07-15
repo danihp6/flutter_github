@@ -19,7 +19,7 @@ class UserAvatar extends StatelessWidget {
 
     return GestureDetector(
       child: ClipRRect(
-        borderRadius: BorderRadius.all(Radius.circular(40)),
+        borderRadius: BorderRadius.all(Radius.circular(100)),
               child: CachedNetworkImage(
           imageUrl: user.avatar,
           placeholder: (context, url) => Loading(),

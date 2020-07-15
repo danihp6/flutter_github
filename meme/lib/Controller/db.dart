@@ -224,13 +224,13 @@ class DataBase {
   }
 
   Future changeHotPoints(
-      String authorId, String postId, String userId, int hotPointsUser) async {
+      String authorId, String postId, String userId, int pointsUser) async {
     DocumentReference ref =
         _firestore.document('users/$authorId/posts/$postId');
     DocumentSnapshot snapshot = await ref.get();
-    Map<String, dynamic> hotPoints = snapshot.data['hotPoints'];
-    hotPoints[userId] = hotPointsUser;
-    ref.updateData({'hotPoints': hotPoints});
+    Map<String, dynamic> points = snapshot.data['points'];
+    points[userId] = pointsUser;
+    ref.updateData({'points': points});
   }
 
   Stream<List<Post>> getFollowedPosts (List<String> followed) {
