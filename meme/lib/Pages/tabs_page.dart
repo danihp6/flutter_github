@@ -6,6 +6,7 @@ import 'package:meme/Pages/notifications_page.dart';
 import 'package:meme/Pages/search_page.dart';
 import 'package:meme/Pages/user_page.dart';
 import 'package:meme/Widgets/upload_button.dart';
+import 'my_user_page.dart';
 
 class TabsPage extends StatefulWidget {
   @override
@@ -15,6 +16,7 @@ class TabsPage extends StatefulWidget {
 class _TabsPageState extends State<TabsPage>
     with SingleTickerProviderStateMixin {
   TabController tabController;
+  GlobalKey<ScaffoldState> scaffoldState = GlobalKey<ScaffoldState>();
   
 
   @override
@@ -26,6 +28,7 @@ class _TabsPageState extends State<TabsPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldState,
       floatingActionButton: UploadButton(
         refresh: () {
           setState(() {});
@@ -40,7 +43,7 @@ class _TabsPageState extends State<TabsPage>
             NotificationsPage(
               userId: db.userId,
             ),
-            UserPage(userId: db.userId, scaffoldState: configuration.mainScaffoldState,),
+            MyUserPage(scaffoldState: scaffoldState,)
           ],
         ),
         bottomNavigationBar: Container(

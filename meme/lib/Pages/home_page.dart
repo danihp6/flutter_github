@@ -49,6 +49,7 @@ class _HomePageState extends State<HomePage> {
                 var posts = snapshot.data;
                 print(posts);
                 return ListView.builder(
+                  key: PageStorageKey('home'),
                     shrinkWrap: true,
                     itemCount: posts.length,
                     itemBuilder: (context, index) =>
