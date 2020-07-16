@@ -73,7 +73,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         CachedNetworkImage(
           imageUrl: _avatar,
           placeholder: (context, url) => Loading(),
-          errorWidget: (context, url, error) => Container(),
         );
       return Image.asset('assets/images/user.png');
     }

@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
               builder: (context, snapshot) {
                 if (snapshot.hasError) print(snapshot.error);
                 if (!snapshot.hasData) return Loading();
-                List<Post> posts = snapshot.data;
+                var posts = snapshot.data;
                 print(posts);
                 return ListView.builder(
                     shrinkWrap: true,

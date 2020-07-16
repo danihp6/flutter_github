@@ -66,8 +66,10 @@ class _SearchPageState extends State<SearchPage>
   Widget build(BuildContext context) {
     Future<List<dynamic>> search(String search) {
       search = search.toLowerCase();
+      print(search);
       if (search[0] == '@') {
         typeSearched = 'users';
+        print('-------------------users');
         return db.userSearch(search.substring(1));
       }
       if (search[0] == '#') {
@@ -226,16 +228,16 @@ class _SearchPageState extends State<SearchPage>
           postId: post.id,
         )));
 
-    return StreamBuilder(
-        stream: db.getUser(db.userId),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) print(snapshot.error);
-          if (!snapshot.hasData) return Loading();
-          User currentUser = snapshot.data;
-          List<String> yourBlockedUsers = currentUser.blockedUsers;
-          return WillPopScope(
-            onWillPop: onWillPop,
-            child: SafeArea(
+    return WillPopScope(
+      onWillPop: onWillPop,
+          child: StreamBuilder(
+          stream: db.getUser(db.userId),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) print(snapshot.error);
+            if (!snapshot.hasData) return Loading();
+            User currentUser = snapshot.data;
+            List<String> yourBlockedUsers = currentUser.blockedUsers;
+            return SafeArea(
               child: Scaffold(
                 body: Column(
                   children: [
@@ -446,8 +448,8 @@ class _SearchPageState extends State<SearchPage>
                   ],
                 ),
               ),
-            ),
-          );
-        });
+            );
+          }),
+    );
   }
 }

@@ -53,23 +53,18 @@ class _PostWidgetState extends State<PostWidget> {
                 child: SizedBox(
                     height: 50,
                     child: PostHeader(
-                      post: widget.post,
-                      postList: widget.postList,
-                      author: author,
-                      scaffoldState:widget.scaffoldState
-                    )),
+                        post: widget.post,
+                        postList: widget.postList,
+                        author: author,
+                        scaffoldState: widget.scaffoldState)),
               ),
             AspectRatio(
               aspectRatio: widget.post.aspectRatio,
               child: widget.post.mediaType == MediaType.image
                   ? GestureDetector(
                       child: CachedNetworkImage(
-                        imageUrl:widget.post.media,
+                        imageUrl: widget.post.media,
                         placeholder: (context, url) => Loading(),
-                        fit: BoxFit.cover,
-                        errorWidget: (context, url, error) {
-                          return Container();
-                        },
                       ),
                       onDoubleTap: () => addOrRemoveFavourite(
                           db.userId, widget.post.author, widget.post.id))

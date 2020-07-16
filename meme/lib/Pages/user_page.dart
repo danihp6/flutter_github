@@ -19,6 +19,7 @@ import 'package:meme/Widgets/user_more_button.dart';
 import 'package:meme/Widgets/user_page_header.dart';
 import 'package:rxdart/streams.dart';
 import 'contact_page.dart';
+import 'package:animated_stream_list/animated_stream_list.dart';
 
 class UserPage extends StatelessWidget {
   String userId;
@@ -158,12 +159,13 @@ class _UserPageBodyState extends State<UserPageBody>
           backgroundColor: Colors.deepOrange,
           title: Text(widget.user.userName),
           actions: <Widget>[
-            ShareButton(userId: widget.user.id, scaffoldState: widget.scaffoldState),
-              UserMoreButton(
-                  user: widget.user,
-                  scaffoldState: widget.scaffoldState,
-                  blocked: widget.blocked,
-                  youAreBlocked: widget.youAreBlocked)
+            ShareButton(
+                userId: widget.user.id, scaffoldState: widget.scaffoldState),
+            UserMoreButton(
+                user: widget.user,
+                scaffoldState: widget.scaffoldState,
+                blocked: widget.blocked,
+                youAreBlocked: widget.youAreBlocked)
           ],
         ),
       ),
@@ -206,25 +208,27 @@ class _UserPageBodyState extends State<UserPageBody>
                   controller: tabController,
                   physics: NeverScrollableScrollPhysics(),
                   children: [
-                    StreamBuilder(
-                      stream: db.getPosts(widget.user.id),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) print(snapshot.error);
-                        if (!snapshot.hasData) return Loading();
-                        List<Post> posts = snapshot.data;
-                        if (posts.length == 0)
-                          return Center(
-                              child: Text('Usuario sin publicaciones'));
-                        return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: posts.length,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            return PostWidget(
-                              post: posts[index],
+                    AnimatedStreamList(
+                      streamList: db.getPosts(widget.user.id),
+                      shrinkWrap: true,
+                      scrollPhysics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (item, index, context, animation) {
+                        return SizeTransition(
+                            axis: Axis.vertical,
+                            sizeFactor: animation,
+                            child: PostWidget(
+                              post: item,
                               scaffoldState: widget.scaffoldState,
-                            );
-                          },
+                            ));
+                      },
+                      itemRemovedBuilder: (item, index, context, animation) {
+                        return SizeTransition(
+                          axis: Axis.vertical,
+                          sizeFactor: animation,
+                          child: PostWidget(
+                            post: item,
+                            scaffoldState: widget.scaffoldState,
+                          ),
                         );
                       },
                     ),
