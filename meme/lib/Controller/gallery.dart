@@ -3,16 +3,39 @@ import 'dart:typed_data';
 
 import 'package:media_gallery/media_gallery.dart';
 
+const int NEXT_PAGE = 50;
+
 class Gallery {
-  Future<List<MyMedia>> getMediaGallery() async {
-    List<MediaCollection> collections = await MediaGallery.listMediaCollections(
+  List<MediaCollection> _mediaCollections;
+
+  List<MyMediaCollection> _collections;
+
+  List<MyMediaCollection> get collections => this._collections;
+
+  getMediaGallery() async {
+    _mediaCollections = await MediaGallery.listMediaCollections(
       mediaTypes: [MediaType.image, MediaType.video],
     );
-    print(collections);
-    MediaPage page = await collections.first.getMedias(
-      take: 50,
-    );
-    return await Future.wait(page.items.map((media) => mediaToMyMedia(media)));
+
+    _collections = _mediaCollections
+        .map((collection) => MyMediaCollection(collection.name))
+        .toList();
+
+    await loadMedia(0);
+  }
+
+  changeCollection(int index) async {
+    if (_collections[index].pagination == 0) await loadMedia(index);
+  }
+
+  Future loadMedia(int index) async {
+    _collections[index].media.addAll(await Future.wait(
+        (await _mediaCollections[index].getMedias(
+                skip: _collections[index]._pagination,
+                take: _collections[index]._pagination + NEXT_PAGE))
+            .items
+            .map((media) => mediaToMyMedia(media))));
+    _collections[index]._pagination += NEXT_PAGE;
   }
 }
 
@@ -55,9 +78,29 @@ class VideoMedia extends MyMedia {
   get thumbnail => this._thumbnail;
 }
 
+class MyMediaCollection {
+  int _pagination;
+  List<MyMedia> _media;
+  String _name;
+
+  MyMediaCollection(name) {
+    this._name = name;
+    this._pagination = 0;
+    this._media = [];
+  }
+
+  int get pagination => this._pagination;
+
+  List<MyMedia> get media => this._media;
+
+  set media(List<MyMedia> media) => this._media = media;
+
+  String get name => this._name;
+}
+
 Future<MyMedia> mediaToMyMedia(Media media) async {
   if (media.mediaType == MediaType.image)
-    return ImageMedia(await (await media.getFile()).readAsBytes(),1);
+    return ImageMedia(await (await media.getFile()).readAsBytes(), 1);
   else
-    return VideoMedia(await media.getFile(), await media.getThumbnail(),1);
+    return VideoMedia(await media.getFile(), await media.getThumbnail(), 1);
 }

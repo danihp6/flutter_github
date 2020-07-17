@@ -1,20 +1,13 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:flutter_video_compress/flutter_video_compress.dart';
 import 'package:image_editor/image_editor.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/gallery.dart';
 import 'package:meme/Pages/image_editor_page.dart';
-import 'package:meme/Pages/upload_publication_page.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/video_player.dart';
-
 import 'package:transparent_image/transparent_image.dart';
 
 class GalleryPage extends StatefulWidget {
@@ -27,7 +20,8 @@ class GalleryPage extends StatefulWidget {
 }
 
 class _GalleryPageState extends State<GalleryPage> {
-  List<MyMedia> mediaList;
+  List<MyMediaCollection> collections;
+  MyMediaCollection selectedCollection;
   MyMedia selectedMedia;
   ImageProvider provider;
   GlobalKey<ExtendedImageEditorState> editorKey =
@@ -36,26 +30,41 @@ class _GalleryPageState extends State<GalleryPage> {
   IconData icon = Icons.image;
   double aspectRatio = 1;
   double maxChildSize;
+  ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
-    gallery.getMediaGallery().then((gallery) {
+    gallery.getMediaGallery().then((_) {
       print(gallery);
-      mediaList = gallery;
-      selectedMedia = mediaList.first;
+      collections = gallery.collections;
+      selectedCollection = collections.first;
+      if(selectedCollection.media.isNotEmpty)selectedMedia = selectedCollection.media.first;
       maxChildSize = (MediaQuery.of(context).size.width + 58) /
           MediaQuery.of(context).size.height;
+      scrollController.addListener(_scrollListener);
       setState(() {});
     });
 
     super.initState();
   }
 
+  void _scrollListener() {
+    if (scrollController.offset >= scrollController.position.maxScrollExtent &&
+        !scrollController.position.outOfRange) {
+      print('end');
+      gallery.loadMedia(collections.indexOf(selectedCollection));
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (mediaList == null) return Scaffold(body: Loading());
+    if (collections == null) return Scaffold(body: Loading());
 
-    if(mediaList.isEmpty) return Scaffold(body: Text('No hay contenido en la galeria'),);
+    if (collections.isEmpty)
+      return Scaffold(
+        body: Text('No hay contenido en la galeria'),
+      );
 
     selectedMedia.aspectRatio = aspectRatio;
 
@@ -72,6 +81,7 @@ class _GalleryPageState extends State<GalleryPage> {
     }
 
     Widget _buildPreview() {
+      print(selectedMedia is ImageMedia);
       if (selectedMedia is ImageMedia) {
         ImageMedia media = selectedMedia;
         provider = ExtendedMemoryImageProvider(media.image);
@@ -186,10 +196,39 @@ class _GalleryPageState extends State<GalleryPage> {
             //     });
             //   },
             // ),
+            title: DropdownButton(
+              value: selectedCollection,
+              iconEnabledColor: Colors.white,
+              selectedItemBuilder: (context) => collections
+                  .map((item) => Center(
+                      child: SizedBox(
+                          width: 150,
+                          child: Text(
+                            selectedCollection.name,
+                            style: TextStyle(color: Colors.white),
+                            overflow: TextOverflow.ellipsis,
+                          ))))
+                  .toList(),
+              items: collections
+                  .map((collection) => DropdownMenuItem(
+                        value: collection,
+                        child: Text(
+                          collection.name,
+                        ),
+                      ))
+                  .toList(),
+              onChanged: (collection) async {
+                selectedCollection = collection;
+                await gallery
+                    .changeCollection(collections.indexOf(selectedCollection));
+                if(selectedCollection.media.isNotEmpty)selectedMedia = selectedCollection.media.first;
+                setState(() {});
+              },
+            ),
             actions: <Widget>[
               IconButton(
                   icon: Icon(Icons.arrow_forward),
-                  onPressed: mediaList.isNotEmpty
+                  onPressed: selectedCollection.media.isNotEmpty
                       ? () {
                           goUploadMedia();
                         }
@@ -197,27 +236,47 @@ class _GalleryPageState extends State<GalleryPage> {
             ],
           ),
         ),
-        body: mediaList.isNotEmpty
+        body: selectedCollection.media.isNotEmpty
             ? Stack(
                 children: <Widget>[
                   GridView.builder(
-                      itemCount: mediaList.length,
+                      controller: scrollController,
+                      itemCount: selectedCollection.media.length,
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
                           crossAxisSpacing: 1,
                           mainAxisSpacing: 1),
                       itemBuilder: (context, index) {
                         return GestureDetector(
-                            child: MediaProvider(
-                                media: mediaList[index] is ImageMedia
-                                    ? (mediaList[index] as ImageMedia).image
-                                    : (mediaList[index] as VideoMedia)
-                                        .thumbnail),
+                            child: Stack(
+                              children: <Widget>[
+                                MediaProvider(
+                                    media: selectedCollection.media[index]
+                                            is ImageMedia
+                                        ? (selectedCollection.media[index]
+                                                as ImageMedia)
+                                            .image
+                                        : (selectedCollection.media[index]
+                                                as VideoMedia)
+                                            .thumbnail),
+                                if (selectedMedia ==
+                                    selectedCollection.media[index])
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        width: 2,
+                                        color: Theme.of(context).accentColor,
+                                      ),
+                                    ),
+                                  )
+                              ],
+                            ),
                             onTap: () {
-                              selectedMedia = mediaList[index];
+                              selectedMedia = selectedCollection.media[index];
                               setState(() {});
                             });
                       }),
+                      if(selectedCollection.media.isNotEmpty)
                   DraggableScrollableSheet(
                     initialChildSize: 0.1,
                     minChildSize: 0.1,
@@ -226,25 +285,9 @@ class _GalleryPageState extends State<GalleryPage> {
                       print(maxChildSize);
                       return SingleChildScrollView(
                         controller: scrollController,
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              height: 0,
-                              color: Theme.of(context)
-                                  .accentColor
-                                  .withOpacity(0.7),
-                              child: Center(
-                                child: Icon(
-                                  Icons.keyboard_arrow_up,
-                                  size: 30,
-                                ),
-                              ),
-                            ),
-                            AspectRatio(
-                                aspectRatio: selectedMedia.aspectRatio,
-                                child: _buildPreview())
-                          ],
-                        ),
+                        child: AspectRatio(
+                            aspectRatio: selectedMedia.aspectRatio,
+                            child: _buildPreview()),
                       );
                     },
                   ),
@@ -260,9 +303,12 @@ class MediaProvider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FadeInImage(
-        fit: BoxFit.cover,
-        placeholder: MemoryImage(kTransparentImage),
-        image: MemoryImage(media));
+    return AspectRatio(
+      aspectRatio: 1,
+      child: FadeInImage(
+          fit: BoxFit.cover,
+          placeholder: MemoryImage(kTransparentImage),
+          image: MemoryImage(media)),
+    );
   }
 }
