@@ -390,7 +390,7 @@ class DataBase {
 
   Stream<List<Tag>> getTendTags() => _firestore
       .collection('tags')
-      .orderBy('posts')
+      .orderBy('totalPoints',descending: true)
       .limit(10)
       .snapshots()
       .map(toTagLists);

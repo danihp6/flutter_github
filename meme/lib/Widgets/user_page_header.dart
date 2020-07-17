@@ -90,7 +90,7 @@ class UserFollowedPoints extends StatelessWidget {
           children: <Widget>[
             Text('Reputación'),
               Text(
-                user.getTotalHotPoints().toString(),
+                user.getTotalPoints().toString(),
                 style: TextStyle(fontSize: 20),
               )
           ],

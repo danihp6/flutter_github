@@ -5,6 +5,8 @@ class Tag {
   String _id;
   String _name;
   List<String> _posts;
+  Map<String, dynamic> _points;
+  int _totalPoints;
 
   Tag(name, posts) {
     this._name = name;
@@ -14,9 +16,17 @@ class Tag {
   Tag.fromFirestore(DocumentSnapshot doc)
       : _id = doc.documentID,
         _name = doc.data['name'],
-        _posts = List<String>.from(doc.data['posts']);
+        _posts = List<String>.from(doc.data['posts']),
+        _points = doc.data['points'],
+        _totalPoints = doc.data['totalPoints'];
 
-  Map<String, dynamic> toFirestore() => {'name': _name, 'posts': _posts,'keyWords':generateKeyWords(_name)};
+  Map<String, dynamic> toFirestore() => {
+        'name': _name,
+        'posts': _posts,
+        'keyWords': generateKeyWords(_name),
+        'points': Map(),
+        'totalPoints': 0
+      };
 
   get id => this._id;
 
@@ -29,6 +39,14 @@ class Tag {
   get posts => this._posts;
 
   set posts(posts) => this._posts = posts;
+
+  get points => this._points;
+
+  set points(points) => this._points = points;
+
+  get totalPoints => this._totalPoints;
+
+  set totalPoints(totalPoints) => this._totalPoints = totalPoints;
 }
 
 List<Tag> toTagLists(QuerySnapshot query) {

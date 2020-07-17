@@ -98,139 +98,154 @@ class _SearchPageState extends State<SearchPage>
 
     Widget recentsView() {
       if (tabController.index == 0)
-        return ListView.builder(
-          itemCount: storage.recentUsers.length,
-          itemBuilder: (context, index) {
-            String userRecentId = storage.recentUsers[index];
-            return StreamBuilder(
-                stream: db.getUser(userRecentId),
+        return storage.recentUsers.isNotEmpty
+            ? StreamBuilder(
+                stream: CombineLatestStream.list(
+                        storage.recentUsers.map((user) => db.getUser(user)))
+                    .asBroadcastStream(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) print(snapshot.error);
                   if (!snapshot.hasData) return Loading();
-                  User user = snapshot.data;
+                  List<User> users = snapshot.data;
+
                   return Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        GestureDetector(
-                          child: Row(
-                            children: <Widget>[
-                              UserAvatar(user: user),
-                              SizedBox(width: 10),
-                              Text(user.userName,
-                                  style: TextStyle(fontSize: 16)),
-                            ],
-                          ),
-                          onTap: () => Navigator.push(context,
-                              SlideLeftRoute(page: UserPage(userId: user.id))),
-                        ),
-                        IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              var newRecentUsers = storage.recentUsers;
-                              newRecentUsers.remove(userRecentId);
-                              storage.recentUsers = newRecentUsers;
-                              setState(() {});
-                            })
-                      ],
-                    ),
-                  );
-                });
-          },
-        );
-      if (tabController.index == 1)
-        return ListView.builder(
-          itemCount: storage.recentTags.length,
-          itemBuilder: (context, index) {
-            String tagRecentId = storage.recentTags[index];
-            return StreamBuilder(
-                stream: db.getTag(tagRecentId),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) print(snapshot.error);
-                  if (!snapshot.hasData) return Loading();
-                  Tag tag = snapshot.data;
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        TagWidget(
-                            tag: tag,
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  SlideLeftRoute(
-                                      page: TagPage(
-                                    tagId: tag.id,
-                                  )));
-                            }),
-                        IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              var newRecentTags = storage.recentTags;
-                              newRecentTags.remove(tagRecentId);
-                              storage.recentTags = newRecentTags;
-                              setState(() {});
-                            })
-                      ],
-                    ),
-                  );
-                });
-          },
-        );
-      if (tabController.index == 2)
-        return ListView.builder(
-          itemCount: storage.recentPostLists.length,
-          itemBuilder: (context, index) {
-            String postListRecentId = storage.recentPostLists[index];
-            return StreamBuilder(
-                stream: db.getPostListByPath(postListRecentId),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) print(snapshot.error);
-                  if (!snapshot.hasData) return Loading();
-                  PostList postList = snapshot.data;
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        PostListWidget(
-                            postList: postList,
-                            activeMoreOptions: false,
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListView.builder(
+                      itemCount: users.length,
+                      itemBuilder: (context, index) => Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          GestureDetector(
+                            child: Row(
+                              children: <Widget>[
+                                UserAvatar(user: users[index]),
+                                SizedBox(width: 10),
+                                Text(users[index].userName,
+                                    style: TextStyle(fontSize: 16)),
+                              ],
+                            ),
                             onTap: () => Navigator.push(
                                 context,
                                 SlideLeftRoute(
-                                    page: PostListPage(
-                                  postList: postList,
-                                )))),
-                        IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              var newRecentPostLists = storage.recentPostLists;
-                              newRecentPostLists.remove(postListRecentId);
-                              storage.recentPostLists = newRecentPostLists;
-                              setState(() {});
-                            })
-                      ],
+                                    page: UserPage(userId: users[index].id))),
+                          ),
+                          IconButton(
+                              icon: Icon(Icons.clear),
+                              onPressed: () {
+                                var newRecentUsers = storage.recentUsers;
+                                newRecentUsers.remove(users[index].id);
+                                storage.recentUsers = newRecentUsers;
+                                setState(() {});
+                              })
+                        ],
+                      ),
                     ),
                   );
-                });
-          },
-        );
-    }
+                },
+              )
+            : Center(
+                child: Text('No hay busquedas de usuarios recientes'),
+              );
+      if (tabController.index == 1)
+        return storage.recentTags.isNotEmpty
+            ? StreamBuilder(
+                stream: CombineLatestStream.list(
+                        storage.recentTags.map((tag) => db.getTag(tag)))
+                    .asBroadcastStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) print(snapshot.error);
+                  if (!snapshot.hasData) return Loading();
+                  List<Tag> tags = snapshot.data;
 
-    goPost(Post post) => Navigator.push(
-        context,
-        SlideLeftRoute(
-            page: PostPage(
-          authorId: post.author,
-          postId: post.id,
-        )));
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListView.builder(
+                      itemCount: tags.length,
+                      itemBuilder: (context, index) => GestureDetector(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            TagWidget(
+                                tag: tags[index],
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      SlideLeftRoute(
+                                          page: TagPage(
+                                        tagId: tags[index].id,
+                                      )));
+                                }),
+                            IconButton(
+                                icon: Icon(Icons.clear),
+                                onPressed: () {
+                                  var newRecentTags = storage.recentTags;
+                                  newRecentTags.remove(tags[index].id);
+                                  storage.recentTags = newRecentTags;
+                                  setState(() {});
+                                })
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              )
+            : Center(
+                child: Text('No hay busquedas de tags recientes'),
+              );
+      if (tabController.index == 2)
+        return storage.recentPostLists.isNotEmpty
+            ? StreamBuilder(
+                stream: CombineLatestStream.list(storage.recentPostLists
+                        .map((postList) => db.getTag(postList)))
+                    .asBroadcastStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) print(snapshot.error);
+                  if (!snapshot.hasData) return Loading();
+                  List<PostList> postLists = snapshot.data;
+
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListView.builder(
+                      itemCount: postLists.length,
+                      itemBuilder: (context, index) => GestureDetector(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            PostListWidget(
+                                postList: postLists[index],
+                                activeMoreOptions: false,
+                                onTap: () => Navigator.push(
+                                    context,
+                                    SlideLeftRoute(
+                                        page: PostListPage(
+                                      postList: postLists[index],
+                                    )))),
+                            IconButton(
+                                icon: Icon(Icons.clear),
+                                onPressed: () {
+                                  var newRecentPostLists =
+                                      storage.recentPostLists;
+                                  newRecentPostLists
+                                      .remove(postLists[index].id);
+                                  storage.recentPostLists = newRecentPostLists;
+                                  setState(() {});
+                                })
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              )
+            : Center(
+                child: Text('No hay busquedas de listas recientes'),
+              );
+    }
 
     return WillPopScope(
       onWillPop: onWillPop,
-          child: StreamBuilder(
+      child: StreamBuilder(
           stream: db.getUser(db.userId),
           builder: (context, snapshot) {
             if (snapshot.hasError) print(snapshot.error);
@@ -266,67 +281,8 @@ class _SearchPageState extends State<SearchPage>
                                 EdgeInsets.only(left: 8, right: 8),
                             minimumChars: 1,
                             placeHolder: !isRecentsView
-                                ? StreamBuilder(
-                                    stream: db.getTendTags(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasError)
-                                        print(snapshot.error);
-                                      if (!snapshot.hasData) return Loading();
-                                      List<Tag> tags = snapshot.data;
-                                      return ListView.builder(
-                                          itemCount: tags.length,
-                                          itemBuilder: (context, index) {
-                                            Tag tag = tags[index];
-                                            List<String> postPaths = tag.posts;
-                                            return Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Column(
-                                                children: <Widget>[
-                                                  TagWidget(
-                                                    tag: tag,
-                                                    onTap: () => Navigator.push(
-                                                        context,
-                                                        SlideLeftRoute(
-                                                            page: TagPage(
-                                                          tagId: tag.id,
-                                                        ))),
-                                                  ),
-                                                  SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  StreamBuilder(
-                                                      stream:
-                                                          CombineLatestStream
-                                                              .list(postPaths
-                                                                  .map((postPath) =>
-                                                                      db.getPostByPath(postPath))),
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        if (snapshot.hasError)
-                                                          print(snapshot.error);
-                                                        if (!snapshot.hasData)
-                                                          return Loading();
-                                                        List<Post> posts =
-                                                            snapshot.data;
-                                                        return PostsCarousel(
-                                                          posts: posts,
-                                                          onTap: goPost,
-                                                        );
-                                                      })
-                                                ],
-                                              ),
-                                            );
-                                          });
-                                    })
-                                : Column(
-                                    children: <Widget>[
-                                      Text('Recientes'),
-                                      Expanded(
-                                        child: recentsView(),
-                                      ),
-                                    ],
-                                  ),
+                                ? TendTagsStream()
+                                : recentsView(),
                             onItemFound: (item, index) {
                               if (typeSearched == 'users') {
                                 bool blocked =
@@ -452,4 +408,84 @@ class _SearchPageState extends State<SearchPage>
           }),
     );
   }
+}
+
+class TendTagsStream extends StatefulWidget {
+  const TendTagsStream({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  _TendTagsStreamState createState() => _TendTagsStreamState();
+}
+
+class _TendTagsStreamState extends State<TendTagsStream>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    goPost(Post post) => Navigator.push(
+        context,
+        SlideLeftRoute(
+            page: PostPage(
+          authorId: post.author,
+          postId: post.id,
+        )));
+
+    return StreamBuilder(
+        stream: db.getTendTags(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+          if (!snapshot.hasData) return Loading();
+          List<Tag> tags = snapshot.data;
+          if (tags.isEmpty)
+            return Center(child: Text('No hay tags en tendencias'));
+          return ListView.builder(
+              itemCount: tags.length,
+              itemBuilder: (context, index) {
+                Tag tag = tags[index];
+                List<String> postPaths = tag.posts;
+                if (postPaths.isEmpty)
+                  return Center(child: Text('No hay tags en tendencias'));
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          Text('${index + 1} - ',style:TextStyle(fontSize: 16)),
+                          TagWidget(
+                            tag: tag,
+                            onTap: () => Navigator.push(
+                                context,
+                                SlideLeftRoute(
+                                    page: TagPage(
+                                  tagId: tag.id,
+                                ))),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      StreamBuilder(
+                          stream: CombineLatestStream.list(postPaths
+                              .map((postPath) => db.getPostByPath(postPath))),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) print(snapshot.error);
+                            if (!snapshot.hasData) return Loading();
+                            List<Post> posts = snapshot.data;
+                            return PostsCarousel(
+                              posts: posts,
+                              onTap: goPost,
+                            );
+                          })
+                    ],
+                  ),
+                );
+              });
+        });
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 }

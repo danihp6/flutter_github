@@ -82,14 +82,17 @@ class _PostDescriptionState extends State<PostDescription> {
         if (_isHotSliderActived)
           SizedBox(
             height: 50,
-            child: HotSlider(
-              value: _value,
-              min: _min,
-              max: _max,
-              isHandlerActived: _isHandlerActived,
-              color: _color,
-              isHotSliderActived: _isHotSliderActived,
-              onDragCompleted: (value) => onDragCompleted(value),
+            child: Padding(
+              padding: const EdgeInsets.only(left:10,right:10),
+              child: HotSlider(
+                value: _value,
+                min: _min,
+                max: _max,
+                isHandlerActived: _isHandlerActived,
+                color: _color,
+                isHotSliderActived: _isHotSliderActived,
+                onDragCompleted: (value) => onDragCompleted(value),
+              ),
             ),
           ),
         SizedBox(
@@ -107,7 +110,7 @@ class _PostDescriptionState extends State<PostDescription> {
                       _isHotSliderActived = !_isHotSliderActived;
                     });
                   }),
-              Text(widget.post.getTotalHotPoints().toString(),
+              Text(widget.post.getTotalPoints().toString(),
                   style: TextStyle(fontSize: 18)),
               IconButton(
                 icon: Icon(Icons.comment),

@@ -100,9 +100,9 @@ class Post {
 
   set aspectRatio(aspectRatio) => this._aspectRatio = aspectRatio;
 
-  int getTotalHotPoints() {
+  int getTotalPoints() {
     int res = 0;
-    points.forEach((id,points) {
+    _points.forEach((id,points) {
       res += points;
     });
     return res;

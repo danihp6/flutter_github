@@ -22,8 +22,20 @@ class TagPage extends StatelessWidget {
           Tag tag = snapshot.data;
           List<String> posts = tag.posts;
           return Scaffold(
-            appBar: AppBar(
-              title: Text('#' + tag.name),
+            key: scaffoldState,
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(40),
+                          child: AppBar(
+                title: Text('#' + tag.name),
+                actions: <Widget>[
+                  Center(child: Text(tag.totalPoints.toString(),style:TextStyle(
+                    fontSize: 16
+                  ))),
+                  SizedBox(width: 5,),
+                  Icon(Icons.whatshot),
+                  SizedBox(width:5)
+                ],
+              ),
             ),
             body: ListView.builder(
               itemCount: posts.length,

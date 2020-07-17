@@ -4,22 +4,18 @@ import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Pages/account_page.dart';
 import 'package:meme/Pages/post_list_page.dart';
 import 'package:meme/Pages/post_page.dart';
-import 'package:meme/Pages/account_page.dart';
-import 'package:meme/Widgets/Stream2Users.dart';
 import 'package:meme/Widgets/loading.dart';
-import 'package:meme/Widgets/post_list_new_button.dart';
 import 'package:meme/Widgets/post.dart';
-import 'package:meme/Widgets/post_list.dart';
 import 'package:meme/Widgets/post_list_carousel.dart';
-import 'package:meme/Widgets/share_button.dart';
+import 'package:meme/Widgets/post_list_new_button.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
-import 'package:meme/Widgets/user_more_button.dart';
 import 'package:meme/Widgets/user_page_header.dart';
 import 'package:rxdart/streams.dart';
+
 import 'contact_page.dart';
-import 'package:animated_stream_list/animated_stream_list.dart';
 
 class MyUserPage extends StatefulWidget {
   GlobalKey<ScaffoldState> scaffoldState;
@@ -33,10 +29,6 @@ class _MyUserPageState extends State<MyUserPage>
     with SingleTickerProviderStateMixin {
   TabController tabController;
 
-  final Key keyPosts = PageStorageKey('posts');
-  final Key keyFavourites = PageStorageKey('favourites');
-  final Key keyPostLists = PageStorageKey('postLists');
-
   @override
   void initState() {
     tabController = new TabController(length: 3, vsync: this);
@@ -48,15 +40,6 @@ class _MyUserPageState extends State<MyUserPage>
     tabController.dispose();
     super.dispose();
   }
-
-  goPostList(PostList postList) => Navigator.of(context)
-      .push(SlideLeftRoute(page: PostListPage(postList: postList)));
-
-  goPost(Post post) => Navigator.of(context).push(SlideLeftRoute(
-          page: PostPage(
-        authorId: post.author,
-        postId: post.id,
-      )));
 
   @override
   Widget build(BuildContext context) {
@@ -174,88 +157,19 @@ class _MyUserPageState extends State<MyUserPage>
                               controller: tabController,
                               physics: NeverScrollableScrollPhysics(),
                               children: [
-                                StreamBuilder(
-                                  stream: db.getPosts(db.userId),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.hasError)
-                                      print(snapshot.error);
-                                    if (!snapshot.hasData) return Loading();
-                                    List<Post> posts = snapshot.data;
-                                    return ListView.builder(
-                                      key: keyPosts,
-                                      physics: NeverScrollableScrollPhysics(),
-                                      itemCount: posts.length,
-                                      itemBuilder: (context, index) =>
-                                          PostWidget(
-                                        post: posts[index],
-                                        scaffoldState: widget.scaffoldState,
-                                      ),
-                                    );
-                                  },
-                                ),
+                                PostsStream(
+                                    scaffoldState: widget.scaffoldState),
                                 favourites.isNotEmpty
-                                    ? StreamBuilder(
-                                        stream: CombineLatestStream.list(
-                                                favourites.map((favourite) => db
-                                                    .getPostByPath(favourite)))
-                                            .asBroadcastStream(),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.hasError)
-                                            print(snapshot.error);
-                                          if (!snapshot.hasData)
-                                            return Loading();
-                                          List<Post> posts = snapshot.data;
-                                          print(posts);
-                                          return ListView.builder(
-                                            key: keyFavourites,
-                                            shrinkWrap: true,
-                                            physics:
-                                                NeverScrollableScrollPhysics(),
-                                            itemCount: posts.length,
-                                            itemBuilder: (context, index) =>
-                                                PostWidget(
-                                              post: posts[index],
-                                              scaffoldState:
-                                                  widget.scaffoldState,
-                                            ),
-                                          );
-                                        },
-                                      )
+                                    ? FavouritesStream(
+                                        favourites: favourites,
+                                        scaffoldState: widget.scaffoldState)
                                     : Center(
                                         child: Text('Usuario sin favoritos')),
                                 Column(
                                   children: <Widget>[
                                     PostListNewButton(),
                                     Expanded(
-                                      child: StreamBuilder(
-                                        stream: db.getPostLists(db.userId),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.hasError)
-                                            print(snapshot.error);
-                                          if (!snapshot.hasData)
-                                            return Loading();
-                                          List<PostList> postlists =
-                                              snapshot.data;
-                                          if (postlists.length == 0)
-                                            return Center(
-                                                child:
-                                                    Text('Usuario sin listas'));
-                                          return ListView.builder(
-                                            key: keyPostLists,
-                                            shrinkWrap: true,
-                                            itemCount: postlists.length,
-                                            physics:
-                                                NeverScrollableScrollPhysics(),
-                                            itemBuilder: (context, index) {
-                                              return PostListCarousel(
-                                                postList: postlists[index],
-                                                onTapPostList: goPostList,
-                                                onTapPost: goPost,
-                                              );
-                                            },
-                                          );
-                                        },
-                                      ),
+                                      child: PostListsStream(),
                                     ),
                                   ],
                                 )
@@ -266,4 +180,130 @@ class _MyUserPageState extends State<MyUserPage>
                   ));
             }));
   }
+}
+
+class PostListsStream extends StatefulWidget {
+  const PostListsStream({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  _PostListsStreamState createState() => _PostListsStreamState();
+}
+
+class _PostListsStreamState extends State<PostListsStream> with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    goPostList(PostList postList) => Navigator.of(context)
+        .push(SlideLeftRoute(page: PostListPage(postList: postList)));
+
+    goPost(Post post) => Navigator.of(context).push(SlideLeftRoute(
+            page: PostPage(
+          authorId: post.author,
+          postId: post.id,
+        )));
+
+    return StreamBuilder(
+      stream: db.getPostLists(db.userId),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) print(snapshot.error);
+        if (!snapshot.hasData) return Loading();
+        List<PostList> postlists = snapshot.data;
+        if (postlists.length == 0)
+          return Center(child: Text('Usuario sin listas'));
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: postlists.length,
+          physics: NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            return PostListCarousel(
+              postList: postlists[index],
+              onTapPostList: goPostList,
+              onTapPost: goPost,
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+
+class FavouritesStream extends StatefulWidget {
+  const FavouritesStream({
+    Key key,
+    @required this.favourites,
+    @required this.scaffoldState,
+  }) : super(key: key);
+
+  final List<String> favourites;
+  final GlobalKey<ScaffoldState> scaffoldState;
+
+  @override
+  _FavouritesStreamState createState() => _FavouritesStreamState();
+}
+
+class _FavouritesStreamState extends State<FavouritesStream> with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: CombineLatestStream.list(
+              widget.favourites.map((favourite) => db.getPostByPath(favourite)))
+          .asBroadcastStream(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) print(snapshot.error);
+        if (!snapshot.hasData) return Loading();
+        List<Post> posts = snapshot.data;
+        print(posts);
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: posts.length,
+          itemBuilder: (context, index) => PostWidget(
+            post: posts[index],
+            scaffoldState: widget.scaffoldState,
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+
+class PostsStream extends StatefulWidget {
+  const PostsStream({Key key, this.scaffoldState}) : super(key: key);
+
+  final GlobalKey<ScaffoldState> scaffoldState;
+
+  @override
+  _PostsStreamState createState() => _PostsStreamState();
+}
+
+class _PostsStreamState extends State<PostsStream> with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: db.getPosts(db.userId),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) print(snapshot.error);
+        if (!snapshot.hasData) return Loading();
+        List<Post> posts = snapshot.data;
+        return ListView.builder(
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: posts.length,
+          itemBuilder: (context, index) => PostWidget(
+            post: posts[index],
+            scaffoldState: widget.scaffoldState,
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 }

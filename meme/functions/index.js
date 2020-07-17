@@ -225,27 +225,41 @@ exports.onCreateReport = functions.region('europe-west2').firestore.document('us
 })
 
 exports.onChangePostPoints = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onUpdate(async (change, context) => {
-  var newPoints = getTotalHotPoints(change.after.data()['points'])
-  var oldPoints = getTotalHotPoints(change.before.data()['points'])
+  var newPoints = getTotalPoints(change.after.data()['points'])
+  var oldPoints = getTotalPoints(change.before.data()['points'])
   console.log(oldPoints)
   console.log(newPoints)
   if (newPoints != oldPoints) {
     var userId = context.params.userId
     var postId = context.params.postId
     var userRef = db.doc(`users/${userId}`)
-    var points = (await userRef.get()).data()['points']
-    points[postId] = newPoints
+    var userPoints = (await userRef.get()).data()['points']
+    userPoints[postId] = newPoints
     userRef.update({
-      points: points
+      points: userPoints
     })
+
+    var tags = change.before.data()['tags']
+    console.log(tags)
+    tags.forEach(async tag => {
+      var tagRef = db.doc(`tags/${tag}`)
+      var tagPoints = (await tagRef.get()).data()['points']
+      tagPoints[postId] = newPoints
+      totalPoints = getTotalPoints(tagPoints)
+      tagRef.update({
+        points: tagPoints,
+        totalPoints: totalPoints
+      })
+
+    });
   }
 })
 
-function getTotalHotPoints(points) {
+function getTotalPoints(points) {
   if (points == null) return 0;
   res = 0;
   for (const key in points) {
-      res += points[key];
+    res += points[key];
   }
   return res;
 }

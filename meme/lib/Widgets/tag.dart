@@ -4,8 +4,8 @@ import 'package:meme/Models/Tag.dart';
 class TagWidget extends StatelessWidget {
   Tag tag;
   Function onTap;
-  bool isNumberPublicationsShowed;
-  TagWidget({@required this.tag, @required this.onTap,this.isNumberPublicationsShowed = true});
+  bool isPointsShowed;
+  TagWidget({@required this.tag, @required this.onTap,this.isPointsShowed = true});
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +27,16 @@ class TagWidget extends StatelessWidget {
           SizedBox(
             width: 5,
           ),
-          if(isNumberPublicationsShowed)
-          Text(
-            tag.posts.length.toString() + ' publicación',
-            style: TextStyle(fontSize: 16),
+          if(isPointsShowed)
+          Row(
+            children: <Widget>[
+              Text(
+                tag.totalPoints.toString(),
+                style: TextStyle(fontSize: 18),
+              ),
+              SizedBox(width: 5,),
+              Icon(Icons.whatshot)
+            ],
           )
         ],
       ),

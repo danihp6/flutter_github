@@ -28,7 +28,7 @@ class StreamTagViewer extends StatelessWidget {
           if (snapshot.hasError) print(snapshot.error);
                     if (!snapshot.hasData) return Container();
                     Tag tag = snapshot.data;
-          return TagWidget(tag: tag,isNumberPublicationsShowed: false, onTap: ()=>Navigator.push(context, SlideLeftRoute(page: TagPage(tagId: tag.id))));
+          return TagWidget(tag: tag,isPointsShowed: false, onTap: ()=>Navigator.push(context, SlideLeftRoute(page: TagPage(tagId: tag.id))));
         }
       ),
     );

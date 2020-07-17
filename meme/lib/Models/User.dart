@@ -113,9 +113,9 @@ class User {
 
   set points(points) => this._points = points;
 
-  int getTotalHotPoints() {
+  int getTotalPoints() {
     int res = 0;
-    points.forEach((id,points) {
+    _points.forEach((id,points) {
       res += points;
     });
     return res;
