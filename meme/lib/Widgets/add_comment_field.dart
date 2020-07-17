@@ -79,7 +79,7 @@ class _AddCommentFieldState extends State<AddCommentField> {
             widget.post.id,
             widget.commentResponse.id,
             new Comment(text, <String>[], db.userId, DateTime.now(), <String>[],
-                1, media, mediaType));
+                1, media, mediaType!=null?mediaType:''));
         widget.cancelResponse();
       } else
         db.newOuterComment(

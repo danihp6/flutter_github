@@ -120,5 +120,5 @@ void orderListPostByDateTime(List<Post> posts) =>
 MediaType toMediaType(String string){
   if(MediaType.image.toString() == string) return MediaType.image;
   if(MediaType.video.toString() == string) return MediaType.video;
-  else throw Exception('Incorrect type');
+  return null;
 }

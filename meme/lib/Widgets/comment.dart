@@ -51,7 +51,7 @@ class _CommentWidgetState extends State<CommentWidget> {
                 actionPane: SlidableDrawerActionPane(),
                 actionExtentRatio: 0.25,
                 actions: <Widget>[
-                  if (db.userId == _comment.authorId)
+                  if (db.userId == _comment.authorId || db.userId == _comment.userPostId)
                     IconSlideAction(
                       caption: 'Borrar',
                       color: Theme.of(context).accentColor,
