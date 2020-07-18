@@ -10,6 +10,8 @@ import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/video_player.dart';
 import 'package:transparent_image/transparent_image.dart';
 
+List<double> myAspectRatios = [1, (4 / 3), 1.91];
+
 class GalleryPage extends StatefulWidget {
   Function onMediaSelected;
 
@@ -28,9 +30,11 @@ class _GalleryPageState extends State<GalleryPage> {
       GlobalKey<ExtendedImageEditorState>();
   ImageEditorOption editorOption = ImageEditorOption();
   IconData icon = Icons.image;
-  double aspectRatio = 1;
+  double aspectRatio = myAspectRatios[0];
   double maxChildSize;
   ScrollController scrollController = ScrollController();
+  GlobalKey<VideoPlayerWidgetState> videoPlayerKey =
+      GlobalKey<VideoPlayerWidgetState>();
 
   @override
   void initState() {
@@ -38,7 +42,8 @@ class _GalleryPageState extends State<GalleryPage> {
       print(gallery);
       collections = gallery.collections;
       selectedCollection = collections.first;
-      if(selectedCollection.media.isNotEmpty)selectedMedia = selectedCollection.media.first;
+      if (selectedCollection.media.isNotEmpty)
+        selectedMedia = selectedCollection.media.first;
       maxChildSize = (MediaQuery.of(context).size.width + 58) /
           MediaQuery.of(context).size.height;
       scrollController.addListener(_scrollListener);
@@ -70,39 +75,52 @@ class _GalleryPageState extends State<GalleryPage> {
 
     changeAspectRatio() {
       setState(() {
-        aspectRatio = aspectRatio == 1 ? (4 / 3) : 1;
-        maxChildSize = aspectRatio == 1
-            ? (MediaQuery.of(context).size.width + 58) /
-                MediaQuery.of(context).size.height
-            : (MediaQuery.of(context).size.width / (4 / 3) + 40) /
-                MediaQuery.of(context).size.height;
+        int indexAspectRatio = myAspectRatios.indexOf(aspectRatio);
+        if (indexAspectRatio == myAspectRatios.length - 1)
+          indexAspectRatio = 0;
+        else
+          indexAspectRatio++;
+        aspectRatio = myAspectRatios[indexAspectRatio];
+        maxChildSize = (MediaQuery.of(context).size.width + 58) /
+            MediaQuery.of(context).size.height;
         print(maxChildSize);
       });
     }
 
     Widget _buildPreview() {
-      print(selectedMedia is ImageMedia);
+      MyMedia media;
       if (selectedMedia is ImageMedia) {
-        ImageMedia media = selectedMedia;
-        provider = ExtendedMemoryImageProvider(media.image);
-        return Stack(
+        media = selectedMedia;
+        provider = ExtendedMemoryImageProvider((media as ImageMedia).image);
+      } else
+        media = selectedMedia;
+      return Container(
+        color: Colors.white,
+        child: Stack(
           alignment: Alignment.bottomRight,
           children: <Widget>[
-            ExtendedImage(
-              image: provider,
-              extendedImageEditorKey: editorKey,
-              mode: ExtendedImageMode.editor,
-              fit: BoxFit.contain,
-              initEditorConfigHandler: (ExtendedImageState state) {
-                return EditorConfig(
-                  maxScale: 3.0,
-                  cropRectPadding: const EdgeInsets.all(8),
-                  hitTestSize: 20.0,
-                  cropAspectRatio: aspectRatio,
-                  initCropRectType: InitCropRectType.layoutRect,
-                );
-              },
-            ),
+            if (selectedMedia is ImageMedia)
+              ExtendedImage(
+                image: provider,
+                extendedImageEditorKey: editorKey,
+                mode: ExtendedImageMode.editor,
+                fit: BoxFit.contain,
+                initEditorConfigHandler: (ExtendedImageState state) {
+                  return EditorConfig(
+                    maxScale: 3.0,
+                    cropRectPadding: const EdgeInsets.all(8),
+                    hitTestSize: 20.0,
+                    cropAspectRatio: aspectRatio,
+                    initCropRectType: InitCropRectType.layoutRect,
+                  );
+                },
+              ),
+            if (selectedMedia is VideoMedia)
+              VideoPlayerWidget(
+                file: (media as VideoMedia).video,
+                key: videoPlayerKey,
+                aspectRatio: aspectRatio,
+              ),
             Padding(
               padding: const EdgeInsets.all(15),
               child: Row(
@@ -121,32 +139,31 @@ class _GalleryPageState extends State<GalleryPage> {
                       shape: CircleBorder(),
                     ),
                   ),
-                  SizedBox(
-                    width: 50,
-                    child: RawMaterialButton(
-                      onPressed: () async => Navigator.push(
-                          context,
-                          SlideLeftRoute(
-                              page: ImageEditorPage(
-                                  onMediaSelected: widget.onMediaSelected,
-                                  imageMedia: media))),
-                      elevation: 1,
-                      fillColor: Colors.white.withOpacity(0.9),
-                      child: Icon(
-                        Icons.edit,
-                        size: 20,
+                  if (media is ImageMedia)
+                    SizedBox(
+                      width: 50,
+                      child: RawMaterialButton(
+                        onPressed: () async => Navigator.push(
+                            context,
+                            SlideLeftRoute(
+                                page: ImageEditorPage(
+                                    onMediaSelected: widget.onMediaSelected,
+                                    imageMedia: media))),
+                        elevation: 1,
+                        fillColor: Colors.white.withOpacity(0.9),
+                        child: Icon(
+                          Icons.edit,
+                          size: 20,
+                        ),
+                        shape: CircleBorder(),
                       ),
-                      shape: CircleBorder(),
                     ),
-                  ),
                 ],
               ),
             )
           ],
-        );
-      }
-      VideoMedia media = selectedMedia;
-      return VideoPlayerWidget(file: media.video);
+        ),
+      );
     }
 
     Future<Uint8List> save() async {
@@ -180,22 +197,6 @@ class _GalleryPageState extends State<GalleryPage> {
           preferredSize: Size.fromHeight(40),
           child: AppBar(
             centerTitle: true,
-            // title: IconButton(
-            //   icon: Icon(icon),
-            //   onPressed: () {
-            //     setState(() {
-            //       page = icon == Icons.image
-            //           ? gallery.videoPage
-            //           : gallery.imagePage;
-            //       icon = icon == Icons.image ? Icons.slideshow : Icons.image;
-            //       images = page.items.map((media) {
-            //         mediaToImageMedia(media).then((image) => image);
-            //       }).toList();
-            //       selectedMediaIndex = 0;
-            //       print(page == gallery.videoPage);
-            //     });
-            //   },
-            // ),
             title: DropdownButton(
               value: selectedCollection,
               iconEnabledColor: Colors.white,
@@ -221,7 +222,8 @@ class _GalleryPageState extends State<GalleryPage> {
                 selectedCollection = collection;
                 await gallery
                     .changeCollection(collections.indexOf(selectedCollection));
-                if(selectedCollection.media.isNotEmpty)selectedMedia = selectedCollection.media.first;
+                if (selectedCollection.media.isNotEmpty)
+                  selectedMedia = selectedCollection.media.first;
                 setState(() {});
               },
             ),
@@ -271,26 +273,31 @@ class _GalleryPageState extends State<GalleryPage> {
                                   )
                               ],
                             ),
-                            onTap: () {
+                            onTap: () async {
                               selectedMedia = selectedCollection.media[index];
+                              setState(() {});
+                              await Future.delayed(Duration(milliseconds: 100));
+                              if (selectedMedia is VideoMedia)
+                                videoPlayerKey.currentState.initController();
                               setState(() {});
                             });
                       }),
-                      if(selectedCollection.media.isNotEmpty)
-                  DraggableScrollableSheet(
-                    initialChildSize: 0.1,
-                    minChildSize: 0.1,
-                    maxChildSize: maxChildSize,
-                    builder: (context, scrollController) {
-                      print(maxChildSize);
-                      return SingleChildScrollView(
-                        controller: scrollController,
-                        child: AspectRatio(
-                            aspectRatio: selectedMedia.aspectRatio,
-                            child: _buildPreview()),
-                      );
-                    },
-                  ),
+                  if (selectedCollection.media.isNotEmpty)
+                    DraggableScrollableSheet(
+                      initialChildSize: 0.1,
+                      minChildSize: 0.1,
+                      maxChildSize: maxChildSize,
+                      builder: (context, scrollController) {
+                        print(maxChildSize);
+                        return Container(
+                          color: Colors.white.withOpacity(0.7),
+                          child: SingleChildScrollView(
+                            controller: scrollController,
+                            child: _buildPreview(),
+                          ),
+                        );
+                      },
+                    ),
                 ],
               )
             : Center(child: Text('No hay contenido disponible')));

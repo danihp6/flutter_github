@@ -31,6 +31,7 @@ class Gallery {
   Future loadMedia(int index) async {
     _collections[index].media.addAll(await Future.wait(
         (await _mediaCollections[index].getMedias(
+          mediaType: MediaType.video,
                 skip: _collections[index]._pagination,
                 take: _collections[index]._pagination + NEXT_PAGE))
             .items

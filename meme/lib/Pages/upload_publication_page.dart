@@ -72,7 +72,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
             children: [
               _media is ImageMedia
                   ? AspectRatio(aspectRatio: _media.aspectRatio, child: Image.memory((_media as ImageMedia).image,fit: BoxFit.cover,))
-                  : VideoPlayerWidget(file: (_media as VideoMedia).video),
+                  : VideoPlayerWidget(file: (_media as VideoMedia).video,aspectRatio: _media.aspectRatio,),
               SizedBox(height: 20),
               SizedBox(
                 width: 300,

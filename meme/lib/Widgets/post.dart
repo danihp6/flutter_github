@@ -68,7 +68,7 @@ class _PostWidgetState extends State<PostWidget> {
                       ),
                       onDoubleTap: () => addOrRemoveFavourite(
                           db.userId, widget.post.author, widget.post.id))
-                  : VideoPlayerWidget(url: widget.post.media),
+                  : VideoPlayerWidget(url: widget.post.media,aspectRatio: widget.post.aspectRatio,),
             ),
             if (_isShowedComments || widget.activeAlwaysShowedComments)
               PostDescription(post: widget.post, author: author)

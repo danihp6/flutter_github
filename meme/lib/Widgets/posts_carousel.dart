@@ -44,6 +44,7 @@ class _PostsCarouselState extends State<PostsCarousel> {
                 : VideoPlayerWidget(
                     url: post.media,
                     isPausable: false,
+                    aspectRatio: post.aspectRatio,
                   ),
           ),
           onTap: () => widget.onTap(post)))

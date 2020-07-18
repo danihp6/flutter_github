@@ -8,15 +8,22 @@ import 'package:cached_video_player/cached_video_player.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 
 class VideoPlayerWidget extends StatefulWidget {
+  Key key;
   String url;
   File file;
   bool isPausable;
-  VideoPlayerWidget({this.url, this.file, this.isPausable = true});
+  double aspectRatio;
+  VideoPlayerWidget(
+      {this.url,
+      this.file,
+      this.isPausable = true,
+      this.key,
+      this.aspectRatio = 1});
   @override
-  _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
+  VideoPlayerWidgetState createState() => VideoPlayerWidgetState();
 }
 
-class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+class VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   CachedVideoPlayerController _controller;
   bool _isManualPaused;
 
@@ -24,6 +31,17 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   void initState() {
     super.initState();
     _isManualPaused = false;
+    initController();
+  }
+
+  initController() async {
+    if (_controller != null) {
+      final oldController = _controller;
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await oldController.dispose();
+      });
+    }
+
     _controller = widget.file == null
         ? CachedVideoPlayerController.network(widget.url)
         : CachedVideoPlayerController.file(widget.file);
@@ -54,81 +72,80 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_controller.value.initialized) return Loading();
 
-    if(!_controller.value.initialized) return Loading();
-
-    if(_controller.value.hasError) return Container();
+    if (_controller.value.hasError) return Container();
 
     var size = MediaQuery.of(context).size.width;
-    return 
-         GestureDetector(
-                  child: VisibilityDetector(
-              key: UniqueKey(),
-              onVisibilityChanged: (info) {
-                if (!mounted) return;
-                if (info.visibleFraction > 0.8 &&
-                    !_controller.value.isPlaying &&
-                    !_isManualPaused)
-                  setState(() {
-                    _controller.play();
-                  });
-                if (info.visibleFraction < 0.8 && _controller.value.isPlaying)
-                  setState(() {
-                    _controller.pause();
-                  });
-              },
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: <Widget>[
-                  Container(
-                    width: size,
-                    height: size,
-                    child: Stack(
-                      fit: StackFit.expand,
-                      alignment: AlignmentDirectional.bottomCenter,
-                      children: [
-                        ClipRect(
-                            child: OverflowBox(
-                                alignment: Alignment.center,
-                                child: FittedBox(
-                                    fit: BoxFit.fitWidth,
-                                    child: Container(
-                                        width: size,
-                                        height: size /
-                                            _controller.value.aspectRatio,
-                                        child: CachedVideoPlayer(_controller))))),
-                        if (widget.isPausable)
-                          _PlayPauseOverlay(
-                            controller: _controller
-                          ),
-                      ],
-                    ),
-                  ),
-                  if (widget.isPausable)
-                    VideoProgressIndicator(_controller, allowScrubbing: true),
-                ],
+    return Stack(
+      children: <Widget>[
+        VisibilityDetector(
+          key: UniqueKey(),
+          onVisibilityChanged: (info) {
+            if (!mounted) return;
+            if (info.visibleFraction > 0.8 &&
+                !_controller.value.isPlaying &&
+                !_isManualPaused)
+              setState(() {
+                _controller.play();
+              });
+            if (info.visibleFraction < 0.8 && _controller.value.isPlaying)
+              setState(() {
+                _controller.pause();
+              });
+          },
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: <Widget>[
+              Container(
+                width: size,
+                height: size / widget.aspectRatio,
+                child: Stack(
+                  fit: StackFit.expand,
+                  alignment: AlignmentDirectional.bottomCenter,
+                  children: [
+                    ClipRect(
+                        child: OverflowBox(
+                            alignment: Alignment.center,
+                            child: FittedBox(
+                                fit: BoxFit.fitWidth,
+                                child: Container(
+                                    width: size,
+                                    height:
+                                        size / _controller.value.aspectRatio,
+                                    child: CachedVideoPlayer(_controller))))),
+                    if (widget.isPausable)
+                      _PlayPauseOverlay(controller: _controller),
+                  ],
+                ),
               ),
-            ),
-            onTap: () {
-                  print('tap');
-                  _controller.value.isPlaying
-                      ? _controller.pause()
-                      : _controller.play();
-                  manualPause();
-                },
-                onDoubleTap: () {
-                  print('double tap');
-                  configuration.volume = _controller.value.volume == 0 ? 1 : 0;
-                  _controller.setVolume(configuration.volume);
-                },
-        );
+              if (widget.isPausable)
+                VideoProgressIndicator(_controller, allowScrubbing: true),
+            ],
+          ),
+        ),
+        if(widget.isPausable)
+        GestureDetector(
+          onTap: () {
+            _controller.value.isPlaying
+                ? _controller.pause()
+                : _controller.play();
+            manualPause();
+          },
+          onDoubleTap: () {
+            configuration.volume = _controller.value.volume == 0 ? 1 : 0;
+            _controller.setVolume(configuration.volume);
+          },
+        )
+      ],
+    );
   }
 }
 
 class _PlayPauseOverlay extends StatelessWidget {
   CachedVideoPlayerController controller;
 
-  _PlayPauseOverlay({ this.controller});
+  _PlayPauseOverlay({this.controller});
 
   @override
   Widget build(BuildContext context) {
