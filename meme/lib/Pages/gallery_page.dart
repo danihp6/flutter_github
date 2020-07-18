@@ -10,7 +10,7 @@ import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/video_player.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-List<double> myAspectRatios = [1, (4 / 3), 1.91];
+List<double> myAspectRatios = [1, 1.91];
 
 class GalleryPage extends StatefulWidget {
   Function onMediaSelected;
@@ -53,11 +53,10 @@ class _GalleryPageState extends State<GalleryPage> {
     super.initState();
   }
 
-  void _scrollListener() {
+  void _scrollListener() async {
     if (scrollController.offset >= scrollController.position.maxScrollExtent &&
         !scrollController.position.outOfRange) {
-      print('end');
-      gallery.loadMedia(collections.indexOf(selectedCollection));
+      await gallery.loadMedia(collections.indexOf(selectedCollection));
       setState(() {});
     }
   }
@@ -94,75 +93,77 @@ class _GalleryPageState extends State<GalleryPage> {
         provider = ExtendedMemoryImageProvider((media as ImageMedia).image);
       } else
         media = selectedMedia;
-      return Container(
-        color: Colors.white,
-        child: Stack(
-          alignment: Alignment.bottomRight,
-          children: <Widget>[
-            if (selectedMedia is ImageMedia)
-              ExtendedImage(
-                image: provider,
-                extendedImageEditorKey: editorKey,
-                mode: ExtendedImageMode.editor,
-                fit: BoxFit.contain,
-                initEditorConfigHandler: (ExtendedImageState state) {
-                  return EditorConfig(
-                    maxScale: 3.0,
-                    cropRectPadding: const EdgeInsets.all(8),
-                    hitTestSize: 20.0,
-                    cropAspectRatio: aspectRatio,
-                    initCropRectType: InitCropRectType.layoutRect,
-                  );
-                },
-              ),
-            if (selectedMedia is VideoMedia)
-              VideoPlayerWidget(
+      return Stack(
+        alignment: Alignment.bottomRight,
+        children: <Widget>[
+          if (selectedMedia is ImageMedia)
+            ExtendedImage(
+              height: MediaQuery.of(context).size.width,
+              image: provider,
+              extendedImageEditorKey: editorKey,
+              mode: ExtendedImageMode.editor,
+              fit: BoxFit.contain,
+              initEditorConfigHandler: (ExtendedImageState state) {
+                return EditorConfig(
+                  maxScale: 3.0,
+                  cropRectPadding: const EdgeInsets.all(8),
+                  hitTestSize: 20.0,
+                  cropAspectRatio: aspectRatio,
+                  initCropRectType: InitCropRectType.layoutRect,
+                );
+              },
+            ),
+          if (selectedMedia is VideoMedia)
+            Container(
+              color: Colors.white,
+              height: MediaQuery.of(context).size.width,
+              child: VideoPlayerWidget(
                 file: (media as VideoMedia).video,
                 key: videoPlayerKey,
                 aspectRatio: aspectRatio,
               ),
-            Padding(
-              padding: const EdgeInsets.all(15),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
+            ),
+          Padding(
+            padding: const EdgeInsets.all(15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                SizedBox(
+                  width: 50,
+                  child: RawMaterialButton(
+                    onPressed: changeAspectRatio,
+                    elevation: 1,
+                    fillColor: Colors.white.withOpacity(0.9),
+                    child: Icon(
+                      Icons.aspect_ratio,
+                      size: 20,
+                    ),
+                    shape: CircleBorder(),
+                  ),
+                ),
+                if (media is ImageMedia)
                   SizedBox(
                     width: 50,
                     child: RawMaterialButton(
-                      onPressed: changeAspectRatio,
+                      onPressed: () async => Navigator.push(
+                          context,
+                          SlideLeftRoute(
+                              page: ImageEditorPage(
+                                  onMediaSelected: widget.onMediaSelected,
+                                  imageMedia: media))),
                       elevation: 1,
                       fillColor: Colors.white.withOpacity(0.9),
                       child: Icon(
-                        Icons.aspect_ratio,
+                        Icons.edit,
                         size: 20,
                       ),
                       shape: CircleBorder(),
                     ),
                   ),
-                  if (media is ImageMedia)
-                    SizedBox(
-                      width: 50,
-                      child: RawMaterialButton(
-                        onPressed: () async => Navigator.push(
-                            context,
-                            SlideLeftRoute(
-                                page: ImageEditorPage(
-                                    onMediaSelected: widget.onMediaSelected,
-                                    imageMedia: media))),
-                        elevation: 1,
-                        fillColor: Colors.white.withOpacity(0.9),
-                        child: Icon(
-                          Icons.edit,
-                          size: 20,
-                        ),
-                        shape: CircleBorder(),
-                      ),
-                    ),
-                ],
-              ),
-            )
-          ],
-        ),
+              ],
+            ),
+          )
+        ],
       );
     }
 
@@ -288,9 +289,9 @@ class _GalleryPageState extends State<GalleryPage> {
                       minChildSize: 0.1,
                       maxChildSize: maxChildSize,
                       builder: (context, scrollController) {
-                        print(maxChildSize);
                         return Container(
                           color: Colors.white.withOpacity(0.7),
+                          
                           child: SingleChildScrollView(
                             controller: scrollController,
                             child: _buildPreview(),

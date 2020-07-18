@@ -31,7 +31,7 @@ class PostPage extends StatelessWidget {
                 if (snapshot.hasError) print(snapshot.error);
                 if (!snapshot.hasData) return Loading();
                 Post post = snapshot.data;
-                return PostWidget(post: post,activeAlwaysShowedComments: true,scaffoldState: scaffoldState,);
+                return PostWidget(post: post,scaffoldState: scaffoldState,);
               }),
         ),
       ),

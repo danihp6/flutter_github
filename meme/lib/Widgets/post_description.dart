@@ -181,7 +181,7 @@ class _PostDescriptionState extends State<PostDescription> {
                     );
                   }),
               SizedBox(
-                height: 5,
+                height: 2,
               ),
               Align(
                   alignment: Alignment.topLeft,

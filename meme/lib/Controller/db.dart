@@ -234,7 +234,7 @@ class DataBase {
   }
 
   Stream<List<Post>> getFollowedPosts (List<String> followed) {
-    return _firestore.collectionGroup('posts').where('author',whereIn: followed).orderBy('dateTime').snapshots().map(toPosts);
+    return _firestore.collectionGroup('posts').where('author',whereIn: followed).orderBy('dateTime',descending: true).snapshots().map(toPosts);
   }
 
 //---------------POSTLIST----------------//

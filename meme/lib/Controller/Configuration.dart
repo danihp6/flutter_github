@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Configuration {
-  bool _isShowedComments = true;
+  // bool _isShowedComments = true;
   bool _isShowedTools = true;
   double _volume = 0;
   GlobalKey<NavigatorState> _mainNavigatorKey;
@@ -16,13 +16,13 @@ class Configuration {
 
   set mainScaffoldState(mainScaffoldState) => this._mainScaffoldState = mainScaffoldState;
 
-  getIsShowedComments() {
-    return this._isShowedComments;
-  }
+  // getIsShowedComments() {
+  //   return this._isShowedComments;
+  // }
 
-  setIsShowedComments(isShowedComments) {
-    this._isShowedComments = isShowedComments;
-  }
+  // setIsShowedComments(isShowedComments) {
+  //   this._isShowedComments = isShowedComments;
+  // }
 
   getIsShowedTools() {
     return this._isShowedTools;

@@ -34,19 +34,19 @@ class _PostsCarouselState extends State<PostsCarousel> {
 
   List<Widget> carousel(List<Post> posts) => posts
       .map((post) => GestureDetector(
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: post.mediaType == MediaType.image
-                ? FadeInImage(
+          child: post.mediaType == MediaType.image
+              ? AspectRatio(
+                aspectRatio: post.aspectRatio,
+                              child: FadeInImage(
                     fit: BoxFit.cover,
                     placeholder: MemoryImage(kTransparentImage),
-                    image: CachedNetworkImageProvider(post.media))
-                : VideoPlayerWidget(
-                    url: post.media,
-                    isPausable: false,
-                    aspectRatio: post.aspectRatio,
-                  ),
-          ),
+                    image: CachedNetworkImageProvider(post.media)),
+              )
+              : VideoPlayerWidget(
+                  url: post.media,
+                  isPausable: false,
+                  aspectRatio: post.aspectRatio,
+                ),
           onTap: () => widget.onTap(post)))
       .toList();
 

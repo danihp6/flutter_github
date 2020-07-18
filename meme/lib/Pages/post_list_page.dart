@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Models/PostList.dart';
-import 'package:meme/Widgets/icon_button_comments.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/post.dart';
 import 'package:meme/Widgets/upload_button.dart';
@@ -50,13 +49,6 @@ class _PostListPageState extends State<PostListPage> {
                           )
                         : Container(),
                   ),
-                  actions: [
-                    IconButtonComments(
-                      refresh: () {
-                        setState(() {});
-                      },
-                    )
-                  ],
                 ),
                 SliverList(
                     delegate: SliverChildBuilderDelegate((context, index) {
@@ -67,11 +59,6 @@ class _PostListPageState extends State<PostListPage> {
                         if (!snapshot.hasData) return Loading();
                         Post post = snapshot.data;
                         return Column(children: [
-                          if (index != 0 &&
-                              !configuration.getIsShowedComments())
-                            SizedBox(
-                              height: 10,
-                            ),
                           PostWidget(
                             post: post,
                             postList: _postList,

@@ -14,22 +14,21 @@ import '../Controller/db.dart';
 class PostWidget extends StatefulWidget {
   Post post;
   PostList postList;
-  bool activeAlwaysShowedComments;
+  bool isDescriptionShowed;
   GlobalKey<ScaffoldState> scaffoldState;
   PostWidget(
       {@required this.post,
       this.postList,
-      this.activeAlwaysShowedComments = false,
+      this.isDescriptionShowed = true,
       this.scaffoldState});
 
   @override
   _PostWidgetState createState() => _PostWidgetState();
 }
 
-class _PostWidgetState extends State<PostWidget> {
+class _PostWidgetState extends State<PostWidget> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
-    bool _isShowedComments = configuration.getIsShowedComments();
     List<String> favourites = widget.post.favourites;
 
     addOrRemoveFavourite(String userId, String postAuthorId, String postId) {
@@ -47,7 +46,7 @@ class _PostWidgetState extends State<PostWidget> {
           if (!snapshot.hasData) return Loading();
           User author = snapshot.data;
           return Column(children: [
-            if (_isShowedComments || widget.activeAlwaysShowedComments)
+            if (widget.isDescriptionShowed)
               Padding(
                 padding: const EdgeInsets.only(left: 8),
                 child: SizedBox(
@@ -70,9 +69,13 @@ class _PostWidgetState extends State<PostWidget> {
                           db.userId, widget.post.author, widget.post.id))
                   : VideoPlayerWidget(url: widget.post.media,aspectRatio: widget.post.aspectRatio,),
             ),
-            if (_isShowedComments || widget.activeAlwaysShowedComments)
-              PostDescription(post: widget.post, author: author)
+            if (widget.isDescriptionShowed)
+              PostDescription(post: widget.post, author: author),
+              SizedBox(height: 5,)
           ]);
         });
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

@@ -165,13 +165,16 @@ class _MyUserPageState extends State<MyUserPage>
                                         scaffoldState: widget.scaffoldState)
                                     : Center(
                                         child: Text('Usuario sin favoritos')),
-                                Column(
-                                  children: <Widget>[
-                                    PostListNewButton(),
-                                    Expanded(
-                                      child: PostListsStream(),
-                                    ),
-                                  ],
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    children: <Widget>[
+                                      PostListNewButton(),
+                                      Expanded(
+                                        child: PostListsStream(),
+                                      ),
+                                    ],
+                                  ),
                                 )
                               ]),
                         ),

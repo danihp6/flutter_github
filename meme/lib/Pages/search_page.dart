@@ -419,17 +419,10 @@ class TendTagsStream extends StatefulWidget {
   _TendTagsStreamState createState() => _TendTagsStreamState();
 }
 
-class _TendTagsStreamState extends State<TendTagsStream>
-    with AutomaticKeepAliveClientMixin {
+class _TendTagsStreamState extends State<TendTagsStream> {
   @override
   Widget build(BuildContext context) {
-    goPost(Post post) => Navigator.push(
-        context,
-        SlideLeftRoute(
-            page: PostPage(
-          authorId: post.author,
-          postId: post.id,
-        )));
+    
 
     return StreamBuilder(
         stream: db.getTendTags(),
@@ -467,18 +460,7 @@ class _TendTagsStreamState extends State<TendTagsStream>
                       SizedBox(
                         height: 5,
                       ),
-                      StreamBuilder(
-                          stream: CombineLatestStream.list(postPaths
-                              .map((postPath) => db.getPostByPath(postPath))),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError) print(snapshot.error);
-                            if (!snapshot.hasData) return Loading();
-                            List<Post> posts = snapshot.data;
-                            return PostsCarousel(
-                              posts: posts,
-                              onTap: goPost,
-                            );
-                          })
+                      StreamPosts(postPaths: postPaths)
                     ],
                   ),
                 );
@@ -486,6 +468,48 @@ class _TendTagsStreamState extends State<TendTagsStream>
         });
   }
 
+}
+
+class StreamPosts extends StatefulWidget {
+  const StreamPosts({
+    Key key,
+    @required this.postPaths,
+  }) : super(key: key);
+
+  final List<String> postPaths;
+
   @override
+  _StreamPostsState createState() => _StreamPostsState();
+}
+
+class _StreamPostsState extends State<StreamPosts> with AutomaticKeepAliveClientMixin {
+  @override
+  Widget build(BuildContext context) {
+
+    goPost(Post post) => Navigator.push(
+        context,
+        SlideLeftRoute(
+            page: PostPage(
+          authorId: post.author,
+          postId: post.id,
+        )));
+        
+    return StreamBuilder(
+        stream: CombineLatestStream.list(widget.postPaths
+            .map((postPath) => db.getPostByPath(postPath))).asBroadcastStream(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+          if (!snapshot.hasData) return Loading();
+          List<Post> posts = snapshot.data;
+          print(posts);
+          return PostsCarousel(
+            posts: posts,
+            onTap: goPost,
+          );
+        });
+  }
+
+  @override
+  // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 }
