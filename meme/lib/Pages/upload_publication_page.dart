@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/gallery.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/Tag.dart';
 import 'package:meme/Widgets/loading.dart';
 import '../Widgets/video_player.dart';
@@ -42,14 +43,23 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
       List<String> tagsId = await db.createTags(tags);
       String postId = await db.newPost(
           db.userId,
-          new Post('', _description, _media is ImageMedia?MediaType.image:MediaType.video, <String>[],
-              DateTime.now(), '', db.userId, tagsId, Map<String, dynamic>(),_media.aspectRatio),
+          new Post(
+              '',
+              _description,
+              _media is ImageMedia ? MediaType.image : MediaType.video,
+              <String>[],
+              DateTime.now(),
+              '',
+              db.userId,
+              tagsId,
+              Map<String, dynamic>(),
+              _media.aspectRatio),
           _media);
       tagsId.forEach((id) {
         db.addPostToTag(id, db.userId, postId);
       });
-      Navigator.pop(context);
-      Navigator.pop(context);
+      navigator.pop(context);
+      navigator.pop(context);
     }
 
     void addKeyWord(String value) {
@@ -71,8 +81,16 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
           child: Column(
             children: [
               _media is ImageMedia
-                  ? AspectRatio(aspectRatio: _media.aspectRatio, child: Image.memory((_media as ImageMedia).image,fit: BoxFit.cover,))
-                  : VideoPlayerWidget(file: (_media as VideoMedia).video,aspectRatio: _media.aspectRatio,),
+                  ? AspectRatio(
+                      aspectRatio: _media.aspectRatio,
+                      child: Image.memory(
+                        (_media as ImageMedia).image,
+                        fit: BoxFit.cover,
+                      ))
+                  : VideoPlayerWidget(
+                      file: (_media as VideoMedia).video,
+                      aspectRatio: _media.aspectRatio,
+                    ),
               SizedBox(height: 20),
               SizedBox(
                 width: 300,
@@ -108,8 +126,8 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
                       color: Colors.red,
                       onPressed: activedUpload
                           ? () {
-                              Navigator.pop(context);
-                              Navigator.pop(context);
+                              navigator.pop(context);
+                              navigator.pop(context);
                             }
                           : null,
                       child: Text(

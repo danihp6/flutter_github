@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/Report.dart';
 
 class ReportModalBottomSheet extends StatefulWidget {
@@ -77,7 +78,7 @@ class _ReportModalBottomSheetState extends State<ReportModalBottomSheet> {
 
   void newReport(Report report, BuildContext context) {
     db.newReport(widget.reportedUserId, report);
-    Navigator.pop(context);
+    navigator.pop(context);
     widget.scaffoldState.currentState.showSnackBar(SnackBar(
         duration: Duration(seconds: 2),
         content: new Text("Gracias por ayudar a nuestra comunidad")));

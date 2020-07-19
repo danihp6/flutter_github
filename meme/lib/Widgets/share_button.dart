@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/dynamic_links.dart';
+import 'package:meme/Controller/navigator.dart';
 
 class ShareButton extends StatelessWidget {
   String authorId;
@@ -47,7 +48,7 @@ class ShareButton extends StatelessWidget {
                           ),
                           onPressed: () {
                             Clipboard.setData(new ClipboardData(text: link));
-                            Navigator.pop(context);
+                            navigator.pop(context);
                             _scaffoldState.currentState
                                 .showSnackBar(SnackBar(
                                     duration: Duration(seconds: 2),

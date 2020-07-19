@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/media_storage.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/PostList.dart';
 
 class PostListMoreButton extends StatelessWidget {
@@ -40,7 +41,7 @@ class PostListMoreButton extends StatelessWidget {
                           if (postList.imageLocation != '')
                             mediaStorage.deleteFile(postList.imageLocation);
                           db.deletePostList(db.userId, postList.id);
-                          Navigator.pop(context);
+                          navigator.pop(context);
                         },
                       )
                     ]),

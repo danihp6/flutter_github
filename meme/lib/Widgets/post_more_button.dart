@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/Report.dart';
@@ -31,11 +32,8 @@ class PostMoreButton extends StatelessWidget {
                     children: [
                         FlatButton(
                           onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.push(
-                              context,
-                              SlideLeftRoute(
-                                  page: SelectPostList(post: post)));
+                            navigator.pop(context);
+                            navigator.goSelectPostList(context, post.id, post.author);
                           } ,
                           child: Row(
                             children: [
@@ -53,7 +51,7 @@ class PostMoreButton extends StatelessWidget {
                         FlatButton(
                           onPressed: () {
                             db.deletePost(db.userId, post.id);
-                            Navigator.pop(context);
+                            navigator.pop(context);
                           } ,
                           child: Row(
                             children: [
@@ -72,7 +70,7 @@ class PostMoreButton extends StatelessWidget {
                           onPressed: () {
                             db.deletePostPathInPostList(
                               db.userId, postList.id, post.author, post.id);
-                              Navigator.pop(context);
+                              navigator.pop(context);
                           } ,
                           child: Row(
                             children: [
@@ -99,7 +97,7 @@ class PostMoreButton extends StatelessWidget {
                           ],
                         ),
                         onPressed: () {
-                          Navigator.pop(context);
+                          navigator.pop(context);
                           showModalBottomSheet(
                               context: context,
                               builder: (context) => ReportModalBottomSheet(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/post_list_new_button.dart';
@@ -8,16 +9,16 @@ import 'package:meme/Widgets/post_list.dart';
 import '../Models/Post.dart';
 
 class SelectPostList extends StatelessWidget {
-  Post post;
+  String postId;
+  String authorId;
 
-  SelectPostList({@required this.post});
+  SelectPostList({@required this.postId,@required this.authorId});
 
   @override
   Widget build(BuildContext context) {
-    addPublicationAndGoBack(
-        String userId, String postId, String postAuthorId, String postListId) {
-      db.addPostPathInPostList(userId, postId, postAuthorId, postListId);
-      Navigator.pop(context);
+    addPublicationAndGoBack( String postListId) {
+      db.addPostPathInPostList(db.userId, postId, authorId, postListId);
+      navigator.pop(context);
     }
 
     return Scaffold(
@@ -48,8 +49,7 @@ class SelectPostList extends StatelessWidget {
                           postList: postLists[index],
                           activeMoreOptions: false,
                           onTap: () {
-                            addPublicationAndGoBack(db.userId, post.id,
-                               post.author, postLists[index].id);
+                            addPublicationAndGoBack(postLists[index].id);
                           },
                         );
                       },

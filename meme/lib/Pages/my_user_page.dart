@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/auth.dart';
 import 'package:meme/Controller/db.dart';
-import 'package:meme/Models/Post.dart';
-import 'package:meme/Models/PostList.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/account_page.dart';
-import 'package:meme/Pages/post_list_page.dart';
-import 'package:meme/Pages/post_page.dart';
 import 'package:meme/Widgets/loading.dart';
-import 'package:meme/Widgets/post.dart';
-import 'package:meme/Widgets/post_list_carousel.dart';
 import 'package:meme/Widgets/post_list_new_button.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/user_page_header.dart';
-import 'package:rxdart/streams.dart';
+import 'user_page.dart';
 
 import 'contact_page.dart';
 
@@ -28,10 +23,14 @@ class MyUserPage extends StatefulWidget {
 class _MyUserPageState extends State<MyUserPage>
     with SingleTickerProviderStateMixin {
   TabController tabController;
+  GlobalKey<ScaffoldState> _scaffoldState;
 
   @override
   void initState() {
     tabController = new TabController(length: 3, vsync: this);
+    if(widget.scaffoldState == null)_scaffoldState = GlobalKey<ScaffoldState>();
+    else _scaffoldState = widget.scaffoldState;
+
     super.initState();
   }
 
@@ -76,8 +75,7 @@ class _MyUserPageState extends State<MyUserPage>
                                 ],
                               )),
                           FlatButton(
-                              onPressed: () => Navigator.push(
-                                  context, SlideLeftRoute(page: ContactPage())),
+                              onPressed: () => navigator.goContact(context),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
@@ -89,8 +87,7 @@ class _MyUserPageState extends State<MyUserPage>
                                 ],
                               )),
                           FlatButton(
-                              onPressed: () => Navigator.push(
-                                  context, SlideLeftRoute(page: AccountPage())),
+                              onPressed: () => navigator.goAccount(context),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
@@ -122,7 +119,7 @@ class _MyUserPageState extends State<MyUserPage>
                       SliverToBoxAdapter(
                           child: UserPageHeader(
                         user: user,
-                        scaffoldState: widget.scaffoldState,
+                        scaffoldState: _scaffoldState,
                       ))
                     ],
                     body: Column(
@@ -158,11 +155,13 @@ class _MyUserPageState extends State<MyUserPage>
                               physics: NeverScrollableScrollPhysics(),
                               children: [
                                 PostsStream(
-                                    scaffoldState: widget.scaffoldState),
+                                  scaffoldState: _scaffoldState,
+                                  userId: user.id,
+                                ),
                                 favourites.isNotEmpty
                                     ? FavouritesStream(
                                         favourites: favourites,
-                                        scaffoldState: widget.scaffoldState)
+                                        scaffoldState: _scaffoldState)
                                     : Center(
                                         child: Text('Usuario sin favoritos')),
                                 Padding(
@@ -171,7 +170,9 @@ class _MyUserPageState extends State<MyUserPage>
                                     children: <Widget>[
                                       PostListNewButton(),
                                       Expanded(
-                                        child: PostListsStream(),
+                                        child: PostListsStream(
+                                          userId: user.id,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -183,130 +184,4 @@ class _MyUserPageState extends State<MyUserPage>
                   ));
             }));
   }
-}
-
-class PostListsStream extends StatefulWidget {
-  const PostListsStream({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  _PostListsStreamState createState() => _PostListsStreamState();
-}
-
-class _PostListsStreamState extends State<PostListsStream> with AutomaticKeepAliveClientMixin {
-  @override
-  Widget build(BuildContext context) {
-    goPostList(PostList postList) => Navigator.of(context)
-        .push(SlideLeftRoute(page: PostListPage(postList: postList)));
-
-    goPost(Post post) => Navigator.of(context).push(SlideLeftRoute(
-            page: PostPage(
-          authorId: post.author,
-          postId: post.id,
-        )));
-
-    return StreamBuilder(
-      stream: db.getPostLists(db.userId),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) print(snapshot.error);
-        if (!snapshot.hasData) return Loading();
-        List<PostList> postlists = snapshot.data;
-        if (postlists.length == 0)
-          return Center(child: Text('Usuario sin listas'));
-        return ListView.builder(
-          shrinkWrap: true,
-          itemCount: postlists.length,
-          physics: NeverScrollableScrollPhysics(),
-          itemBuilder: (context, index) {
-            return PostListCarousel(
-              postList: postlists[index],
-              onTapPostList: goPostList,
-              onTapPost: goPost,
-            );
-          },
-        );
-      },
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-}
-
-class FavouritesStream extends StatefulWidget {
-  const FavouritesStream({
-    Key key,
-    @required this.favourites,
-    @required this.scaffoldState,
-  }) : super(key: key);
-
-  final List<String> favourites;
-  final GlobalKey<ScaffoldState> scaffoldState;
-
-  @override
-  _FavouritesStreamState createState() => _FavouritesStreamState();
-}
-
-class _FavouritesStreamState extends State<FavouritesStream> with AutomaticKeepAliveClientMixin {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: CombineLatestStream.list(
-              widget.favourites.map((favourite) => db.getPostByPath(favourite)))
-          .asBroadcastStream(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) print(snapshot.error);
-        if (!snapshot.hasData) return Loading();
-        List<Post> posts = snapshot.data;
-        print(posts);
-        return ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: posts.length,
-          itemBuilder: (context, index) => PostWidget(
-            post: posts[index],
-            scaffoldState: widget.scaffoldState,
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
-}
-
-class PostsStream extends StatefulWidget {
-  const PostsStream({Key key, this.scaffoldState}) : super(key: key);
-
-  final GlobalKey<ScaffoldState> scaffoldState;
-
-  @override
-  _PostsStreamState createState() => _PostsStreamState();
-}
-
-class _PostsStreamState extends State<PostsStream> with AutomaticKeepAliveClientMixin {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: db.getPosts(db.userId),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) print(snapshot.error);
-        if (!snapshot.hasData) return Loading();
-        List<Post> posts = snapshot.data;
-        return ListView.builder(
-          physics: NeverScrollableScrollPhysics(),
-          itemCount: posts.length,
-          itemBuilder: (context, index) => PostWidget(
-            post: posts[index],
-            scaffoldState: widget.scaffoldState,
-          ),
-        );
-      },
-    );
-  }
-
-  @override
-  bool get wantKeepAlive => true;
 }

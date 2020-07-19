@@ -8,23 +8,19 @@ import 'package:meme/Widgets/upload_button.dart';
 import '../Models/Post.dart';
 import '../Controller/db.dart';
 
-class PostListPage extends StatefulWidget {
-  PostList postList;
-  PostListPage({@required this.postList});
+class PostListPage extends StatelessWidget {
+  String postListId;
+  String authorId;
+  PostListPage({@required this.postListId,@required this.authorId});
 
-  @override
-  _PostListPageState createState() => _PostListPageState();
-}
 
-class _PostListPageState extends State<PostListPage> {
   GlobalKey<ScaffoldState> scaffoldState = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
-    PostList _postList = widget.postList;
     return Scaffold(
         key: scaffoldState,
         body: StreamBuilder(
-            stream: db.getPostList(_postList.author, _postList.id),
+            stream: db.getPostList(authorId, postListId),
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
               if (!snapshot.hasData) return Loading();
@@ -37,8 +33,8 @@ class _PostListPageState extends State<PostListPage> {
                   expandedHeight: 200,
                   flexibleSpace: FlexibleSpaceBar(
                     centerTitle: true,
-                    title: Text(_postList.name),
-                    background: _postList.image != ''
+                    title: Text(postList.name),
+                    background: postList.image != ''
                         ? Padding(
                             padding: const EdgeInsets.all(50),
                             child: CachedNetworkImage(
@@ -61,7 +57,7 @@ class _PostListPageState extends State<PostListPage> {
                         return Column(children: [
                           PostWidget(
                             post: post,
-                            postList: _postList,
+                            postList: postList,
                             scaffoldState: scaffoldState,
                           )
                         ]);

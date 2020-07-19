@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/Tag.dart';
 import 'package:meme/Pages/tag_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
@@ -28,7 +29,7 @@ class StreamTagViewer extends StatelessWidget {
           if (snapshot.hasError) print(snapshot.error);
                     if (!snapshot.hasData) return Container();
                     Tag tag = snapshot.data;
-          return TagWidget(tag: tag,isPointsShowed: false, onTap: ()=>Navigator.push(context, SlideLeftRoute(page: TagPage(tagId: tag.id))));
+          return TagWidget(tag: tag,isPointsShowed: false, onTap: ()=>navigator.goTag(context, tag.id));
         }
       ),
     );

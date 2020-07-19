@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Controller/string_functions.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/Post.dart';
@@ -15,13 +16,15 @@ import '../Models/Notification.dart' as mynotification;
 
 class AddCommentField extends StatefulWidget {
   User user;
-  Post post;
+  String postAuthorId;
+  String postId;
   FocusNode focusNode;
   Comment commentResponse;
   Function cancelResponse;
   AddCommentField(
       {@required this.user,
-      @required this.post,
+      @required this.postAuthorId,
+      @required this.postId,
       @required this.focusNode,
       this.commentResponse,
       this.cancelResponse});
@@ -75,16 +78,16 @@ class _AddCommentFieldState extends State<AddCommentField> {
       userMentions = wordsStartWith(text, '@');
       if (widget.commentResponse != null) {
         db.newInnerComment(
-            widget.post.author,
-            widget.post.id,
+            widget.postAuthorId,
+            widget.postId,
             widget.commentResponse.id,
             new Comment(text, <String>[], db.userId, DateTime.now(), <String>[],
                 1, media, mediaType!=null?mediaType:''));
         widget.cancelResponse();
       } else
         db.newOuterComment(
-            widget.post.author,
-            widget.post.id,
+            widget.postAuthorId,
+            widget.postId,
             new Comment(text, <String>[], db.userId, DateTime.now(), <String>[],
                 0, media, mediaType));
       userMentions.forEach((userName) async {
@@ -95,8 +98,8 @@ class _AddCommentFieldState extends State<AddCommentField> {
             new mynotification.Notification(
                 'Te han mencionado',
                 widget.user.userName + ' te ha mencionado',
-                widget.post.author,
-                widget.post.id,
+                widget.postAuthorId,
+                widget.postId,
                 DateTime.now()));
       });
       controller.clear();
@@ -109,7 +112,7 @@ class _AddCommentFieldState extends State<AddCommentField> {
       setState(() {
         media = post.media;
         mediaType = post.mediaType;
-        Navigator.pop(context);
+        navigator.pop(context);
       });
     }
 
@@ -223,14 +226,7 @@ class _AddCommentFieldState extends State<AddCommentField> {
             if (text.length == 0)
               IconButton(
                   icon: Icon(Icons.image),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        SlideLeftRoute(
-                            page: SelectPostFromPostListPage(
-                          onTap: selectMedia,
-                        )));
-                  }),
+                  onPressed: () => navigator.goSelectPost(context, selectMedia)),
             if (text.length > 0)
               IconButton(
                 icon: Icon(Icons.send),

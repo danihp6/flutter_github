@@ -10,8 +10,10 @@ import 'package:meme/Widgets/user_avatar.dart';
 import '../Models/Comment.dart';
 
 class CommentsPage extends StatefulWidget {
-  Post post;
-  CommentsPage({@required this.post});
+  String postId;
+  String authorId;
+  String description;
+  CommentsPage({@required this.postId,@required this.authorId,@required this.description});
 
   @override
   _CommentsPageState createState() => _CommentsPageState();
@@ -64,9 +66,9 @@ class _CommentsPageState extends State<CommentsPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    if(widget.post.description!='')
+                    if(widget.description!='')
                     StreamBuilder(
-                      stream: db.getUser(widget.post.author),
+                      stream: db.getUser(widget.authorId),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) print(snapshot.error);
                         if (!snapshot.hasData) return Loading();
@@ -86,7 +88,7 @@ class _CommentsPageState extends State<CommentsPage> {
                                   text: user.userName + ' ',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
-                              TextSpan(text: widget.post.description),
+                              TextSpan(text: widget.description),
                             ],
                           ),
                         ),
@@ -94,11 +96,11 @@ class _CommentsPageState extends State<CommentsPage> {
                     );
                       },
                     ),
-                    if(widget.post.description!='')
+                    if(widget.description!='')
                     Divider(),
                     StreamBuilder(
                         stream:
-                            db.getOuterComments(widget.post.author, widget.post.id),
+                            db.getOuterComments(widget.authorId, widget.postId),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) print(snapshot.error);
                           if (!snapshot.hasData) return Loading();
@@ -132,7 +134,8 @@ class _CommentsPageState extends State<CommentsPage> {
                   color: Colors.grey[300],
                   child: AddCommentField(
                     user: user,
-                    post: widget.post,
+                    postAuthorId: widget.authorId,
+                    postId: widget.postId,
                     focusNode: focusNode,
                     commentResponse:commentResponse,
                     cancelResponse:cancelResponse

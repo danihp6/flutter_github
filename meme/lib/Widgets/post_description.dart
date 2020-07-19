@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/datetime_functions.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/User.dart';
@@ -115,10 +116,7 @@ class _PostDescriptionState extends State<PostDescription> {
               IconButton(
                 icon: Icon(Icons.comment),
                 iconSize: 35,
-                onPressed: () => Navigator.of(context).push(SlideLeftRoute(
-                    page: CommentsPage(
-                  post: widget.post,
-                ))),
+                onPressed: () => navigator.goComments(context, widget.post.id, widget.post.author, widget.post.description),
               ),
               StreamBuilder(
                   stream: db.getComments(widget.author.id, widget.post.id),

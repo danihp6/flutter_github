@@ -6,6 +6,7 @@ import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/gallery.dart';
 import 'package:meme/Controller/media_storage.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/PostList.dart';
 import '../Widgets/tag_selector.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
@@ -36,7 +37,7 @@ class _NewPostListPageState extends State<NewPostListPage> {
             new PostList(_name, '', '', <String>[], db.userId,
                 DateTime.now()),
             _media);
-        Navigator.pop(context);
+        navigator.pop(context);
       }
     }
 
@@ -44,7 +45,7 @@ class _NewPostListPageState extends State<NewPostListPage> {
       setState(() {
         _media = media;
       });
-      Navigator.pop(context);
+      navigator.pop(context);
     }
 
     return Scaffold(
@@ -79,11 +80,7 @@ class _NewPostListPageState extends State<NewPostListPage> {
                         : Container(),
                   ),
                 ),
-                onTap: () => Navigator.push(
-                    context,
-                    SlideLeftRoute(
-                        page: GalleryPage(
-                            onMediaSelected: selectImage))),
+                onTap: () => navigator.goGallery(context, selectImage),
               ),
               Text('Selecciona una imagen'),
               SizedBox(height: 30),

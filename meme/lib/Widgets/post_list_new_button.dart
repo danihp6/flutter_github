@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Pages/new_post_list_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 
@@ -20,7 +21,7 @@ class PostListNewButton extends StatelessWidget {
             ],
           ),
         ),
-        onTap: ()=>Navigator.push(context, SlideLeftRoute(page:NewPostListPage())),
+        onTap: ()=>navigator.goNewPostList(context),
       );
   }
 }

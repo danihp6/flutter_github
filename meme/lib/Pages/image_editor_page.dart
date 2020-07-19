@@ -14,6 +14,7 @@ import 'package:media_gallery/media_gallery.dart';
 import 'package:fitted_text_field_container/fitted_text_field_container.dart';
 
 import 'package:extended_image_library/extended_image_library.dart';
+import 'package:meme/Controller/navigator.dart';
 import '../Controller/gallery.dart';
 
 List<Color> colors = [
@@ -34,21 +35,6 @@ List<Color> colors = [
 List<BlendMode> blendModes = [
   BlendMode.color,
   BlendMode.saturation,
-  BlendMode.difference,
-  BlendMode.plus,
-  BlendMode.modulate,
-  BlendMode.screen,
-  BlendMode.overlay,
-  BlendMode.darken,
-  BlendMode.lighten,
-  BlendMode.colorDodge,
-  BlendMode.colorBurn,
-  BlendMode.hardLight,
-  BlendMode.softLight,
-  BlendMode.exclusion,
-  BlendMode.multiply,
-  BlendMode.hue,
-  BlendMode.luminosity
 ];
 
 class ImageEditorPage<File> extends StatefulWidget {
@@ -79,7 +65,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
 
   Future<Uint8List> _capturePng() async {
     try {
-
       RenderRepaintBoundary boundary =
           _globalKey.currentContext.findRenderObject();
       ui.Image image = await boundary.toImage(pixelRatio: 3.0);
@@ -164,7 +149,7 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                 Icons.arrow_back,
                 color: Colors.white,
               ),
-              onPressed: () => Navigator.pop(context)),
+              onPressed: () => navigator.pop(context)),
           title: IconButton(icon: Icon(Icons.restore), onPressed: null),
           centerTitle: true,
           actions: <Widget>[
@@ -175,8 +160,8 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                   setState(() {});
                   await Future.delayed(const Duration(milliseconds: 10), () {});
                   _imageMedia.image = await _capturePng();
-                  Navigator.pop(context);
-                  widget.onMediaSelected(_imageMedia);
+                  navigator.pop(context);
+                  widget.onMediaSelected(context, _imageMedia);
                 })
           ],
         ),
@@ -185,31 +170,34 @@ class _ImageEditorPageState extends State<ImageEditorPage>
         children: <Widget>[
           RepaintBoundary(
             key: _globalKey,
-            child: Stack(
-              children: <Widget>[
-                AspectRatio(
-                    aspectRatio: widget.imageMedia.aspectRatio,
-                    child: LayoutBuilder(builder: (context, constraints) {
-                      imageSize = constraints.biggest;
-                      return Container(
-                          transform: transform.matrix4,
-                          child: Image.memory(_imageMedia.image,
-                              fit: BoxFit.cover,
-                              color: colorFilter,
-                              colorBlendMode: blendMode));
-                    })),
-                Positioned.fill(
-                  child: Stack(
-                    children: floatingTexts
-                        .map((key) => FloatingText(
-                              remove: removeFloatingButton,
-                              key: key,
-                              isTextOptionsVisible: isTextOptionsVisible,
-                            ))
-                        .toList(),
-                  ),
-                )
-              ],
+            child: CustomPaint(
+              painter: ,
+              child: Stack(
+                children: <Widget>[
+                  AspectRatio(
+                      aspectRatio: widget.imageMedia.aspectRatio,
+                      child: LayoutBuilder(builder: (context, constraints) {
+                        imageSize = constraints.biggest;
+                        return Container(
+                            transform: transform.matrix4,
+                            child: Image.memory(_imageMedia.image,
+                                fit: BoxFit.cover,
+                                color: colorFilter,
+                                colorBlendMode: blendMode));
+                      })),
+                  Positioned.fill(
+                    child: Stack(
+                      children: floatingTexts
+                          .map((key) => FloatingText(
+                                remove: removeFloatingButton,
+                                key: key,
+                                isTextOptionsVisible: isTextOptionsVisible,
+                              ))
+                          .toList(),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
           Expanded(
@@ -304,52 +292,119 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                   ),
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  SizedBox(
-                    width: 120,
-                    height: 200,
-                    child: ListWheelScrollView(
-                      itemExtent: 50,
-                      diameterRatio: 2,
-                      squeeze: 0.9,
-                      physics: FixedExtentScrollPhysics(),
-                      children: _buildColors(),
-                      onSelectedItemChanged: (index) {
-                        setState(() {
-                          if (index == 0)
-                            colorFilter = null;
-                          else
-                            colorFilter = colors[index - 1];
-                        });
-                      },
-                    ),
+              Row(children: <Widget>[
+                Expanded(
+                  child: ListWheelScrollView(
+                    itemExtent: 50,
+                    diameterRatio: 2,
+                    physics: FixedExtentScrollPhysics(),
+                    squeeze: 0.9,
+                    children: blendModes
+                        .map((mode) => Center(
+                            child: Text(
+                                mode.toString()[10].toUpperCase() +
+                                    mode.toString().substring(11),
+                                style: TextStyle(
+                                    fontSize: 22,
+                                    color: mode == blendMode
+                                        ? Theme.of(context).accentColor
+                                        : Colors.black))))
+                        .toList(),
+                    onSelectedItemChanged: (index) {
+                      setState(() {
+                        blendMode = blendModes[index];
+                      });
+                    },
                   ),
-                  SizedBox(
-                    width: 120,
-                    height: 200,
-                    child: ListWheelScrollView(
-                      itemExtent: 50,
-                      diameterRatio: 2,
-                      physics: FixedExtentScrollPhysics(),
-                      squeeze: 0.9,
-                      children: blendModes
-                          .map((blendMode) => Center(
-                              child: Text(
-                                  blendMode.toString()[10].toUpperCase() +
-                                      blendMode.toString().substring(11),
-                                  style: TextStyle(fontSize: 20))))
-                          .toList(),
-                      onSelectedItemChanged: (index) {
-                        setState(() {
-                          blendMode = blendModes[index];
-                        });
-                      },
-                    ),
-                  )
-                ],
-              ),
+                ),
+                Expanded(
+                    child: GestureDetector(
+                  child: colorFilter == null
+                      ? Container(
+                          height: 100,
+                          decoration: BoxDecoration(
+                              border: Border.all(width: 1),
+                              shape: BoxShape.circle),
+                          child: FittedBox(child: Icon(Icons.clear)),
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              height: 100,
+                              decoration: BoxDecoration(
+                                  border: colorFilter == Colors.white
+                                      ? Border.all(width: 1)
+                                      : null,
+                                  color: colorFilter,
+                                  shape: BoxShape.circle),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            GestureDetector(
+                              child: Container(
+                                height: 50,
+                                decoration: BoxDecoration(
+                                    border: Border.all(width: 1),
+                                    shape: BoxShape.circle),
+                                child: FittedBox(child: Icon(Icons.clear)),
+                              ),
+                              onTap: () {
+                                colorFilter = null;
+                                setState(() {});
+                              },
+                            )
+                          ],
+                        ),
+                  onTap: () async {
+                    colorFilter = await buildColorsBottomSheet(context);
+                    setState(() {});
+                  },
+                ))
+                //           )
+              ]),
+              // SizedBox(
+              //   width: 120,
+              //   height: 200,
+              //   child: ListWheelScrollView(
+              //     itemExtent: 50,
+              //     diameterRatio: 2,
+              //     squeeze: 0.9,
+              //     physics: FixedExtentScrollPhysics(),
+              //     children: _buildColors(),
+              //     onSelectedItemChanged: (index) {
+              //       setState(() {
+              //         if (index == 0)
+              //           colorFilter = null;
+              //         else
+              //           colorFilter = colors[index - 1];
+              //       });
+              //     },
+              //   ),
+              // ),
+              // SizedBox(
+              //   width: 120,
+              //   height: 200,
+              //   child: ListWheelScrollView(
+              //     itemExtent: 50,
+              //     diameterRatio: 2,
+              //     physics: FixedExtentScrollPhysics(),
+              //     squeeze: 0.9,
+              //     children: blendModes
+              //         .map((blendMode) => Center(
+              //             child: Text(
+              //                 blendMode.toString()[10].toUpperCase() +
+              //                     blendMode.toString().substring(11),
+              //                 style: TextStyle(fontSize: 20))))
+              //         .toList(),
+              //     onSelectedItemChanged: (index) {
+              //       setState(() {
+              //         blendMode = blendModes[index];
+              //       });
+              //     },
+              //   ),
+              // )
             ]),
           )
         ],
@@ -367,24 +422,25 @@ class _ImageEditorPageState extends State<ImageEditorPage>
     );
   }
 
-  List<Widget> _buildColors() {
-    List<Widget> colorWidgets = colors
-        .map((color) => Container(
-              decoration: BoxDecoration(
-                  border: color == Colors.white ? Border.all(width: 1) : null,
-                  color: color,
-                  shape: BoxShape.circle),
-            ))
-        .toList();
-    colorWidgets.insert(
-        0,
-        Container(
-          decoration: BoxDecoration(
-              border: Border.all(width: 1), shape: BoxShape.circle),
-          child: FittedBox(child: Icon(Icons.clear)),
-        ));
-    return colorWidgets;
-  }
+  // List<Widget> _buildColors() {
+  //   List<Widget> colorWidgets = colors
+  //       .map((color) => Container(
+  //             decoration: BoxDecoration(
+  //                 border: color == Colors.white ? Border.all(width: 1) : null,
+  //                 color: color,
+  //                 shape: BoxShape.circle),
+  //           ))
+  //       .toList();
+  //   colorWidgets.insert(
+  //       0,
+  //       Container(
+  //         decoration: BoxDecoration(
+  //             border: Border.all(width: 1), shape: BoxShape.circle),
+  //         child: FittedBox(child: Icon(Icons.clear)),
+  //       ));
+  //   return colorWidgets;
+  // }
+
 }
 
 class FloatingText extends StatefulWidget {
@@ -584,7 +640,7 @@ Future<Color> buildColorsBottomSheet(BuildContext context) {
                 ),
                 onTap: () {
                   print(colors[index]);
-                  Navigator.pop(context, colors[index]);
+                  navigator.pop(context, colors[index]);
                 }),
           ),
         ),

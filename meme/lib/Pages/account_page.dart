@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/auth.dart';
+import 'package:meme/Controller/navigator.dart';
 import '../Controller/db.dart';
 
 class AccountPage extends StatefulWidget {
@@ -85,8 +86,8 @@ class _AccountPageState extends State<AccountPage> {
                         onPressed: _passwordController.text.length>0? () async {
                           try {
                             auth.deleteUser(_password);
-                            Navigator.pop(context);
-                            Navigator.pop(context);
+                            navigator.pop(context);
+                            navigator.pop(context);
                           } catch (e) {
                             setState(() {
                               if (e.code == 'ERROR_WRONG_PASSWORD')
@@ -101,7 +102,7 @@ class _AccountPageState extends State<AccountPage> {
                           _password = '';
                           _passwordError = '';
                           _passwordController.clear();
-                          Navigator.pop(context);
+                          navigator.pop(context);
                         },
                       )
                     ],

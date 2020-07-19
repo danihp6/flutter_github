@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Pages/select_media_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -30,7 +31,7 @@ class _UploadButtonState extends State<UploadButton> {
             },
             child: FloatingActionButton(
               heroTag: 'tools',
-              onPressed: ()async =>await Permission.storage.request().isGranted?Navigator.push(context, SlideLeftRoute(page:SelectMediaPage())):null,
+              onPressed: ()async =>await Permission.storage.request().isGranted?navigator.goSelectMedia(context):null,
               child: Icon(
                 Icons.file_upload,
                 size: 35,

@@ -105,7 +105,7 @@ class User {
 
   set tokens(tokens) => this._tokens = tokens;
 
-  get blockedUsers => this._blockedUsers;
+  List<String> get blockedUsers => this._blockedUsers;
 
   set blockedUsers(blockedUsers) => this._blockedUsers = blockedUsers;
 

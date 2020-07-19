@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/Report.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/loading.dart';
@@ -47,7 +48,7 @@ class UserMoreButton extends StatelessWidget {
                             ],
                           ),
                           onPressed: () {
-                            Navigator.pop(context);
+                            navigator.pop(context);
                             if (blocked)
                               db.unblock(db.userId, user.id);
                             else
@@ -77,13 +78,13 @@ class UserMoreButton extends StatelessWidget {
                                             children: <Widget>[
                                               FlatButton(
                                                   onPressed: () =>
-                                                      Navigator.pop(context),
+                                                      navigator.pop(context),
                                                   child: Text('Cancelar')),
                                               FlatButton(
                                                   onPressed: () {
                                                     db.block(
                                                         db.userId, user.id);
-                                                    Navigator.pop(context);
+                                                    navigator.pop(context);
                                                   },
                                                   child: Text('Bloquear'))
                                             ],
@@ -111,7 +112,7 @@ class UserMoreButton extends StatelessWidget {
                           ],
                         ),
                         onPressed: () async {
-                          Navigator.pop(context);
+                          navigator.pop(context);
                           if (!await db.reporter(user.id, db.userId))
                             showModalBottomSheet(
                                 context: context,

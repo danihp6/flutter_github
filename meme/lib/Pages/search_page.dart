@@ -1,6 +1,7 @@
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/local_storage.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/Tag.dart';
@@ -92,7 +93,7 @@ class _SearchPageState extends State<SearchPage>
         focusNode.unfocus();
         return false;
       }
-      Navigator.pop(context);
+      navigator.pop(context);
       return true;
     }
 
@@ -124,10 +125,7 @@ class _SearchPageState extends State<SearchPage>
                                     style: TextStyle(fontSize: 16)),
                               ],
                             ),
-                            onTap: () => Navigator.push(
-                                context,
-                                SlideLeftRoute(
-                                    page: UserPage(userId: users[index].id))),
+                            onTap: () => navigator.goUser(context, users[index].id),
                           ),
                           IconButton(
                               icon: Icon(Icons.clear),
@@ -167,14 +165,7 @@ class _SearchPageState extends State<SearchPage>
                           children: <Widget>[
                             TagWidget(
                                 tag: tags[index],
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      SlideLeftRoute(
-                                          page: TagPage(
-                                        tagId: tags[index].id,
-                                      )));
-                                }),
+                                onTap: () => navigator.goTag(context, tags[index].id)),
                             IconButton(
                                 icon: Icon(Icons.clear),
                                 onPressed: () {
@@ -215,12 +206,7 @@ class _SearchPageState extends State<SearchPage>
                             PostListWidget(
                                 postList: postLists[index],
                                 activeMoreOptions: false,
-                                onTap: () => Navigator.push(
-                                    context,
-                                    SlideLeftRoute(
-                                        page: PostListPage(
-                                      postList: postLists[index],
-                                    )))),
+                                onTap: () => navigator.goPostList(context, postLists[index].id, postLists[index].author),),
                             IconButton(
                                 icon: Icon(Icons.clear),
                                 onPressed: () {
@@ -304,12 +290,7 @@ class _SearchPageState extends State<SearchPage>
                                           storage.recentUsers =
                                               storage.recentUsers + [item.id];
                                         setState(() {});
-                                        Navigator.push(
-                                            context,
-                                            SlideLeftRoute(
-                                                page: UserPage(
-                                              userId: item.id,
-                                            )));
+                                        navigator.goUser(context, item.id);
                                       },
                                     )));
                               }
@@ -324,10 +305,7 @@ class _SearchPageState extends State<SearchPage>
                                         storage.recentTags =
                                             storage.recentTags + [item.id];
                                       setState(() {});
-                                      Navigator.push(
-                                          context,
-                                          SlideLeftRoute(
-                                              page: TagPage(tagId: item.id)));
+                                      navigator.goTag(context, item.id);
                                     },
                                   ),
                                 );
@@ -353,12 +331,7 @@ class _SearchPageState extends State<SearchPage>
                                                   storage.recentPostLists +
                                                       [item];
                                             setState(() {});
-                                            Navigator.push(
-                                                context,
-                                                SlideLeftRoute(
-                                                    page: PostListPage(
-                                                  postList: postList,
-                                                )));
+                                            navigator.goPostList(context, item.id, item.author);
                                           },
                                         ),
                                       );
@@ -448,12 +421,7 @@ class _TendTagsStreamState extends State<TendTagsStream> {
                           Text('${index + 1} - ',style:TextStyle(fontSize: 16)),
                           TagWidget(
                             tag: tag,
-                            onTap: () => Navigator.push(
-                                context,
-                                SlideLeftRoute(
-                                    page: TagPage(
-                                  tagId: tag.id,
-                                ))),
+                            onTap: () => navigator.goTag(context, tag.id),
                           ),
                         ],
                       ),
@@ -486,13 +454,7 @@ class _StreamPostsState extends State<StreamPosts> with AutomaticKeepAliveClient
   @override
   Widget build(BuildContext context) {
 
-    goPost(Post post) => Navigator.push(
-        context,
-        SlideLeftRoute(
-            page: PostPage(
-          authorId: post.author,
-          postId: post.id,
-        )));
+    
         
     return StreamBuilder(
         stream: CombineLatestStream.list(widget.postPaths
@@ -504,7 +466,7 @@ class _StreamPostsState extends State<StreamPosts> with AutomaticKeepAliveClient
           print(posts);
           return PostsCarousel(
             posts: posts,
-            onTap: goPost,
+            onTap: navigator.goPost,
           );
         });
   }

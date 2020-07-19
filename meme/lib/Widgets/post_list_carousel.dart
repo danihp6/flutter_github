@@ -76,7 +76,7 @@ class _PostListCarouselState extends State<PostListCarousel> {
                   : Container()
             ],
           ),
-          onTap: () => widget.onTapPostList(_postList),
+          onTap: () => widget.onTapPostList(context,_postList),
         ),
         SizedBox(
           height: 5,

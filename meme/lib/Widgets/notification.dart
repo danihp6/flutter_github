@@ -3,6 +3,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:meme/Controller/configuration.dart';
 import 'package:meme/Controller/datetime_functions.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/post_page.dart';
@@ -30,7 +31,7 @@ class NotificationWidget extends StatelessWidget {
             if (!snapshot.hasData) return Loading();
             User user = snapshot.data;
             return StreamBuilder(
-                stream: db.getPost(notification.sender,notification.post),
+                stream: db.getPost(notification.sender, notification.post),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) print(snapshot.error);
                   if (!snapshot.hasData) return Loading();
@@ -48,16 +49,8 @@ class NotificationWidget extends StatelessWidget {
                       ),
                     ],
                     child: Row(children: [
-                      GestureDetector(
-                        child: UserAvatar(
-                          user: user,
-                        ),
-                        onTap: () => Navigator.push(
-                            context,
-                            SlideLeftRoute(
-                                page: UserPage(
-                              userId: user.id,
-                            ))),
+                      UserAvatar(
+                        user: user,
                       ),
                       SizedBox(
                         width: 12,
@@ -82,8 +75,8 @@ class NotificationWidget extends StatelessWidget {
                       ),
                       GestureDetector(
                         child: Image.network(post.media),
-                        onTap: () => Navigator.push(context,
-                            SlideLeftRoute(page: PostPage(authorId: post.author,postId: post.id))),
+                        onTap: () =>
+                            navigator.goPost(context, post.id, post.author),
                       )
                     ]),
                   );
@@ -107,16 +100,8 @@ class NotificationWidget extends StatelessWidget {
               ),
             ],
             child: Row(children: [
-              GestureDetector(
-                child: UserAvatar(
-                  user: user,
-                ),
-                onTap: () => Navigator.push(
-                    context,
-                    SlideLeftRoute(
-                        page: UserPage(
-                      userId: user.id,
-                    ))),
+              UserAvatar(
+                user: user,
               ),
               SizedBox(
                 width: 12,

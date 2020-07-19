@@ -4,6 +4,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:image_editor/image_editor.dart';
 import 'package:meme/Controller/gallery.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Pages/image_editor_page.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
@@ -145,12 +146,8 @@ class _GalleryPageState extends State<GalleryPage> {
                   SizedBox(
                     width: 50,
                     child: RawMaterialButton(
-                      onPressed: () async => Navigator.push(
-                          context,
-                          SlideLeftRoute(
-                              page: ImageEditorPage(
-                                  onMediaSelected: widget.onMediaSelected,
-                                  imageMedia: media))),
+                      onPressed: () => navigator.goImageEditor(
+                          context, widget.onMediaSelected, media),
                       elevation: 1,
                       fillColor: Colors.white.withOpacity(0.9),
                       child: Icon(
@@ -190,7 +187,7 @@ class _GalleryPageState extends State<GalleryPage> {
       if (selectedMedia is ImageMedia) {
         (selectedMedia as ImageMedia).image = await save();
       }
-      widget.onMediaSelected(selectedMedia);
+      widget.onMediaSelected(context,selectedMedia);
     }
 
     return Scaffold(
@@ -291,7 +288,6 @@ class _GalleryPageState extends State<GalleryPage> {
                       builder: (context, scrollController) {
                         return Container(
                           color: Colors.white.withOpacity(0.7),
-                          
                           child: SingleChildScrollView(
                             controller: scrollController,
                             child: _buildPreview(),

@@ -47,7 +47,7 @@ class _PostsCarouselState extends State<PostsCarousel> {
                   isPausable: false,
                   aspectRatio: post.aspectRatio,
                 ),
-          onTap: () => widget.onTap(post)))
+          onTap: () => widget.onTap(context,post.id,post.author)))
       .toList();
 
   @override

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Pages/sign_in_page.dart';
 import 'package:meme/Widgets/scroll_column_expandable.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
@@ -221,8 +222,7 @@ class _LogInPageState extends State<LogInPage> {
                               ],
                             ),
                             FlatButton(
-                              onPressed: () => Navigator.push(
-                                  context, SlideLeftRoute(page: SignInPage())),
+                              onPressed: () => navigator.goSignIn(context),
                               child: Text(
                                 'Registrarse',
                                 style: TextStyle(

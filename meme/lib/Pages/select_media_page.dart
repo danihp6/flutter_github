@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/image_functions.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Pages/camera_page.dart';
 import 'package:meme/Pages/gallery_page.dart';
 import 'package:meme/Pages/upload_publication_page.dart';
@@ -37,12 +38,6 @@ class _SelectMediaPageState extends State<SelectMediaPage>
   @override
   Widget build(BuildContext context) {
     
-    onMediaSelected(MyMedia media) async {
-        Navigator.push(
-            context,
-            SlideLeftRoute(
-                page: UploadPublicationPage(media:media)));
-    }
 
     return Scaffold(
 
@@ -51,7 +46,7 @@ class _SelectMediaPageState extends State<SelectMediaPage>
         physics: NeverScrollableScrollPhysics(),
         children: [
           GalleryPage(
-            onMediaSelected: onMediaSelected
+            onMediaSelected: navigator.goUploadPublication
           ),
           CameraPage()
         ],

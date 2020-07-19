@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/user_page.dart';
 import 'package:meme/Widgets/follow_button.dart';
@@ -53,12 +54,7 @@ class FollowedListPage extends StatelessWidget {
                                 user: followedUser,
                                 blocked: blocked,
                                 youAreBlocked: youAreBlocked,
-                                onTap: () => Navigator.push(
-                                    context,
-                                    SlideLeftRoute(
-                                        page: UserPage(
-                                      userId: followedUser.id,
-                                    ))),
+                                onTap: () => navigator.goUser(context, userId)
                               );
                             },
                           );

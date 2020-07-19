@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/followed_list_page.dart';
 import 'package:meme/Pages/followers_list_page.dart';
@@ -105,10 +106,7 @@ class UserFollowedPoints extends StatelessWidget {
               )
             ],
           ),
-          onTap: () => Navigator.push(
-              context,
-              SlideLeftRoute(
-                  page: FollowersListPage(userId: user.id))),
+          onTap: () => navigator.goFollowers(context, user.id),
         ),
         GestureDetector(
           child: Column(

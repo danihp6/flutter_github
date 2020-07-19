@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/scroll_column_expandable.dart';
 import '../Controller/auth.dart';
@@ -225,7 +226,7 @@ class _SignInPageState extends State<SignInPage> {
                                                   [token]),
                                               _password);
 
-                                          Navigator.pop(context);
+                                          navigator.pop(context);
                                         } catch (error) {
                                           showError(error);
                                         }
