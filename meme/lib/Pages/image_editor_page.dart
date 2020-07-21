@@ -60,8 +60,11 @@ class _ImageEditorPageState extends State<ImageEditorPage>
   BlendMode blendMode = BlendMode.color;
   Matrix4Transform transform = Matrix4Transform();
   Size imageSize;
+  BoxFit imageFit = BoxFit.cover;
 
   Color textColor = Colors.white;
+  bool labelTextActived = false;
+  double labelTextHeight = 100;
 
   Future<Uint8List> _capturePng() async {
     try {
@@ -124,20 +127,47 @@ class _ImageEditorPageState extends State<ImageEditorPage>
       });
     }
 
-    void flip() {
+    void flipHorizontally() {
       transform =
           transform.flipHorizontally(origin: Offset(imageSize.width / 2, 0));
       setState(() {});
     }
 
+    void flipVertically() {
+      double dy = labelTextActived
+          ? (imageSize.width - labelTextHeight) / 2
+          : imageSize.width / 2;
+      transform = transform.flipVertically(origin: Offset(0, dy));
+      setState(() {});
+    }
+
     void rotate(double degrees) {
-      transform = transform.rotateByCenterDegrees(degrees, imageSize);
+      double height = labelTextActived
+          ? imageSize.height - labelTextHeight
+          : imageSize.height;
+      Size size = Size(imageSize.width, height);
+      transform = transform.rotateByCenterDegrees(degrees, size);
       setState(() {});
     }
 
     restore() {
       _imageMedia = widget.imageMedia;
       setState(() {});
+    }
+
+    changeFit() {
+      setState(() {
+        if (imageFit == BoxFit.cover)
+          imageFit = BoxFit.contain;
+        else
+          imageFit = BoxFit.cover;
+      });
+    }
+
+    activeLabelText() {
+      setState(() {
+        labelTextActived = !labelTextActived;
+      });
     }
 
     return Scaffold(
@@ -170,115 +200,170 @@ class _ImageEditorPageState extends State<ImageEditorPage>
         children: <Widget>[
           RepaintBoundary(
             key: _globalKey,
-            child: CustomPaint(
-              painter: ,
-              child: Stack(
-                children: <Widget>[
-                  AspectRatio(
-                      aspectRatio: widget.imageMedia.aspectRatio,
-                      child: LayoutBuilder(builder: (context, constraints) {
-                        imageSize = constraints.biggest;
-                        return Container(
-                            transform: transform.matrix4,
-                            child: Image.memory(_imageMedia.image,
-                                fit: BoxFit.cover,
-                                color: colorFilter,
-                                colorBlendMode: blendMode));
-                      })),
-                  Positioned.fill(
-                    child: Stack(
-                      children: floatingTexts
-                          .map((key) => FloatingText(
-                                remove: removeFloatingButton,
-                                key: key,
-                                isTextOptionsVisible: isTextOptionsVisible,
-                              ))
-                          .toList(),
-                    ),
-                  )
-                ],
-              ),
+            child: Stack(
+              children: <Widget>[
+                AspectRatio(
+                  aspectRatio: widget.imageMedia.aspectRatio,
+                  child: LayoutBuilder(builder: (context, constraints) {
+                    imageSize = constraints.biggest;
+                    return Column(
+                      children: <Widget>[
+                        if (labelTextActived)
+                          Container(
+                              height: labelTextHeight, color: Colors.white),
+                        Container(
+                          transform: transform.matrix4,
+                          width: imageSize.width,
+                          height: labelTextActived
+                              ? imageSize.height - labelTextHeight
+                              : imageSize.height,
+                          child: Image.memory(_imageMedia.image,
+                              fit: imageFit,
+                              color: colorFilter,
+                              colorBlendMode: blendMode),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+                Positioned.fill(
+                  child: Stack(
+                    children: floatingTexts
+                        .map((key) => FloatingText(
+                              remove: removeFloatingButton,
+                              key: key,
+                              isTextOptionsVisible: isTextOptionsVisible,
+                            ))
+                        .toList(),
+                  ),
+                )
+              ],
             ),
           ),
           Expanded(
             child: TabBarView(controller: tabController, children: [
-              Row(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Expanded(
-                    child: FittedBox(
-                      child: IconButton(
-                          icon: Icon(
-                            Icons.flip,
-                            color: Colors.black,
-                          ),
-                          onPressed: flip),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      SizedBox(
+                        height: 80,
+                        child: FittedBox(
+                          child: IconButton(
+                              icon: Icon(
+                                Icons.settings_overscan,
+                                color: Colors.black,
+                              ),
+                              onPressed: changeFit),
+                        ),
+                      ),
+                    ],
                   ),
                   Expanded(
-                    child: FittedBox(
-                      child: IconButton(
-                          icon: LayoutBuilder(
-                            builder: (context, constraints) => Container(
-                                transform: Matrix4Transform()
-                                    .rotateByCenterDegrees(
-                                        90, constraints.biggest)
-                                    .left(constraints.maxWidth / 4)
-                                    .matrix4,
-                                child: Icon(
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: FittedBox(
+                            child: IconButton(
+                                icon: Icon(
                                   Icons.flip,
                                   color: Colors.black,
-                                )),
+                                ),
+                                onPressed: flipHorizontally),
                           ),
-                          onPressed: flip),
+                        ),
+                        Expanded(
+                          child: FittedBox(
+                            child: IconButton(
+                                icon: LayoutBuilder(
+                                  builder: (context, constraints) => Container(
+                                      transform: Matrix4Transform()
+                                          .rotateByCenterDegrees(
+                                              90, constraints.biggest)
+                                          .left(constraints.maxWidth / 4)
+                                          .matrix4,
+                                      child: Icon(
+                                        Icons.flip,
+                                        color: Colors.black,
+                                      )),
+                                ),
+                                onPressed: flipVertically),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Expanded(
-                    child: FittedBox(
-                      child: IconButton(
-                          icon: Icon(
-                            Icons.rotate_right,
-                            color: Colors.black,
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: FittedBox(
+                            child: IconButton(
+                                icon: Icon(
+                                  Icons.rotate_right,
+                                  color: Colors.black,
+                                ),
+                                onPressed: () => rotate(90)),
                           ),
-                          onPressed: () => rotate(90)),
-                    ),
-                  ),
-                  Expanded(
-                    child: FittedBox(
-                      child: IconButton(
-                          icon: Icon(
-                            Icons.rotate_left,
-                            color: Colors.black,
+                        ),
+                        Expanded(
+                          child: FittedBox(
+                            child: IconButton(
+                                icon: Icon(
+                                  Icons.rotate_left,
+                                  color: Colors.black,
+                                ),
+                                onPressed: () => rotate(-90)),
                           ),
-                          onPressed: () => rotate(-90)),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              Column(
                 children: <Widget>[
-                  Expanded(
-                    child: FittedBox(
-                      child: IconButton(
-                          icon: Icon(
-                            Icons.delete_forever,
-                            color: Colors.black,
-                          ),
-                          onPressed: removeAllFloatingButton),
-                    ),
-                  ),
-                  Expanded(
-                    child: FittedBox(
-                      child: IconButton(
-                          icon: Icon(
-                            isTextOptionsVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                            color: Colors.black,
-                          ),
-                          onPressed: showTextOptions),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      SizedBox(
+                        height: 80,
+                        child: FittedBox(
+                          child: IconButton(
+                              icon: Icon(
+                                Icons.delete_forever,
+                                color: Colors.black,
+                              ),
+                              onPressed: removeAllFloatingButton),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 80,
+                        child: FittedBox(
+                          child: IconButton(
+                              icon: Icon(
+                                isTextOptionsVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Colors.black,
+                              ),
+                              onPressed: showTextOptions),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 80,
+                        child: FittedBox(
+                          child: IconButton(
+                              icon: Icon(
+                                Icons.label,
+                                color: Colors.black,
+                              ),
+                              onPressed: activeLabelText),
+                        ),
+                      ),
+                    ],
                   ),
                   Expanded(
                     child: FittedBox(
@@ -292,78 +377,86 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                   ),
                 ],
               ),
-              Row(children: <Widget>[
-                Expanded(
-                  child: ListWheelScrollView(
-                    itemExtent: 50,
-                    diameterRatio: 2,
-                    physics: FixedExtentScrollPhysics(),
-                    squeeze: 0.9,
-                    children: blendModes
-                        .map((mode) => Center(
-                            child: Text(
-                                mode.toString()[10].toUpperCase() +
-                                    mode.toString().substring(11),
-                                style: TextStyle(
-                                    fontSize: 22,
-                                    color: mode == blendMode
-                                        ? Theme.of(context).accentColor
-                                        : Colors.black))))
-                        .toList(),
-                    onSelectedItemChanged: (index) {
-                      setState(() {
-                        blendMode = blendModes[index];
-                      });
-                    },
+              Column(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        GestureDetector(
+                          child: Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                                border: Border.all(width: 1),
+                                shape: BoxShape.circle),
+                            child: FittedBox(child: Icon(Icons.clear)),
+                          ),
+                          onTap: colorFilter != null
+                              ? () {
+                                  colorFilter = null;
+                                  setState(() {});
+                                }
+                              : null,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Expanded(
-                    child: GestureDetector(
-                  child: colorFilter == null
-                      ? Container(
-                          height: 100,
-                          decoration: BoxDecoration(
-                              border: Border.all(width: 1),
-                              shape: BoxShape.circle),
-                          child: FittedBox(child: Icon(Icons.clear)),
-                        )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-                              height: 100,
-                              decoration: BoxDecoration(
-                                  border: colorFilter == Colors.white
-                                      ? Border.all(width: 1)
-                                      : null,
-                                  color: colorFilter,
-                                  shape: BoxShape.circle),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            GestureDetector(
-                              child: Container(
-                                height: 50,
+                  Expanded(
+                    child: Row(children: <Widget>[
+                      Expanded(
+                        child: ListWheelScrollView(
+                          itemExtent: 50,
+                          diameterRatio: 2,
+                          physics: FixedExtentScrollPhysics(),
+                          squeeze: 0.9,
+                          children: blendModes
+                              .map((mode) => Center(
+                                  child: Text(
+                                      mode.toString()[10].toUpperCase() +
+                                          mode.toString().substring(11),
+                                      style: TextStyle(
+                                          fontSize: 22,
+                                          color: mode == blendMode
+                                              ? Theme.of(context).accentColor
+                                              : Colors.black))))
+                              .toList(),
+                          onSelectedItemChanged: (index) {
+                            setState(() {
+                              blendMode = blendModes[index];
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                          child: GestureDetector(
+                        child: colorFilter == null
+                            ? Container(
+                                height: 100,
                                 decoration: BoxDecoration(
                                     border: Border.all(width: 1),
                                     shape: BoxShape.circle),
-                                child: FittedBox(child: Icon(Icons.clear)),
+                                child: FittedBox(child: Icon(Icons.remove)),
+                              )
+                            : Container(
+                                height: 100,
+                                decoration: BoxDecoration(
+                                    border: colorFilter == Colors.white
+                                        ? Border.all(width: 1)
+                                        : null,
+                                    color: colorFilter,
+                                    shape: BoxShape.circle),
                               ),
-                              onTap: () {
-                                colorFilter = null;
-                                setState(() {});
-                              },
-                            )
-                          ],
-                        ),
-                  onTap: () async {
-                    colorFilter = await buildColorsBottomSheet(context);
-                    setState(() {});
-                  },
-                ))
-                //           )
-              ]),
+                        onTap: () async {
+                          colorFilter = await buildColorsBottomSheet(context);
+                          setState(() {});
+                        },
+                      ))
+                      //           )
+                    ]),
+                  ),
+                ],
+              ),
               // SizedBox(
               //   width: 120,
               //   height: 200,
@@ -492,6 +585,7 @@ class _FloatingTextState extends State<FloatingText> {
                 keyboardType: TextInputType.multiline,
                 scrollPhysics: NeverScrollableScrollPhysics(),
                 maxLines: null,
+                textAlign: TextAlign.center,
                 controller: textController,
                 focusNode: focusNode,
                 style: TextStyle(fontSize: scaleFactor, color: textColor),

@@ -36,6 +36,7 @@ class _GalleryPageState extends State<GalleryPage> {
   ScrollController scrollController = ScrollController();
   GlobalKey<VideoPlayerWidgetState> videoPlayerKey =
       GlobalKey<VideoPlayerWidgetState>();
+ 
 
   @override
   void initState() {
@@ -83,7 +84,6 @@ class _GalleryPageState extends State<GalleryPage> {
         aspectRatio = myAspectRatios[indexAspectRatio];
         maxChildSize = (MediaQuery.of(context).size.width + 58) /
             MediaQuery.of(context).size.height;
-        print(maxChildSize);
       });
     }
 
@@ -187,7 +187,7 @@ class _GalleryPageState extends State<GalleryPage> {
       if (selectedMedia is ImageMedia) {
         (selectedMedia as ImageMedia).image = await save();
       }
-      widget.onMediaSelected(context,selectedMedia);
+      widget.onMediaSelected(context, selectedMedia);
     }
 
     return Scaffold(

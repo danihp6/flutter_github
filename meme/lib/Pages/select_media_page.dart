@@ -6,6 +6,7 @@ import 'package:meme/Controller/image_functions.dart';
 import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Pages/camera_page.dart';
 import 'package:meme/Pages/gallery_page.dart';
+import 'package:meme/Pages/template_page.dart';
 import 'package:meme/Pages/upload_publication_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import '../Controller/gallery.dart';
@@ -26,7 +27,7 @@ class _SelectMediaPageState extends State<SelectMediaPage>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 2, vsync: this);
+    tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -48,7 +49,9 @@ class _SelectMediaPageState extends State<SelectMediaPage>
           GalleryPage(
             onMediaSelected: navigator.goUploadPublication
           ),
-          CameraPage()
+          TemplatePage(),
+          CameraPage(),
+          
         ],
       ),
       bottomNavigationBar: Container(
@@ -64,6 +67,13 @@ class _SelectMediaPageState extends State<SelectMediaPage>
               Tab(
                 icon: Icon(
                   Icons.image,
+                  size: 30,
+                  color: Colors.black,
+                ),
+              ),
+              Tab(
+                icon: Icon(
+                  Icons.filter_frames,
                   size: 30,
                   color: Colors.black,
                 ),
