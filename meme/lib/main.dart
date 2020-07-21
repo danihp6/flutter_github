@@ -32,17 +32,17 @@ class _MyAppState extends State<MyApp> {
       Map linkParameters = link.queryParameters;
       print('-----------------------------------');
       String type = linkParameters['type'];
-      if(type == 'post')
-      configuration.mainNavigatorKey.currentState.push(SlideLeftRoute(
-          page: PostPage(
-        authorId: linkParameters['author'],
-        postId: linkParameters['id'],
-      )));
-      if(type == 'user')
-      configuration.mainNavigatorKey.currentState.push(SlideLeftRoute(
-          page: UserPage(
-        userId: linkParameters['id'],
-      )));
+      if (type == 'post')
+        configuration.mainNavigatorKey.currentState.push(SlideLeftRoute(
+            page: PostPage(
+          authorId: linkParameters['author'],
+          postId: linkParameters['id'],
+        )));
+      if (type == 'user')
+        configuration.mainNavigatorKey.currentState.push(SlideLeftRoute(
+            page: UserPage(
+          userId: linkParameters['id'],
+        )));
     });
   }
 
@@ -61,9 +61,8 @@ class _MyAppState extends State<MyApp> {
           visualDensity: VisualDensity.adaptivePlatformDensity,
           bottomSheetTheme: BottomSheetThemeData(
             backgroundColor: Color(0xFF323232),
-            
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top:Radius.circular(10)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
             ),
           )),
       home: RootPage(),

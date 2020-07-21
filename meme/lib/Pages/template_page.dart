@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/Template.dart';
 
 class TemplatePage extends StatelessWidget {
@@ -9,10 +10,14 @@ class TemplatePage extends StatelessWidget {
     return Scaffold(
       body: GridView.builder(
         itemCount: templates.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
+        gridDelegate:
+            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
         itemBuilder: (context, index) {
-          return Card(
-            child: Image.asset(templates[index].front),
+          return GestureDetector(
+            child: Card(
+              child: Image.asset(templates[index].front),
+            ),
+            onTap: () => templates[index].goTemplate(context,templates[index]),
           );
         },
       ),

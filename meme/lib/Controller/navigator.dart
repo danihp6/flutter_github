@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/gallery.dart';
+import 'package:meme/Models/Template.dart';
 import 'package:meme/Pages/account_page.dart';
 import 'package:meme/Pages/comments_page.dart';
 import 'package:meme/Pages/contact_page.dart';
@@ -9,6 +10,7 @@ import 'package:meme/Pages/gallery_page.dart';
 import 'package:meme/Pages/image_editor_page.dart';
 import 'package:meme/Pages/my_user_page.dart';
 import 'package:meme/Pages/new_post_list_page.dart';
+import 'package:meme/Pages/over_image_camera_page.dart';
 import 'package:meme/Pages/post_list_page.dart';
 import 'package:meme/Pages/post_page.dart';
 import 'package:meme/Pages/select_media_page.dart';
@@ -16,6 +18,7 @@ import 'package:meme/Pages/select_post_from_post_list_page.dart';
 import 'package:meme/Pages/select_post_list_page.dart';
 import 'package:meme/Pages/sign_in_page.dart';
 import 'package:meme/Pages/tag_page.dart';
+import 'package:meme/Pages/template_text.dart';
 import 'package:meme/Pages/upload_publication_page.dart';
 import 'package:meme/Pages/user_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
@@ -124,10 +127,18 @@ class MyNavigator {
   goSelectMedia(BuildContext context) =>
       Navigator.push(context, SlideLeftRoute(page: SelectMediaPage()));
 
-  goFollowers(BuildContext context,String userId)=>Navigator.push(
-              context,
-              SlideLeftRoute(
-                  page: FollowersListPage(userId: userId)));
+  goFollowers(BuildContext context, String userId) => Navigator.push(
+      context, SlideLeftRoute(page: FollowersListPage(userId: userId)));
+
+  goOverImageCamera(BuildContext context, Template template) => Navigator.push(
+      context,
+      SlideLeftRoute(
+          page: OverImageCameraPage(
+        image: template.front,
+      )));
+
+  goTemplateFixText(BuildContext context, Template template) => Navigator.push(
+      context, SlideLeftRoute(page: TemplateText(template: template)));
 }
 
 MyNavigator navigator = MyNavigator();
