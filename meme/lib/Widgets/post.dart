@@ -4,10 +4,12 @@ import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/Configuration.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
+import 'package:meme/Models/Template.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/post_description.dart';
 import 'package:meme/Widgets/post_header.dart';
+import 'package:meme/Widgets/template_row.dart';
 import 'package:meme/Widgets/video_player.dart';
 import '../Controller/db.dart';
 
@@ -26,7 +28,8 @@ class PostWidget extends StatefulWidget {
   _PostWidgetState createState() => _PostWidgetState();
 }
 
-class _PostWidgetState extends State<PostWidget> with AutomaticKeepAliveClientMixin {
+class _PostWidgetState extends State<PostWidget>
+    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     List<String> favourites = widget.post.favourites;
@@ -67,11 +70,16 @@ class _PostWidgetState extends State<PostWidget> with AutomaticKeepAliveClientMi
                       ),
                       onDoubleTap: () => addOrRemoveFavourite(
                           db.userId, widget.post.author, widget.post.id))
-                  : VideoPlayerWidget(url: widget.post.media,aspectRatio: widget.post.aspectRatio,),
+                  : VideoPlayerWidget(
+                      url: widget.post.media,
+                      aspectRatio: widget.post.aspectRatio,
+                    ),
             ),
             if (widget.isDescriptionShowed)
               PostDescription(post: widget.post, author: author),
-              SizedBox(height: 5,)
+            SizedBox(
+              height: 5,
+            )
           ]);
         });
   }

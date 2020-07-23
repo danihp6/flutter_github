@@ -1,27 +1,71 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meme/Controller/navigator.dart';
 
-class Template {
-  String _name;
-  String _front;
-  Function _goTemplate;
+enum TemplateType { OverImageCamera, Text }
 
-  Template(name,front,goTemplate){
+class Template {
+  String _id;
+  String _name;
+  String _image;
+  TemplateType _type;
+  DateTime _dateTime;
+
+  Template(name, image, type) {
     this._name = name;
-    this._front = front;
-    this._goTemplate = goTemplate;
+    this._image = image;
+    this._type = type;
+    _dateTime = DateTime.now();
   }
 
-  get name => this._name;
+  Template.fromFirestore(DocumentSnapshot doc)
+      : _id = doc.documentID,
+        _name = doc.data['name'],
+        _image = doc.data['image'],
+        _type = toTemplateType(doc.data['type']),
+        _dateTime = (doc.data['dateTime'] as Timestamp).toDate();
 
-  get front => this._front;
+  Map<String, dynamic> toFirestore() => {
+        'name': _name,
+        'image': _image,
+        'type': _type.toString(),
+        'dateTime' : _dateTime
+      };
 
-  get goTemplate => this._goTemplate;
+  get id => this._id;
+
+  String get name => this._name;
+
+  get image => this._image;
+
+  get goTemplate {
+    switch (this._type) {
+      case TemplateType.OverImageCamera:
+        return navigator.goTemplateOverImageCamera;
+        break;
+      case TemplateType.Text:
+        return navigator.goTemplateText;
+        break;
+      default:
+        throw Exception('Template error');
+    }
+  }
 }
 
-Template president = Template('President','assets/templates/president.png',navigator.goOverImageCamera);
+List<Template> toTemplates(QuerySnapshot query) {
+  return query.documents.map((doc) => Template.fromFirestore(doc)).toList();
+}
 
-Template fish = Template('Fish','assets/templates/fish.png',navigator.goTemplateFixText);
-
-List<Template> templates = [president,fish];
+TemplateType toTemplateType(String string) {
+  switch (string) {
+    case 'TemplateType.OverImageCamera':
+      return TemplateType.OverImageCamera;
+      break;
+    case 'TemplateType.Text':
+      return TemplateType.Text;
+      break;
+    default:
+      throw Exception('Template error');
+  }
+}

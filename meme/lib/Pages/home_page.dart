@@ -8,7 +8,8 @@ const int NEXT_POSTS_HOME_PAGE = 10;
 
 class HomePage extends StatefulWidget {
   String userId;
-  HomePage({@required this.userId});
+  GlobalKey<ScaffoldState> scaffoldState;
+  HomePage({@required this.userId, @required this.scaffoldState});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -36,7 +37,7 @@ class _HomePageState extends State<HomePage>
           ],
         ),
       ),
-      body: HomeStream(isDescriptionShowed: isDescriptionShowed),
+      body: HomeStream(isDescriptionShowed: isDescriptionShowed,scaffoldState: widget.scaffoldState,),
     );
   }
 
@@ -44,14 +45,10 @@ class _HomePageState extends State<HomePage>
   bool get wantKeepAlive => true;
 }
 
-class HomeStream extends StatefulWidget {
-  HomeStream({this.isDescriptionShowed});
+class HomeStream extends StatelessWidget {
+  HomeStream({this.isDescriptionShowed, this.scaffoldState});
   bool isDescriptionShowed;
-  @override
-  _HomeStreamState createState() => _HomeStreamState();
-}
-
-class _HomeStreamState extends State<HomeStream> {
+  GlobalKey<ScaffoldState> scaffoldState;
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +71,8 @@ class _HomeStreamState extends State<HomeStream> {
                   itemCount: posts.length,
                   itemBuilder: (context, index) => PostWidget(
                         post: posts[index],
-                        isDescriptionShowed: widget.isDescriptionShowed,
+                        isDescriptionShowed: isDescriptionShowed,
+                        scaffoldState: scaffoldState,
                       ));
             },
           );

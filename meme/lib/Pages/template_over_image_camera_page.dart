@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -8,6 +9,7 @@ import 'package:matrix4_transform/matrix4_transform.dart';
 import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Controller/gallery.dart';
 import 'package:meme/Controller/navigator.dart';
+import 'package:meme/Models/Template.dart';
 import 'package:meme/Pages/upload_publication_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:path_provider/path_provider.dart';
@@ -15,20 +17,21 @@ import 'dart:ui' as ui;
 
 List<CameraDescription> cameras;
 
-class OverImageCameraPage extends StatefulWidget {
-  String image;
-  OverImageCameraPage({@required this.image});
+class TemplateOverImageCameraPage extends StatefulWidget {
+  Template template;
+  TemplateOverImageCameraPage({@required this.template});
   @override
-  _OverImageCameraPageState createState() => _OverImageCameraPageState();
+  _TemplateOverImageCameraPageState createState() =>
+      _TemplateOverImageCameraPageState();
 }
 
-class _OverImageCameraPageState extends State<OverImageCameraPage> {
+class _TemplateOverImageCameraPageState
+    extends State<TemplateOverImageCameraPage> {
   CameraController controller;
   CameraDescription camera;
   String imagePath;
   GlobalKey _globalKey = new GlobalKey();
   Uint8List result;
-
   @override
   void initState() {
     super.initState();
@@ -84,10 +87,7 @@ class _OverImageCameraPageState extends State<OverImageCameraPage> {
 
   void onTakePictureButtonPressed() async {
     result = await File(await takePicture()).readAsBytes();
-    setState(() {
-      
-    });
-    // navigator.goUploadPublication(context, ImageMedia(image, 1));
+    setState(() {});
   }
 
   @override
@@ -103,6 +103,26 @@ class _OverImageCameraPageState extends State<OverImageCameraPage> {
     }
     var size = MediaQuery.of(context).size.width;
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(40),
+        child: AppBar(
+          title: Text(
+            widget.template.name,
+          ),
+          actions: <Widget>[
+            IconButton(
+                icon: Icon(Icons.arrow_forward),
+                onPressed: result != null
+                    ? () async {
+                        Uint8List image = await _capturePng();
+                        navigator.pop(context);
+                        navigator.goUploadPublication(
+                            context, ImageMedia(image, 1),widget.template);
+                      }
+                    : null)
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: <Widget>[
@@ -117,17 +137,22 @@ class _OverImageCameraPageState extends State<OverImageCameraPage> {
                   children: <Widget>[
                     Positioned(
                       left: 100,
-                      child: result==null?FittedBox(
-                        fit: BoxFit.cover,
-                        child: Container(
-                            transform: Matrix4Transform().scale(0.6).matrix4,
-                            width: size,
-                            height: size / controller.value.aspectRatio,
-                            child: CameraPreview(controller)),
-                      ):Image.memory(result),
+                      child: Container(
+                        transform: Matrix4Transform().scale(0.6).matrix4,
+                        width: size,
+                        height: size / controller.value.aspectRatio,
+                        child: result == null
+                            ? CameraPreview(controller)
+                            : Container(
+                                transform: Matrix4Transform()
+                                    .flipHorizontally(
+                                        origin: Offset(size / 2, 0))
+                                    .matrix4,
+                                child: Image.memory(result)),
+                      ),
                     ),
-                    Image.asset(
-                      widget.image,
+                    CachedNetworkImage(
+                      imageUrl: widget.template.image,
                       width: size,
                       height: size,
                     ),
@@ -136,15 +161,34 @@ class _OverImageCameraPageState extends State<OverImageCameraPage> {
               ),
             ),
             Expanded(
-              child: FittedBox(
-                child: IconButton(
-                  icon: Icon(Icons.camera_alt),
-                  color: Theme.of(context).accentColor,
-                  onPressed:
-                      controller != null && controller.value.isInitialized
-                          ? onTakePictureButtonPressed
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    child: FittedBox(
+                      child: IconButton(
+                        icon: Icon(Icons.camera_alt),
+                        color: Theme.of(context).accentColor,
+                        onPressed:
+                            controller != null && controller.value.isInitialized
+                                ? onTakePictureButtonPressed
+                                : null,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 50,
+                    child: IconButton(
+                      icon: Icon(Icons.clear),
+                      color: Theme.of(context).accentColor,
+                      onPressed: result != null
+                          ? () {
+                              result = null;
+                              setState(() {});
+                            }
                           : null,
-                ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

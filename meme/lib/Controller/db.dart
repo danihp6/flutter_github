@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -8,6 +7,7 @@ import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/Tag.dart';
+import 'package:meme/Models/Template.dart';
 import 'package:meme/Models/User.dart';
 import '../Models/Notification.dart';
 import 'media_storage.dart';
@@ -144,7 +144,9 @@ class DataBase {
       .map(toPosts);
 
   Stream<List<Post>> getLastlyPosts(String userId) => _firestore
-      .collection('users/$userId/posts').orderBy('dateTime',descending: true).limit(100)
+      .collection('users/$userId/posts')
+      .orderBy('dateTime', descending: true)
+      .limit(100)
       .snapshots()
       .map(toPosts);
 
@@ -233,8 +235,13 @@ class DataBase {
     ref.updateData({'points': points});
   }
 
-  Stream<List<Post>> getFollowedPosts (List<String> followed) {
-    return _firestore.collectionGroup('posts').where('author',whereIn: followed).orderBy('dateTime',descending: true).snapshots().map(toPosts);
+  Stream<List<Post>> getFollowedPosts(List<String> followed) {
+    return _firestore
+        .collectionGroup('posts')
+        .where('author', whereIn: followed)
+        .orderBy('dateTime', descending: true)
+        .snapshots()
+        .map(toPosts);
   }
 
 //---------------POSTLIST----------------//
@@ -390,7 +397,7 @@ class DataBase {
 
   Stream<List<Tag>> getTendTags() => _firestore
       .collection('tags')
-      .orderBy('totalPoints',descending: true)
+      .orderBy('totalPoints', descending: true)
       .limit(10)
       .snapshots()
       .map(toTagLists);
@@ -454,6 +461,18 @@ class DataBase {
           .documents
           .length >
       0;
+
+  //---------------TEMPLATES----------------//
+  Stream<List<Template>> getTemplates() => _firestore
+      .collection('templates')
+      .orderBy('dateTime', descending: true)
+      .snapshots()
+      .map(toTemplates);
+
+  Stream<Template> getTemplate(String id) => _firestore
+      .document('templates/$id')
+      .snapshots()
+      .map((doc) => Template.fromFirestore(doc));
 }
 
 DataBase db = new DataBase();

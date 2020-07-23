@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:media_gallery/media_gallery.dart';
 import 'package:meme/Models/Comment.dart';
+import 'package:meme/Models/Template.dart';
 import 'package:meme/Models/User.dart';
 
 class Post {
@@ -15,19 +16,21 @@ class Post {
   List<String> _tags;
   Map<String, dynamic> _points;
   double _aspectRatio;
+  String _template;
 
-  Post(media, description, mediaType, favourites, dateTime, mediaLocation,
-      authorId, tags,points,aspectRatio) {
+  Post(media, description, mediaType, favourites, mediaLocation,
+      authorId, tags, points, aspectRatio, template) {
     this._media = media;
     this._mediaType = mediaType;
     this._description = description;
     this._favourites = favourites;
-    this._dateTime = dateTime;
+    this._dateTime = DateTime.now();
     this._mediaLocation = mediaLocation;
     this._author = authorId;
     this._tags = tags;
     this._points = points;
     this._aspectRatio = aspectRatio;
+    this._template = template;
   }
 
   Post.fromFirestore(DocumentSnapshot doc)
@@ -41,7 +44,8 @@ class Post {
         _author = doc.reference.parent().parent().documentID,
         _tags = List<String>.from(doc.data['tags']),
         _points = doc.data['points'],
-        _aspectRatio = doc.data['aspectRatio'].toDouble();
+        _aspectRatio = doc.data['aspectRatio'].toDouble(),
+        _template = doc.data['template'];
 
   Map<String, dynamic> toFirestore() => {
         'media': _media,
@@ -52,8 +56,9 @@ class Post {
         'mediaLocation': _mediaLocation,
         'tags': _tags,
         'points': _points,
-        'aspectRatio':_aspectRatio,
-        'author':_author
+        'aspectRatio': _aspectRatio,
+        'author': _author,
+        'template': _template
       };
 
   get id => this._id;
@@ -96,13 +101,15 @@ class Post {
 
   set points(points) => this._points = points;
 
-    get aspectRatio => this._aspectRatio;
+  get aspectRatio => this._aspectRatio;
 
   set aspectRatio(aspectRatio) => this._aspectRatio = aspectRatio;
 
+  get template => this._template;
+
   int getTotalPoints() {
     int res = 0;
-    _points.forEach((id,points) {
+    _points.forEach((id, points) {
       res += points;
     });
     return res;
@@ -114,11 +121,10 @@ List<Post> toPosts(QuerySnapshot query) {
 }
 
 void orderListPostByDateTime(List<Post> posts) =>
-   posts.sort((a, b) => b.dateTime.compareTo(a.dateTime));
+    posts.sort((a, b) => b.dateTime.compareTo(a.dateTime));
 
-
-MediaType toMediaType(String string){
-  if(MediaType.image.toString() == string) return MediaType.image;
-  if(MediaType.video.toString() == string) return MediaType.video;
+MediaType toMediaType(String string) {
+  if (MediaType.image.toString() == string) return MediaType.image;
+  if (MediaType.video.toString() == string) return MediaType.video;
   return null;
 }

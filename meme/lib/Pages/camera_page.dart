@@ -64,7 +64,7 @@ class _CameraPageState extends State<CameraPage> {
 
   void onTakePictureButtonPressed() async {
     Uint8List image = await File(await takePicture()).readAsBytes();
-    navigator.goUploadPublication(context, ImageMedia(image,1));
+    navigator.goUploadPublication(context, ImageMedia(image, 1));
   }
 
   Future<String> startVideoRecording() async {
@@ -148,7 +148,7 @@ class _CameraPageState extends State<CameraPage> {
     stopVideoRecording().then((_) {
       if (mounted) setState(() {});
       File file = File(videoPath);
-      navigator.goUploadPublication(context, VideoMedia(file, null,1));
+      navigator.goUploadPublication(context, VideoMedia(file, null, 1));
     });
   }
 
@@ -177,6 +177,12 @@ class _CameraPageState extends State<CameraPage> {
     }
     var size = MediaQuery.of(context).size.width;
     return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(40),
+        child: AppBar(
+          title: Text('Camara'),
+        ),
+      ),
       body: Column(
         children: <Widget>[
           Container(

@@ -10,7 +10,7 @@ import 'package:meme/Pages/gallery_page.dart';
 import 'package:meme/Pages/image_editor_page.dart';
 import 'package:meme/Pages/my_user_page.dart';
 import 'package:meme/Pages/new_post_list_page.dart';
-import 'package:meme/Pages/over_image_camera_page.dart';
+import 'package:meme/Pages/template_over_image_camera_page.dart';
 import 'package:meme/Pages/post_list_page.dart';
 import 'package:meme/Pages/post_page.dart';
 import 'package:meme/Pages/select_media_page.dart';
@@ -40,11 +40,12 @@ class MyNavigator {
           )));
   }
 
-  goUploadPublication(BuildContext context, MyMedia media) => Navigator.push(
+  goUploadPublication(BuildContext context, MyMedia media,[Template template]) => Navigator.push(
       context,
       SlideLeftRoute(
           page: UploadPublicationPage(
         media: media,
+        template: template,
       )));
 
   goGallery(BuildContext context, Function onMediaSelected) => Navigator.push(
@@ -130,14 +131,14 @@ class MyNavigator {
   goFollowers(BuildContext context, String userId) => Navigator.push(
       context, SlideLeftRoute(page: FollowersListPage(userId: userId)));
 
-  goOverImageCamera(BuildContext context, Template template) => Navigator.push(
+  goTemplateOverImageCamera(BuildContext context, Template template) => Navigator.push(
       context,
       SlideLeftRoute(
-          page: OverImageCameraPage(
-        image: template.front,
+          page: TemplateOverImageCameraPage(
+        template: template,
       )));
 
-  goTemplateFixText(BuildContext context, Template template) => Navigator.push(
+  goTemplateText(BuildContext context, Template template) => Navigator.push(
       context, SlideLeftRoute(page: TemplateText(template: template)));
 }
 

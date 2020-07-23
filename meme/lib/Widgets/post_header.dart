@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/db.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
+import 'package:meme/Models/Template.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Widgets/loading.dart';
 import 'post_more_button.dart';
 import 'package:meme/Widgets/share_button.dart';
 import 'package:meme/Widgets/user_avatar.dart';
@@ -31,22 +34,93 @@ class PostHeader extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              if (post.template != null)
+                StreamBuilder(
+                    stream: db.getTemplate(post.template),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) print(snapshot.error);
+                      if (!snapshot.hasData) return Loading();
+                      Template template = snapshot.data;
+                      return TemplateButton(
+                        template: template,
+                      );
+                    }),
               ShareButton(
                   authorId: post.author,
                   postId: post.id,
                   scaffoldState: scaffoldState),
-              SizedBox(
-                width: 35,
-                child: PostMoreButton(
-                  post: post,
-                  postList: postList,
-                  scaffoldState: scaffoldState,
-                ),
+              PostMoreButton(
+                post: post,
+                postList: postList,
+                scaffoldState: scaffoldState,
               )
             ],
           ),
         ),
       ],
     );
+  }
+}
+
+class TemplateButton extends StatelessWidget {
+  const TemplateButton({Key key, @required this.template}) : super(key: key);
+  final Template template;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+        icon: Icon(Icons.filter_frames),
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return Container(
+                height: 150,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: <Widget>[
+                      Text(template.name,
+                          style: TextStyle(fontSize: 25, color: Colors.white)),
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            RawMaterialButton(
+                              onPressed: () {},
+                              elevation: 1,
+                              fillColor: Colors.white.withOpacity(0.9),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(
+                                  Icons.file_download,
+                                  size: 50,
+                                ),
+                              ),
+                              shape: CircleBorder(),
+                            ),
+                            RawMaterialButton(
+                              onPressed: ()=>template.goTemplate(context,template),
+                              elevation: 1,
+                              fillColor: Colors.white.withOpacity(0.9),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Icon(
+                                  Icons.play_arrow,
+                                  size: 50,
+                                ),
+                              ),
+                              shape: CircleBorder(),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        });
   }
 }
