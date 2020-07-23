@@ -36,7 +36,6 @@ class _GalleryPageState extends State<GalleryPage> {
   ScrollController scrollController = ScrollController();
   GlobalKey<VideoPlayerWidgetState> videoPlayerKey =
       GlobalKey<VideoPlayerWidgetState>();
- 
 
   @override
   void initState() {
@@ -183,11 +182,11 @@ class _GalleryPageState extends State<GalleryPage> {
       return result;
     }
 
-    Future goUploadMedia() async {
+    Future<MyMedia> futureMedia() async {
       if (selectedMedia is ImageMedia) {
         (selectedMedia as ImageMedia).image = await save();
       }
-      widget.onMediaSelected(context, selectedMedia);
+      return selectedMedia;
     }
 
     return Scaffold(
@@ -230,7 +229,7 @@ class _GalleryPageState extends State<GalleryPage> {
                   icon: Icon(Icons.arrow_forward),
                   onPressed: selectedCollection.media.isNotEmpty
                       ? () {
-                          goUploadMedia();
+                          widget.onMediaSelected(context, futureMedia);
                         }
                       : null)
             ],

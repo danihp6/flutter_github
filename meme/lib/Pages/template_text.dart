@@ -1,24 +1,14 @@
-import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:image_editor/image_editor.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:matrix4_transform/matrix4_transform.dart';
-import 'package:media_gallery/media_gallery.dart';
-
-import 'package:fitted_text_field_container/fitted_text_field_container.dart';
-
-import 'package:extended_image_library/extended_image_library.dart';
 import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/Template.dart';
 import 'package:meme/Widgets/scroll_column_expandable.dart';
 import 'package:transparent_image/transparent_image.dart';
+
 import '../Controller/gallery.dart';
 import '../Widgets/floating_text.dart';
 
@@ -61,6 +51,11 @@ class _TemplateTextState extends State<TemplateText>
     });
   }
 
+  Future<ImageMedia> getImageMedia() async {
+    Uint8List image = await _capturePng();
+    return ImageMedia(image, 1);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,9 +72,10 @@ class _TemplateTextState extends State<TemplateText>
                   isTextOptionsVisible = false;
                   setState(() {});
                   await Future.delayed(const Duration(milliseconds: 10), () {});
-                  Uint8List image = await _capturePng();
+                  
                   navigator.pop(context);
-                  navigator.goUploadPublication(context, ImageMedia(image, 1),widget.template);
+                  navigator.goUploadPublication(
+                      context, getImageMedia, widget.template);
                 })
           ],
         ),

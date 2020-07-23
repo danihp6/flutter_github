@@ -4,6 +4,7 @@ import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/Template.dart';
 import 'package:meme/Models/User.dart';
+import 'package:meme/Pages/template_page.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'post_more_button.dart';
 import 'package:meme/Widgets/share_button.dart';
@@ -71,56 +72,8 @@ class TemplateButton extends StatelessWidget {
     return IconButton(
         icon: Icon(Icons.filter_frames),
         onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return Container(
-                height: 150,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: <Widget>[
-                      Text(template.name,
-                          style: TextStyle(fontSize: 25, color: Colors.white)),
-                      Expanded(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            RawMaterialButton(
-                              onPressed: () {},
-                              elevation: 1,
-                              fillColor: Colors.white.withOpacity(0.9),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Icon(
-                                  Icons.file_download,
-                                  size: 50,
-                                ),
-                              ),
-                              shape: CircleBorder(),
-                            ),
-                            RawMaterialButton(
-                              onPressed: ()=>template.goTemplate(context,template),
-                              elevation: 1,
-                              fillColor: Colors.white.withOpacity(0.9),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Icon(
-                                  Icons.play_arrow,
-                                  size: 50,
-                                ),
-                              ),
-                              shape: CircleBorder(),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
+          showModalTemplate(context,template);
         });
   }
+
 }

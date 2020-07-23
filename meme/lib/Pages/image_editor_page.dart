@@ -1,21 +1,12 @@
-import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:image_editor/image_editor.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:matrix4_transform/matrix4_transform.dart';
-import 'package:media_gallery/media_gallery.dart';
-
-import 'package:fitted_text_field_container/fitted_text_field_container.dart';
-
-import 'package:extended_image_library/extended_image_library.dart';
 import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Widgets/scroll_column_expandable.dart';
+
 import '../Controller/gallery.dart';
 import '../Widgets/floating_text.dart';
 
@@ -157,6 +148,11 @@ class _ImageEditorPageState extends State<ImageEditorPage>
       });
     }
 
+    Future<ImageMedia> getImageMedia() async {
+      _imageMedia.image = await _capturePng();
+      return _imageMedia;
+    }
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(40),
@@ -176,9 +172,9 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                   isTextOptionsVisible = false;
                   setState(() {});
                   await Future.delayed(const Duration(milliseconds: 10), () {});
-                  _imageMedia.image = await _capturePng();
+
                   navigator.pop(context);
-                  widget.onMediaSelected(context, _imageMedia);
+                  widget.onMediaSelected(context, getImageMedia);
                 })
           ],
         ),
@@ -311,59 +307,59 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                 ],
               ),
               ScrollColumnExpandable(
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        SizedBox(
-                          height: 80,
-                          child: FittedBox(
-                            child: IconButton(
-                icon: Icon(
-                  Icons.delete_forever,
-                  color: Colors.black,
-                ),
-                onPressed: removeAllFloatingButton),
-                          ),
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      SizedBox(
+                        height: 80,
+                        child: FittedBox(
+                          child: IconButton(
+                              icon: Icon(
+                                Icons.delete_forever,
+                                color: Colors.black,
+                              ),
+                              onPressed: removeAllFloatingButton),
                         ),
-                        SizedBox(
-                          height: 80,
-                          child: FittedBox(
-                            child: IconButton(
-                icon: Icon(
-                  isTextOptionsVisible
-                      ? Icons.visibility
-                      : Icons.visibility_off,
-                  color: Colors.black,
-                ),
-                onPressed: showTextOptions),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 80,
-                          child: FittedBox(
-                            child: IconButton(
-                icon: Icon(
-                  Icons.label,
-                  color: Colors.black,
-                ),
-                onPressed: activeLabelText),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Expanded(
-                      child: FittedBox(
-                        child: IconButton(
-                            icon: Icon(
-              Icons.add,
-              color: Colors.black,
-                            ),
-                            onPressed: addFloatingButton),
                       ),
+                      SizedBox(
+                        height: 80,
+                        child: FittedBox(
+                          child: IconButton(
+                              icon: Icon(
+                                isTextOptionsVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Colors.black,
+                              ),
+                              onPressed: showTextOptions),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 80,
+                        child: FittedBox(
+                          child: IconButton(
+                              icon: Icon(
+                                Icons.label,
+                                color: Colors.black,
+                              ),
+                              onPressed: activeLabelText),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: FittedBox(
+                      child: IconButton(
+                          icon: Icon(
+                            Icons.add,
+                            color: Colors.black,
+                          ),
+                          onPressed: addFloatingButton),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
               Column(
                 children: <Widget>[
                   Padding(
@@ -522,9 +518,3 @@ class _ImageEditorPageState extends State<ImageEditorPage>
   // }
 
 }
-
-
-
-
-
-

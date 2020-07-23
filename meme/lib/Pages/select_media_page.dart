@@ -1,17 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:media_gallery/media_gallery.dart';
-import 'package:meme/Controller/image_functions.dart';
 import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Pages/camera_page.dart';
 import 'package:meme/Pages/gallery_page.dart';
 import 'package:meme/Pages/template_page.dart';
-import 'package:meme/Pages/upload_publication_page.dart';
-import 'package:meme/Widgets/slide_left_route.dart';
-import '../Controller/gallery.dart';
-import 'package:image_editor/image_editor.dart';
-import 'image_editor_page.dart';
 
 class SelectMediaPage extends StatefulWidget {
   @override

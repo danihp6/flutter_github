@@ -6,10 +6,14 @@ class TagSelector extends StatefulWidget {
   List<Tag> tags;
   Function onFieldSubmitted;
   Function onClearTag;
+  String tag;
+  Function setTag;
   TagSelector(
       {@required this.tags,
+      @required this.tag,
       @required this.onFieldSubmitted,
-      @required this.onClearTag});
+      @required this.onClearTag,
+      @required this.setTag});
 
   @override
   _TagSelectorState createState() => _TagSelectorState();
@@ -17,7 +21,6 @@ class TagSelector extends StatefulWidget {
 
 class _TagSelectorState extends State<TagSelector> {
   TextEditingController tagsController;
-  String _tag = '';
 
   @override
   void initState() {
@@ -37,10 +40,15 @@ class _TagSelectorState extends State<TagSelector> {
       children: [
         SizedBox(
             height: 30,
-            child: TagViewer(
-              tags: widget.tags,
-              onClearTag: widget.onClearTag,
-            )),
+            child: widget.tags.isNotEmpty
+                ? TagViewer(
+                    tags: widget.tags,
+                    onClearTag: widget.onClearTag,
+                  )
+                : Center(
+                    child: Text('Añade tags',
+                        style: TextStyle(color: Colors.black38)),
+                  )),
         SizedBox(
           height: 20,
         ),
@@ -51,36 +59,31 @@ class _TagSelectorState extends State<TagSelector> {
             decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Tags',
-                prefixIcon: _tag.length > 0
+                prefixIcon: widget.tag.length > 0
                     ? IconButton(
                         icon: Icon(Icons.done),
                         onPressed: () {
                           setState(() {
-                            widget.onFieldSubmitted(_tag);
-                            _tag = '';
+                            widget.onFieldSubmitted();
                             tagsController.clear();
                           });
                         })
                     : null,
-                suffixIcon: _tag.length > 0
+                suffixIcon: widget.tag.length > 0
                     ? IconButton(
                         icon: Icon(Icons.clear),
                         onPressed: () {
-                          setState(() {
-                            _tag = '';
-                            tagsController.clear();
-                          });
+                          tagsController.clear();
+
+                          widget.setTag('');
                         })
                     : null),
             onChanged: (value) {
-              setState(() {
-                _tag = value;
-              });
+              widget.setTag(value);
             },
-            onFieldSubmitted: (tag) {
-              widget.onFieldSubmitted(tag);
+            onFieldSubmitted: (_) {
+              widget.onFieldSubmitted();
               setState(() {
-                _tag = '';
                 tagsController.clear();
               });
             },

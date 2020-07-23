@@ -90,6 +90,11 @@ class _TemplateOverImageCameraPageState
     setState(() {});
   }
 
+  Future getMedia() async {
+    Uint8List image = await _capturePng();
+    return ImageMedia(image, 1);
+  }
+
   @override
   void dispose() {
     controller.dispose();
@@ -114,10 +119,9 @@ class _TemplateOverImageCameraPageState
                 icon: Icon(Icons.arrow_forward),
                 onPressed: result != null
                     ? () async {
-                        Uint8List image = await _capturePng();
                         navigator.pop(context);
                         navigator.goUploadPublication(
-                            context, ImageMedia(image, 1),widget.template);
+                            context, getMedia, widget.template);
                       }
                     : null)
           ],

@@ -62,9 +62,11 @@ class _CameraPageState extends State<CameraPage> {
     return filePath;
   }
 
-  void onTakePictureButtonPressed() async {
-    Uint8List image = await File(await takePicture()).readAsBytes();
-    navigator.goUploadPublication(context, ImageMedia(image, 1));
+  void onTakePictureButtonPressed() =>
+      navigator.goUploadPublication(context, getImage);
+
+  Future<ImageMedia> getImage() async {
+    return ImageMedia(await File(await takePicture()).readAsBytes(), 1);
   }
 
   Future<String> startVideoRecording() async {
@@ -147,9 +149,14 @@ class _CameraPageState extends State<CameraPage> {
   void onStopButtonPressed() {
     stopVideoRecording().then((_) {
       if (mounted) setState(() {});
-      File file = File(videoPath);
-      navigator.goUploadPublication(context, VideoMedia(file, null, 1));
+
+      navigator.goUploadPublication(context, getVideo);
     });
+  }
+
+  Future<VideoMedia> getVideo() async {
+    File file = File(videoPath);
+    return VideoMedia(file, null, 1);
   }
 
   void onPauseButtonPressed() {

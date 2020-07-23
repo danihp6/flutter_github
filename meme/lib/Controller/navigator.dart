@@ -40,11 +40,11 @@ class MyNavigator {
           )));
   }
 
-  goUploadPublication(BuildContext context, MyMedia media,[Template template]) => Navigator.push(
+  goUploadPublication(BuildContext context, Function futureMedia,[Template template]) => Navigator.push(
       context,
       SlideLeftRoute(
           page: UploadPublicationPage(
-        media: media,
+        futureMedia : futureMedia,
         template: template,
       )));
 
