@@ -9,7 +9,6 @@ import 'package:meme/Models/Tag.dart';
 import 'package:meme/Models/Template.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/scroll_column_expandable.dart';
-import 'package:meme/Widgets/template_row.dart';
 import '../Widgets/video_player.dart';
 
 import '../Models/Post.dart';
@@ -34,6 +33,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
   void initState() {
     _media = widget.media;
     activedUpload = true;
+    if (widget.template != null) tags.add(Tag(widget.template.name));
     super.initState();
   }
 
@@ -69,7 +69,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
     void addKeyWord(String value) {
       if (tags.length < 5)
         setState(() {
-          tags.add(Tag(value.toLowerCase(), <String>[]));
+          tags.add(Tag(value.toLowerCase()));
         });
     }
 
@@ -100,8 +100,6 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
                     file: (_media as VideoMedia).video,
                     aspectRatio: _media.aspectRatio,
                   ),
-            if (widget.template != null)
-              TemplateRow(template: widget.template),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(top: 8.0, bottom: 8),
@@ -178,4 +176,3 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
     );
   }
 }
-

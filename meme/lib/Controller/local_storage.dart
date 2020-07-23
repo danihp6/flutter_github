@@ -27,6 +27,13 @@ class LocalStorage {
 
   set recentPostLists(List<String> recentPostLists) =>
       _prefs.setStringList('recentPostLists', recentPostLists);
+
+    List<String> get templates => _prefs.containsKey('templates')
+      ? _prefs.getStringList('templates')
+      : <String>[];
+
+  set templates(List<String> templates) =>
+      _prefs.setStringList('templates', templates);
 }
 
 LocalStorage storage = new LocalStorage();

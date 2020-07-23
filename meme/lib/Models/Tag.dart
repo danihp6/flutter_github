@@ -8,9 +8,9 @@ class Tag {
   Map<String, dynamic> _points;
   int _totalPoints;
 
-  Tag(name, posts) {
+  Tag(name) {
     this._name = name;
-    this._posts = posts;
+    this._posts = [];
   }
 
   Tag.fromFirestore(DocumentSnapshot doc)

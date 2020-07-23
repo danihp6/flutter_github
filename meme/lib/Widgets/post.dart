@@ -8,9 +8,7 @@ import 'package:meme/Models/Template.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/post_description.dart';
-import 'package:meme/Widgets/post_header.dart';
-import 'package:meme/Widgets/template_row.dart';
-import 'package:meme/Widgets/video_player.dart';
+import 'package:meme/Widgets/post_header.dart';import 'package:meme/Widgets/video_player.dart';
 import '../Controller/db.dart';
 
 class PostWidget extends StatefulWidget {

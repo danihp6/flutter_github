@@ -411,7 +411,7 @@ class _TendTagsStreamState extends State<TendTagsStream> {
                 Tag tag = tags[index];
                 List<String> postPaths = tag.posts;
                 if (postPaths.isEmpty)
-                  return Center(child: Text('No hay tags en tendencias'));
+                  return Loading();
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(

@@ -9,24 +9,28 @@ class ShareButton extends StatelessWidget {
   String postId;
   String userId;
   GlobalKey<ScaffoldState> scaffoldState;
-  ShareButton({ this.postId, this.authorId, @required this.scaffoldState,this.userId});
-  
+  ShareButton(
+      {this.postId, this.authorId, @required this.scaffoldState, this.userId});
+
   GlobalKey<ScaffoldState> _scaffoldState;
   @override
   Widget build(BuildContext context) {
-    if(scaffoldState==null)_scaffoldState=configuration.mainScaffoldState;
-    else _scaffoldState = scaffoldState;
+    if (scaffoldState == null)
+      _scaffoldState = configuration.mainScaffoldState;
+    else
+      _scaffoldState = scaffoldState;
 
     return IconButton(
       icon: Icon(Icons.share),
       onPressed: () async {
         String link;
-        if(postId != null)
-        link = await dynamicLinks.postDynamicLink(true,authorId,postId);
-        else if(userId!=null)
-        link = await dynamicLinks.userDynamicLink(true,userId);
-        _scaffoldState.currentState.showBottomSheet(
-          (context) {
+        if (postId != null)
+          link = await dynamicLinks.postDynamicLink(true, authorId, postId);
+        else if (userId != null)
+          link = await dynamicLinks.userDynamicLink(true, userId);
+        showModalBottomSheet(
+          context: context,
+          builder: (context) {
             return Container(
               height: 100,
               child: Padding(
@@ -49,11 +53,9 @@ class ShareButton extends StatelessWidget {
                           onPressed: () {
                             Clipboard.setData(new ClipboardData(text: link));
                             navigator.pop(context);
-                            _scaffoldState.currentState
-                                .showSnackBar(SnackBar(
-                                    duration: Duration(seconds: 2),
-                                    content:
-                                        new Text("Copiado al portapapeles")));
+                            _scaffoldState.currentState.showSnackBar(SnackBar(
+                                duration: Duration(seconds: 2),
+                                content: new Text("Copiado al portapapeles")));
                           },
                         )
                       ],
