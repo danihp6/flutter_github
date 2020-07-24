@@ -18,7 +18,7 @@ class HotSlider extends StatefulWidget {
       this.max = 5,
       this.isHotSliderActived = false,
       this.isHandlerActived = true,
-      this.color = Colors.black});
+      this.color});
 
   @override
   _HotSliderState createState() => _HotSliderState();
@@ -39,6 +39,12 @@ class _HotSliderState extends State<HotSlider> {
     _color = widget.color;
     _isHandlerActived = widget.isHandlerActived;
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if(_color == Theme.of(context).sliderTheme.thumbColor)_color = Theme.of(context).sliderTheme.valueIndicatorColor;
+    super.didChangeDependencies();
   }
 
   @override
@@ -69,9 +75,13 @@ class _HotSliderState extends State<HotSlider> {
         disabled: !_isHandlerActived,
       ),
       handler: FlutterSliderHandler(
+        decoration: BoxDecoration(
+          color: Theme.of(context).sliderTheme.thumbColor,
+          shape: BoxShape.circle
+        ),
           child: Icon(Icons.whatshot, color: _color, size: 30), opacity: 0.8),
       trackBar:
-          FlutterSliderTrackBar(activeTrackBar: BoxDecoration(color: _color)),
+          FlutterSliderTrackBar(activeTrackBar: BoxDecoration(color: _color),inactiveTrackBar: BoxDecoration(color: Theme.of(context).sliderTheme.thumbColor)),
       step: FlutterSliderStep(
           step: 20, // default
           isPercentRange:

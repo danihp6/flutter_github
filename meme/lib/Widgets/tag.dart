@@ -21,7 +21,6 @@ class TagWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(4),
                 child: Text(
                   '#' + tag.name,
-                  style: TextStyle(fontSize: 16),
                 ),
               )),
           SizedBox(
@@ -32,7 +31,7 @@ class TagWidget extends StatelessWidget {
             children: <Widget>[
               Text(
                 tag.totalPoints.toString(),
-                style: TextStyle(fontSize: 18),
+                style:Theme.of(context).textTheme.bodyText1,
               ),
               SizedBox(width: 5,),
               Icon(Icons.whatshot)

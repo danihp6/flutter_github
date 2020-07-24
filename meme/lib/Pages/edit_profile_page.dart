@@ -90,7 +90,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           SizedBox(
                             height: 10,
                           ),
-                          Text('Cambiar foto del perfil'),
+                          Text('Cambiar foto del perfil',style:Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 15)),
                         ],
                       ),
                       onTap: () async =>
@@ -102,6 +102,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       height: 10,
                     ),
                     TextField(
+                      style: Theme.of(context).textTheme.bodyText1,
                       decoration: InputDecoration(
                         labelText: 'Nombre',
                       ),
@@ -113,6 +114,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     ),
                     TextFormField(
                       maxLines: 3,
+                      style: Theme.of(context).textTheme.bodyText1,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Descripción',

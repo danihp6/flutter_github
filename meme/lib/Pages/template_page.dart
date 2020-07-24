@@ -6,7 +6,6 @@ import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/Template.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/scroll_column_expandable.dart';
-import 'package:toast/toast.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:transparent_image/transparent_image.dart';
 

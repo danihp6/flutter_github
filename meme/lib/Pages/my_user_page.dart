@@ -28,8 +28,10 @@ class _MyUserPageState extends State<MyUserPage>
   @override
   void initState() {
     tabController = new TabController(length: 3, vsync: this);
-    if(widget.scaffoldState == null)_scaffoldState = GlobalKey<ScaffoldState>();
-    else _scaffoldState = widget.scaffoldState;
+    if (widget.scaffoldState == null)
+      _scaffoldState = GlobalKey<ScaffoldState>();
+    else
+      _scaffoldState = widget.scaffoldState;
 
     super.initState();
   }
@@ -147,7 +149,8 @@ class _MyUserPageState extends State<MyUserPage>
                             ),
                           ],
                           labelColor: Colors.deepOrange,
-                          unselectedLabelColor: Colors.black,
+                          unselectedLabelColor:
+                              Theme.of(context).iconTheme.color,
                         ),
                         Expanded(
                           child: TabBarView(
@@ -163,7 +166,7 @@ class _MyUserPageState extends State<MyUserPage>
                                         favourites: favourites,
                                         scaffoldState: _scaffoldState)
                                     : Center(
-                                        child: Text('Usuario sin favoritos')),
+                                        child: Text('Usuario sin favoritos',style:Theme.of(context).textTheme.bodyText1)),
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(

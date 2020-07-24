@@ -29,7 +29,7 @@ class PostHeader extends StatelessWidget {
         SizedBox(width: 10),
         Text(
           author.userName,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: Theme.of(context).textTheme.headline1,
         ),
         Expanded(
           child: Row(

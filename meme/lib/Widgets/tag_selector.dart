@@ -8,12 +8,14 @@ class TagSelector extends StatefulWidget {
   Function onClearTag;
   String tag;
   Function setTag;
+  FocusNode focusNode;
   TagSelector(
       {@required this.tags,
       @required this.tag,
       @required this.onFieldSubmitted,
       @required this.onClearTag,
-      @required this.setTag});
+      @required this.setTag,
+      @required this.focusNode});
 
   @override
   _TagSelectorState createState() => _TagSelectorState();
@@ -56,6 +58,7 @@ class _TagSelectorState extends State<TagSelector> {
           width: 300,
           height: 50,
           child: TextFormField(
+            focusNode: widget.focusNode,
             decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Tags',

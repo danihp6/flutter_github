@@ -36,7 +36,7 @@ class _PostDescriptionState extends State<PostDescription> {
   bool _isHotSliderActived = false;
   bool _isHandlerActived = true;
   double _value;
-  Color _color = Colors.black;
+  Color _color;
 
   @override
   void initState() {
@@ -50,10 +50,16 @@ class _PostDescriptionState extends State<PostDescription> {
         _color = Colors.blueAccent;
     } catch (e) {
       _value = 0;
-      _color = Colors.black;
+      
     }
 
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if(_color == null ) _color = Theme.of(context).iconTheme.color;
+    super.didChangeDependencies();
   }
 
   @override
@@ -112,7 +118,7 @@ class _PostDescriptionState extends State<PostDescription> {
                     });
                   }),
               Text(widget.post.getTotalPoints().toString(),
-                  style: TextStyle(fontSize: 18)),
+                  style: Theme.of(context).textTheme.bodyText1),
               IconButton(
                 icon: Icon(Icons.comment),
                 iconSize: 35,
@@ -125,11 +131,11 @@ class _PostDescriptionState extends State<PostDescription> {
                     if (!snapshot.hasData) return Container();
                     List<Comment> comments = snapshot.data;
                     return Text(comments.length.toString(),
-                        style: TextStyle(fontSize: 18));
+                        style: Theme.of(context).textTheme.bodyText1);
                   }),
               FavouriteButton(post: widget.post),
               Text(widget.post.favourites.length.toString(),
-                  style: TextStyle(fontSize: 18))
+                  style: Theme.of(context).textTheme.bodyText1)
             ],
           ),
         ),
@@ -143,11 +149,11 @@ class _PostDescriptionState extends State<PostDescription> {
                   alignment: Alignment.topLeft,
                   child: RichText(
                     text: TextSpan(
-                        style: TextStyle(fontSize: 15, color: Colors.black),
+                        style: Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 15),
                         children: [
                           TextSpan(
                               text: widget.author.userName + ' ',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                              style: Theme.of(context).textTheme.headline1),
                           TextSpan(text: widget.post.description)
                         ]),
                   ),
@@ -185,7 +191,7 @@ class _PostDescriptionState extends State<PostDescription> {
                   alignment: Alignment.topLeft,
                   child: Text(
                     'Publicada hace ' + getPastTime(widget.post.dateTime),
-                    style: TextStyle(fontSize: 13),
+                    style: Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 13),
                   )),
             ],
           ),

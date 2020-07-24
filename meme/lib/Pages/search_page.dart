@@ -122,10 +122,12 @@ class _SearchPageState extends State<SearchPage>
                                 UserAvatar(user: users[index]),
                                 SizedBox(width: 10),
                                 Text(users[index].userName,
-                                    style: TextStyle(fontSize: 16)),
+                                    style:
+                                        Theme.of(context).textTheme.bodyText1),
                               ],
                             ),
-                            onTap: () => navigator.goUser(context, users[index].id),
+                            onTap: () =>
+                                navigator.goUser(context, users[index].id),
                           ),
                           IconButton(
                               icon: Icon(Icons.clear),
@@ -142,7 +144,8 @@ class _SearchPageState extends State<SearchPage>
                 },
               )
             : Center(
-                child: Text('No hay busquedas de usuarios recientes'),
+                child: Text('No hay busquedas de usuarios recientes',
+                    style: Theme.of(context).textTheme.bodyText1),
               );
       if (tabController.index == 1)
         return storage.recentTags.isNotEmpty
@@ -165,7 +168,8 @@ class _SearchPageState extends State<SearchPage>
                           children: <Widget>[
                             TagWidget(
                                 tag: tags[index],
-                                onTap: () => navigator.goTag(context, tags[index].id)),
+                                onTap: () =>
+                                    navigator.goTag(context, tags[index].id)),
                             IconButton(
                                 icon: Icon(Icons.clear),
                                 onPressed: () {
@@ -182,7 +186,8 @@ class _SearchPageState extends State<SearchPage>
                 },
               )
             : Center(
-                child: Text('No hay busquedas de tags recientes'),
+                child: Text('No hay busquedas de tags recientes',
+                    style: Theme.of(context).textTheme.bodyText1),
               );
       if (tabController.index == 2)
         return storage.recentPostLists.isNotEmpty
@@ -204,9 +209,11 @@ class _SearchPageState extends State<SearchPage>
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             PostListWidget(
-                                postList: postLists[index],
-                                activeMoreOptions: false,
-                                onTap: () => navigator.goPostList(context, postLists[index].id, postLists[index].author),),
+                              postList: postLists[index],
+                              activeMoreOptions: false,
+                              onTap: () => navigator.goPostList(context,
+                                  postLists[index].id, postLists[index].author),
+                            ),
                             IconButton(
                                 icon: Icon(Icons.clear),
                                 onPressed: () {
@@ -225,7 +232,8 @@ class _SearchPageState extends State<SearchPage>
                 },
               )
             : Center(
-                child: Text('No hay busquedas de listas recientes'),
+                child: Text('No hay busquedas de listas recientes',
+                    style: Theme.of(context).textTheme.bodyText1),
               );
     }
 
@@ -244,6 +252,7 @@ class _SearchPageState extends State<SearchPage>
                   children: [
                     Expanded(
                         child: SearchBar(
+                            textStyle: Theme.of(context).textTheme.bodyText1,
                             onSearch: search,
                             searchBarController: searchBarController,
                             focusNode: focusNode,
@@ -259,7 +268,9 @@ class _SearchPageState extends State<SearchPage>
                                   )
                                 : Icon(Icons.search),
                             emptyWidget: Center(
-                                child: Text('No se han encontrado resultados')),
+                                child: Text('No se han encontrado resultados',
+                                    style:
+                                        Theme.of(context).textTheme.bodyText1)),
                             hintText: 'Busca...',
                             iconActiveColor: Theme.of(context).primaryColor,
                             crossAxisSpacing: 20,
@@ -280,18 +291,21 @@ class _SearchPageState extends State<SearchPage>
                                     padding: const EdgeInsets.only(
                                         left: 8.0, right: 8),
                                     child: GestureDetector(
-                                        child: UserRow(
-                                      user: item,
-                                      blocked: blocked,
-                                      youAreBlocked: youAreBlocked,
-                                      onTap: () {
-                                        if (!storage.recentUsers
-                                            .contains(item.id))
-                                          storage.recentUsers =
-                                              storage.recentUsers + [item.id];
-                                        setState(() {});
-                                        navigator.goUser(context, item.id);
-                                      },
+                                        child: SizedBox(
+                                      height: 50,
+                                      child: UserRow(
+                                        user: item,
+                                        blocked: blocked,
+                                        youAreBlocked: youAreBlocked,
+                                        onTap: () {
+                                          if (!storage.recentUsers
+                                              .contains(item.id))
+                                            storage.recentUsers =
+                                                storage.recentUsers + [item.id];
+                                          setState(() {});
+                                          navigator.goUser(context, item.id);
+                                        },
+                                      ),
                                     )));
                               }
 
@@ -331,7 +345,8 @@ class _SearchPageState extends State<SearchPage>
                                                   storage.recentPostLists +
                                                       [item];
                                             setState(() {});
-                                            navigator.goPostList(context, item.id, item.author);
+                                            navigator.goPostList(
+                                                context, item.id, item.author);
                                           },
                                         ),
                                       );
@@ -345,7 +360,6 @@ class _SearchPageState extends State<SearchPage>
                                         child: TabBar(
                                             controller: tabController,
                                             labelStyle: TextStyle(fontSize: 15),
-                                            labelColor: Colors.black,
                                             onTap: (value) {
                                               if (value == 0)
                                                 typeSearched = 'users';
@@ -395,8 +409,6 @@ class TendTagsStream extends StatefulWidget {
 class _TendTagsStreamState extends State<TendTagsStream> {
   @override
   Widget build(BuildContext context) {
-    
-
     return StreamBuilder(
         stream: db.getTendTags(),
         builder: (context, snapshot) {
@@ -404,21 +416,23 @@ class _TendTagsStreamState extends State<TendTagsStream> {
           if (!snapshot.hasData) return Loading();
           List<Tag> tags = snapshot.data;
           if (tags.isEmpty)
-            return Center(child: Text('No hay tags en tendencias'));
+            return Center(
+                child: Text('No hay tags en tendencias',
+                    style: Theme.of(context).textTheme.bodyText1));
           return ListView.builder(
               itemCount: tags.length,
               itemBuilder: (context, index) {
                 Tag tag = tags[index];
                 List<String> postPaths = tag.posts;
-                if (postPaths.isEmpty)
-                  return Loading();
+                if (postPaths.isEmpty) return Loading();
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: <Widget>[
                       Row(
                         children: <Widget>[
-                          Text('${index + 1} - ',style:TextStyle(fontSize: 16)),
+                          Text('${index + 1} - ',
+                              style: Theme.of(context).textTheme.bodyText1),
                           TagWidget(
                             tag: tag,
                             onTap: () => navigator.goTag(context, tag.id),
@@ -435,7 +449,6 @@ class _TendTagsStreamState extends State<TendTagsStream> {
               });
         });
   }
-
 }
 
 class StreamPosts extends StatefulWidget {
@@ -450,15 +463,14 @@ class StreamPosts extends StatefulWidget {
   _StreamPostsState createState() => _StreamPostsState();
 }
 
-class _StreamPostsState extends State<StreamPosts> with AutomaticKeepAliveClientMixin {
+class _StreamPostsState extends State<StreamPosts>
+    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
-
-    
-        
     return StreamBuilder(
-        stream: CombineLatestStream.list(widget.postPaths
-            .map((postPath) => db.getPostByPath(postPath))).asBroadcastStream(),
+        stream: CombineLatestStream.list(
+                widget.postPaths.map((postPath) => db.getPostByPath(postPath)))
+            .asBroadcastStream(),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return Loading();

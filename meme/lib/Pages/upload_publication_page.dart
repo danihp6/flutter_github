@@ -28,6 +28,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
   String _description = '';
   List<Tag> tags = <Tag>[];
   String tag = '';
+  FocusNode focusNode = FocusNode();
 
   @override
   void initState() {
@@ -95,6 +96,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
         body: _media != null
             ? ScrollColumnExpandable(
                 children: <Widget>[
+                  
                   _media is ImageMedia
                       ? AspectRatio(
                           aspectRatio: _media.aspectRatio,
@@ -136,7 +138,8 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
                               onFieldSubmitted: addKeyWord,
                               onClearTag: removeKeyWord,
                               tag: tag,
-                              setTag: setTag),
+                              setTag: setTag,
+                              focusNode:focusNode),
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 8.0),
@@ -158,57 +161,9 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
                                         color: Theme.of(context).accentColor,
                                       ),
                                       onPressed: () async {
+                                        focusNode.unfocus();
                                         if (tag.isNotEmpty)
-                                          await showModalBottomSheet(
-                                              context: context,
-                                              builder: (context) {
-                                                return Container(
-                                                  height: 100,
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceEvenly,
-                                                    children: <Widget>[
-                                                      Text('Añadir el tag:',
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize: 16)),
-                                                      Text(
-                                                        '#$tag',
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 16),
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceEvenly,
-                                                        children: <Widget>[
-                                                          IconButton(
-                                                            iconSize: 30,
-                                                            color: Colors.red,
-                                                              icon: Icon(
-                                                                  Icons.clear),
-                                                              onPressed: () =>
-                                                                  Navigator.pop(
-                                                                      context)),
-                                                          IconButton(
-                                                            iconSize: 30,
-                                                            color: Theme.of(context).accentColor,
-                                                              icon: Icon(
-                                                                  Icons.done),
-                                                              onPressed: () {
-                                                                addKeyWord();
-                                                                Navigator.pop(
-                                                                    context);
-                                                              })
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                );
-                                              });
+                                          await showModalTag(context, addKeyWord);
                                         uploadPublication();
                                         navigator.pop(context);
                                         navigator.pop(context);
@@ -226,5 +181,58 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
             : Loading(),
       ),
     );
+  }
+
+  Future showModalTag(BuildContext context, void addKeyWord()) {
+    return showModalBottomSheet(
+                                            context: context,
+                                            builder: (context) {
+                                              return Container(
+                                                height: 100,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  children: <Widget>[
+                                                    Text('Añadir el tag:',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white,
+                                                            fontSize: 16)),
+                                                    Text(
+                                                      '#$tag',
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 16),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: <Widget>[
+                                                        IconButton(
+                                                          iconSize: 30,
+                                                          color: Colors.red,
+                                                            icon: Icon(
+                                                                Icons.clear),
+                                                            onPressed: () =>
+                                                                Navigator.pop(
+                                                                    context)),
+                                                        IconButton(
+                                                          iconSize: 30,
+                                                          color: Theme.of(context).accentColor,
+                                                            icon: Icon(
+                                                                Icons.done),
+                                                            onPressed: () {
+                                                              addKeyWord();
+                                                              Navigator.pop(
+                                                                  context);
+                                                            })
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              );
+                                            });
   }
 }

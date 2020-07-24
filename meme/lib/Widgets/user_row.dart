@@ -32,7 +32,7 @@ class UserRow extends StatelessWidget {
               ),
               Text(
                 user.userName,
-                style: TextStyle(fontSize: 15),
+                style: Theme.of(context).textTheme.bodyText1,
               )
             ],
           ),

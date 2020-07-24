@@ -53,6 +53,45 @@ class _MyAppState extends State<MyApp> {
       DeviceOrientation.portraitDown,
     ]);
     return MaterialApp(
+      themeMode: ThemeMode.dark,
+      darkTheme: ThemeData(
+        backgroundColor: Colors.black,
+        scaffoldBackgroundColor: Colors.black,
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(50)),
+            borderSide: BorderSide(
+            )
+          )
+        ),
+        sliderTheme: SliderThemeData(
+          valueIndicatorColor: Colors.black,
+          thumbColor: Colors.white
+        ),
+        iconTheme: IconThemeData(
+          color: Colors.white
+        ),
+        textTheme: TextTheme(
+          bodyText1: TextStyle(
+            color: Colors.white,
+            fontSize: 18
+          ),
+          headline1: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold
+          ),
+        ),
+        primarySwatch: Colors.deepOrange,
+          accentColor: Colors.deepOrangeAccent,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          bottomSheetTheme: BottomSheetThemeData(
+            backgroundColor: Color(0xFF323232),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+            ),
+          )
+      ),
       debugShowCheckedModeBanner: false,
       navigatorKey: configuration.mainNavigatorKey,
       theme: ThemeData(

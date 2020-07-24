@@ -51,7 +51,8 @@ class _CommentWidgetState extends State<CommentWidget> {
                 actionPane: SlidableDrawerActionPane(),
                 actionExtentRatio: 0.25,
                 actions: <Widget>[
-                  if (db.userId == _comment.authorId || db.userId == _comment.userPostId)
+                  if (db.userId == _comment.authorId ||
+                      db.userId == _comment.userPostId)
                     IconSlideAction(
                       caption: 'Borrar',
                       color: Theme.of(context).accentColor,
@@ -82,9 +83,14 @@ class _CommentWidgetState extends State<CommentWidget> {
                                 children: [
                                   TextSpan(
                                       text: user.userName + ' ',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  TextSpan(text: _comment.text),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline1),
+                                  TextSpan(
+                                      text: _comment.text,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1),
                                 ],
                               ),
                             ),
@@ -93,20 +99,21 @@ class _CommentWidgetState extends State<CommentWidget> {
                         SizedBox(
                           height: 25,
                           child: Row(children: [
-                            Text(_comment.likes.length.toString()),
+                            Text(_comment.likes.length.toString(),
+                                style: Theme.of(context).textTheme.bodyText1),
                             LikeCommentButton(comment: _comment),
                             SizedBox(
                               width: 2,
                             ),
-                            Text(getPastTime(_comment.dateTime)),
+                            Text(getPastTime(_comment.dateTime),
+                                style: Theme.of(context).textTheme.bodyText1),
                             if (_comment.level == 0)
                               FlatButton(
-                                  child: Text(
-                                    ' Responder',
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold),
-                                  ),
+                                  child: Text(' Responder',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline1
+                                          .copyWith(fontSize: 15)),
                                   onPressed: () => widget.response(_comment))
                           ]),
                         )
@@ -140,18 +147,24 @@ class _CommentWidgetState extends State<CommentWidget> {
           SizedBox(
             height: 20,
             child: FlatButton(
-                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                padding: EdgeInsets.all(0),
-                onPressed: () {
-                  setState(() {
-                    _isShowedInnedComments = !_isShowedInnedComments;
-                  });
-                },
-                child: _innerCommentsId.length == 1
-                    ? Text('Ver ' + 1.toString() + ' respuesta')
-                    : Text('Ver ' +
-                        _innerCommentsId.length.toString() +
-                        ' respuestas')),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              padding: EdgeInsets.all(0),
+              onPressed: () {
+                setState(() {
+                  _isShowedInnedComments = !_isShowedInnedComments;
+                });
+              },
+              child: Text(
+                  _innerCommentsId.length == 1
+                      ? 'Ver ' + 1.toString() + ' respuesta'
+                      : 'Ver ' +
+                          _innerCommentsId.length.toString() +
+                          ' respuestas',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1
+                      .copyWith(fontSize: 14)),
+            ),
           ),
         if (_isShowedInnedComments) SizedBox(height: 5),
         if (_isShowedInnedComments)
@@ -187,9 +200,9 @@ class _CommentWidgetState extends State<CommentWidget> {
                     _isShowedInnedComments = !_isShowedInnedComments;
                   });
                 },
-                child: _innerCommentsId.length == 1
-                    ? Text('Esconder respuesta')
-                    : Text('Esconder respuestas')),
+                child: Text(_innerCommentsId.length == 1
+                    ? 'Esconder respuesta'
+                    : 'Esconder respuestas',style:Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 14))),
           ),
         if (_isShowedInnedComments &&
             _comment.level == 0 &&

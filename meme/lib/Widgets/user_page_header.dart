@@ -57,13 +57,12 @@ class UserPageHeader extends StatelessWidget {
                 ),
                 Align(
                   alignment: Alignment.topLeft,
-                  child: Text(
-                    user.description,
-                    maxLines: 3,
-                    style: TextStyle(
-                      fontSize: 12,
-                    ),
-                  ),
+                  child: Text(user.description,
+                      maxLines: 3,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          .copyWith(fontSize: 14)),
                 ),
               ],
             ),
@@ -87,23 +86,25 @@ class UserFollowedPoints extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        Column(
+        Row(
           children: <Widget>[
-            Text('Reputación'),
-              Text(
-                user.getTotalPoints().toString(),
-                style: TextStyle(fontSize: 20),
-              )
+            // Text('Reputación',style:Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 14)),
+            Text(user.getTotalPoints().toString(),
+                style: Theme.of(context).textTheme.bodyText1),
+                SizedBox(width:2),
+            Icon(Icons.whatshot)
           ],
         ),
         GestureDetector(
           child: Column(
             children: [
-              Text('Seguidores'),
-              Text(
-                user.followers.length.toString(),
-                style: TextStyle(fontSize: 20),
-              )
+              Text('Seguidores',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1
+                      .copyWith(fontSize: 14)),
+              Text(user.followers.length.toString(),
+                  style: Theme.of(context).textTheme.bodyText1)
             ],
           ),
           onTap: () => navigator.goFollowers(context, user.id),
@@ -111,17 +112,17 @@ class UserFollowedPoints extends StatelessWidget {
         GestureDetector(
           child: Column(
             children: [
-              Text('Seguidos'),
-              Text(
-                user.followed.length.toString(),
-                style: TextStyle(fontSize: 20),
-              )
+              Text('Seguidos',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1
+                      .copyWith(fontSize: 14)),
+              Text(user.followed.length.toString(),
+                  style: Theme.of(context).textTheme.bodyText1),
             ],
           ),
           onTap: () => Navigator.push(
-              context,
-              SlideLeftRoute(
-                  page: FollowedListPage(userId: user.id))),
+              context, SlideLeftRoute(page: FollowedListPage(userId: user.id))),
         ),
       ],
     );

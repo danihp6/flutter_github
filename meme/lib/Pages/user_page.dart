@@ -134,7 +134,7 @@ class _UserPageState extends State<UserPage>
                                             favourites: favourites,
                                             scaffoldState: scaffoldState)
                                         : Center(
-                                            child: Text('Usuario sin favoritos')),
+                                            child: Text('Usuario sin favoritos',style:Theme.of(context).textTheme.bodyText1)),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Column(
@@ -154,7 +154,7 @@ class _UserPageState extends State<UserPage>
                                         ),
                                       ): Center(
                           child: Text('Usuario bloqueado',
-                              style: TextStyle(fontSize: 16))),
+                              style:Theme.of(context).textTheme.bodyText1)),
                                     );
               }
             );}));
@@ -185,7 +185,7 @@ class _PostListsStreamState extends State<PostListsStream> with AutomaticKeepAli
         if (!snapshot.hasData) return Loading();
         List<PostList> postlists = snapshot.data;
         if (postlists.length == 0)
-          return Center(child: Text('Usuario sin listas'));
+          return Center(child: Text('Usuario sin listas',style:Theme.of(context).textTheme.bodyText1));
         return ListView.builder(
           shrinkWrap: true,
           itemCount: postlists.length,
