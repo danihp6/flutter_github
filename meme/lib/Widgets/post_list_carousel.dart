@@ -55,7 +55,7 @@ class _PostListCarouselState extends State<PostListCarousel> {
                 children: <Widget>[
                   Text(
                     _postList.name,
-                    style: TextStyle(fontSize: 18),
+                    style: Theme.of(context).textTheme.bodyText1,
                   ),
                   Text(
                     _postList.posts.length.toString() + ' publicaciones',

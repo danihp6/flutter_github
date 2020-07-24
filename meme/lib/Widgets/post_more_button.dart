@@ -1,5 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/local_storage.dart';
+import 'package:meme/Controller/media_storage.dart';
 import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
@@ -30,6 +35,21 @@ class PostMoreButton extends StatelessWidget {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+                      FlatButton(
+                          onPressed: () async {
+                            navigator.pop(context);
+                            ImageGallerySaver.saveFile(File.fromUri(Uri(path: await mediaStorage.downloadFile(post.mediaLocation))).path);
+                          } ,
+                          child: Row(
+                            children: [
+                              Icon(Icons.file_download,color: Theme.of(context).accentColor,),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text('Descargar')
+                            ],
+                          ),
+                        ),
                         FlatButton(
                           onPressed: () {
                             navigator.pop(context);

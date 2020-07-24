@@ -59,63 +59,7 @@ class _MyUserPageState extends State<MyUserPage>
                       title: Text(user.userName),
                     ),
                   ),
-                  endDrawer: Container(
-                    width: 170,
-                    child: Drawer(
-                      child: Column(
-                        children: <Widget>[
-                          FlatButton(
-                              onPressed: () {},
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Icon(Icons.settings),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text('Configuración'),
-                                ],
-                              )),
-                          FlatButton(
-                              onPressed: () => navigator.goContact(context),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Icon(Icons.mail),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text('Contactar'),
-                                ],
-                              )),
-                          FlatButton(
-                              onPressed: () => navigator.goAccount(context),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Icon(Icons.person),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text('Cuenta'),
-                                ],
-                              )),
-                          FlatButton(
-                              onPressed: () => auth.signOut(),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Icon(Icons.exit_to_app),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text('Cerrar sesión'),
-                                ],
-                              ))
-                        ],
-                      ),
-                    ),
-                  ),
+                  endDrawer: MyDrawer(),
                   body: NestedScrollView(
                     headerSliverBuilder: (context, _) => [
                       SliverToBoxAdapter(
@@ -186,5 +130,72 @@ class _MyUserPageState extends State<MyUserPage>
                     ),
                   ));
             }));
+  }
+}
+
+class MyDrawer extends StatelessWidget {
+  const MyDrawer({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 170,
+      child: Drawer(
+        child: Column(
+          children: <Widget>[
+            FlatButton(
+                onPressed: () => navigator.goSettings(context),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Icon(Icons.settings),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text('Configuración'),
+                  ],
+                )),
+            FlatButton(
+                onPressed: () => navigator.goContact(context),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Icon(Icons.mail),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text('Contactar'),
+                  ],
+                )),
+            FlatButton(
+                onPressed: () => navigator.goAccount(context),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Icon(Icons.person),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text('Cuenta'),
+                  ],
+                )),
+            FlatButton(
+                onPressed: () => auth.signOut(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Icon(Icons.exit_to_app),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    Text('Cerrar sesión'),
+                  ],
+                ))
+          ],
+        ),
+      ),
+    );
   }
 }

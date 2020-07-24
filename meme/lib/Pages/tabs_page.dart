@@ -76,8 +76,7 @@ class _TabsPageState extends State<TabsPage>
                 ),
               )
             ],
-            labelColor: Colors.deepOrange,
-            unselectedLabelColor: Theme.of(context).iconTheme.color,
+            
             indicator: UnderlineTabIndicator(borderSide: BorderSide(width: 0)),
           ),
         ));

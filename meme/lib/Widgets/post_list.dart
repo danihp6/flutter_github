@@ -42,7 +42,7 @@ class _PostListWidgetState extends State<PostListWidget> {
               children: [
                 Text(
                   _postList.name,
-                  style: TextStyle(fontSize: 18),
+                  style: Theme.of(context).textTheme.bodyText1,
                 ),
                 Text(
                   _postList.posts.length.toString(),
@@ -51,7 +51,6 @@ class _PostListWidgetState extends State<PostListWidget> {
               ],
             ),
             SizedBox(),
-            Container(width: 50,color:Colors.red,),
             widget.activeMoreOptions
                 ? Expanded(
                     child: Align(

@@ -47,7 +47,6 @@ class _SelectMediaPageState extends State<SelectMediaPage>
         ],
       ),
       bottomNavigationBar: Container(
-        color: Colors.grey[300],
         child: SizedBox(
           height: 40,
           child: TabBar(
@@ -60,21 +59,18 @@ class _SelectMediaPageState extends State<SelectMediaPage>
                 icon: Icon(
                   Icons.image,
                   size: 30,
-                  color: Colors.black,
                 ),
               ),
               Tab(
                 icon: Icon(
                   Icons.filter_frames,
                   size: 30,
-                  color: Colors.black,
                 ),
               ),
               Tab(
                 icon: Icon(
                   Icons.camera,
                   size: 30,
-                  color: Colors.black,
                 ),
               ),
             ],

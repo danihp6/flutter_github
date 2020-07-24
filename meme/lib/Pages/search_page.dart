@@ -1,4 +1,5 @@
 import 'package:flappy_search_bar/flappy_search_bar.dart';
+import 'package:flappy_search_bar/search_bar_style.dart';
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/local_storage.dart';
 import 'package:meme/Controller/navigator.dart';
@@ -253,6 +254,9 @@ class _SearchPageState extends State<SearchPage>
                     Expanded(
                         child: SearchBar(
                             textStyle: Theme.of(context).textTheme.bodyText1,
+                            searchBarStyle: SearchBarStyle(
+                              backgroundColor: Theme.of(context).backgroundColor,
+                            ),
                             onSearch: search,
                             searchBarController: searchBarController,
                             focusNode: focusNode,
@@ -266,7 +270,9 @@ class _SearchPageState extends State<SearchPage>
                                           focusNode.unfocus();
                                         }),
                                   )
-                                : Icon(Icons.search),
+                                : Icon(Icons.search,
+                                color: Theme.of(context).unselectedWidgetColor,
+                                ),
                             emptyWidget: Center(
                                 child: Text('No se han encontrado resultados',
                                     style:
@@ -359,7 +365,7 @@ class _SearchPageState extends State<SearchPage>
                                         height: 30,
                                         child: TabBar(
                                             controller: tabController,
-                                            labelStyle: TextStyle(fontSize: 15),
+                                            labelStyle: Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 16),
                                             onTap: (value) {
                                               if (value == 0)
                                                 typeSearched = 'users';

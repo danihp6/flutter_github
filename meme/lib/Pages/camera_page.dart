@@ -213,7 +213,7 @@ class _CameraPageState extends State<CameraPage> {
                 Align(
                   alignment: Alignment.bottomLeft,
                   child: IconButton(
-                    color: Colors.deepOrange,
+                    color: Theme.of(context).primaryColor,
                     iconSize: 30,
                     icon: Icon(Icons.rotate_90_degrees_ccw),
                     onPressed: changeCamera,
@@ -257,7 +257,7 @@ class _CameraPageState extends State<CameraPage> {
                     child: IconButton(
                       icon: controller != null &&
                               controller.value.isRecordingPaused
-                          ? Icon(Icons.play_arrow)
+                          ? Icon(Icons.play_arrow,color: Theme.of(context).iconTheme.color,)
                           : Icon(Icons.pause),
                       color: Theme.of(context).accentColor,
                       onPressed: controller != null &&

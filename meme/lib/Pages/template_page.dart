@@ -34,14 +34,14 @@ class _TemplatePageState extends State<TemplatePage>
             SliverToBoxAdapter(
                 child: Align(
                     alignment: Alignment.center,
-                    child: Text('Guardadas', style: TextStyle(fontSize: 18)))),
+                    child: Text('Guardadas', style: Theme.of(context).textTheme.bodyText1))),
             if (storage.templates.length == 0)
               SliverToBoxAdapter(
                 child: SizedBox(
                   height: 100,
                   child: Center(
                     child: Text('No tienes plantillas guardadas',
-                        style: TextStyle(fontSize: 16)),
+                        style: Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 15)),
                   ),
                 ),
               ),
@@ -137,7 +137,7 @@ class TemplateWidget extends StatelessWidget {
                         Image.memory(kTransparentImage),
                     fit: BoxFit.contain)),
           ),
-          Text(template.name, style: TextStyle(fontSize: 15))
+          Text(template.name, style: Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 15))
         ],
       ),
       onTap: () => template.goTemplate(context, template),

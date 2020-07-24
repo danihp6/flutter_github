@@ -10,6 +10,7 @@ import 'package:meme/Pages/gallery_page.dart';
 import 'package:meme/Pages/image_editor_page.dart';
 import 'package:meme/Pages/my_user_page.dart';
 import 'package:meme/Pages/new_post_list_page.dart';
+import 'package:meme/Pages/settings_page.dart';
 import 'package:meme/Pages/template_over_image_camera_page.dart';
 import 'package:meme/Pages/post_list_page.dart';
 import 'package:meme/Pages/post_page.dart';
@@ -40,13 +41,15 @@ class MyNavigator {
           )));
   }
 
-  goUploadPublication(BuildContext context, Function futureMedia,[Template template]) => Navigator.push(
-      context,
-      SlideLeftRoute(
-          page: UploadPublicationPage(
-        futureMedia : futureMedia,
-        template: template,
-      )));
+  goUploadPublication(BuildContext context, Function futureMedia,
+          [Template template]) =>
+      Navigator.push(
+          context,
+          SlideLeftRoute(
+              page: UploadPublicationPage(
+            futureMedia: futureMedia,
+            template: template,
+          )));
 
   goGallery(BuildContext context, Function onMediaSelected) => Navigator.push(
       context,
@@ -131,15 +134,19 @@ class MyNavigator {
   goFollowers(BuildContext context, String userId) => Navigator.push(
       context, SlideLeftRoute(page: FollowersListPage(userId: userId)));
 
-  goTemplateOverImageCamera(BuildContext context, Template template) => Navigator.push(
-      context,
-      SlideLeftRoute(
-          page: TemplateOverImageCameraPage(
-        template: template,
-      )));
+  goTemplateOverImageCamera(BuildContext context, Template template) =>
+      Navigator.push(
+          context,
+          SlideLeftRoute(
+              page: TemplateOverImageCameraPage(
+            template: template,
+          )));
 
   goTemplateText(BuildContext context, Template template) => Navigator.push(
       context, SlideLeftRoute(page: TemplateText(template: template)));
+
+  goSettings(BuildContext context) =>
+      Navigator.push(context, SlideLeftRoute(page: SettingsPage()));
 }
 
 MyNavigator navigator = MyNavigator();

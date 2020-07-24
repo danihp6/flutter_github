@@ -1,15 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/loading.dart';
+import 'package:meme/Widgets/scroll_column_expandable.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:math' as math;
 
 import '../Controller/gallery.dart';
 
 class EditProfilePage extends StatefulWidget {
-
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
 }
@@ -32,8 +34,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     editUser() {
-      db.editUser(db.userId, _userName, _description, _avatar,
-          _avatarLocation, _media);
+      db.editUser(
+          db.userId, _userName, _description, _avatar, _avatarLocation, _media);
       navigator.pop(context);
     }
 
@@ -72,49 +74,60 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _avatar = user.avatar;
             _avatarLocation = user.avatarLocation;
 
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(40),
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      child: Column(
-                        children: <Widget>[
-                          SizedBox(
-                              width: 120,
-                              height: 120,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(100),
-                                child: _buildImage(),
-                              )),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text('Cambiar foto del perfil',style:Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 15)),
-                        ],
-                      ),
-                      onTap: () async =>
-                          await Permission.storage.request().isGranted
-                              ? navigator.goGallery(context, editAvatar)
-                              : null,
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ScrollColumnExpandable(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(
+                            width: 120,
+                            height: 120,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: _buildImage(),
+                            )),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Text('Cambiar foto del perfil',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1
+                                .copyWith(fontSize: 15)),
+                      ],
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    TextField(
-                      style: Theme.of(context).textTheme.bodyText1,
+                    onTap: () async =>
+                        await Permission.storage.request().isGranted
+                            ? navigator.goGallery(context, editAvatar)
+                            : null,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 100, right: 100),
+                    child: TextField(
+                      maxLength: 15,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          .copyWith(fontSize: 16),
                       decoration: InputDecoration(
+                        border: OutlineInputBorder(),
                         labelText: 'Nombre',
                       ),
                       controller: _nameController,
                       onChanged: (name) => _userName = name,
                     ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    TextFormField(
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left:20,right:20),
+                    child: TextFormField(
                       maxLines: 3,
-                      style: Theme.of(context).textTheme.bodyText1,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyText1
+                          .copyWith(fontSize: 16),
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Descripción',
@@ -122,17 +135,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       controller: _descriptionController,
                       onChanged: (description) => _description = description,
                     ),
-                    SizedBox(
-                      height: 40,
-                    ),
-                    RaisedButton(
-                      color: Colors.deepOrange,
-                      textColor: Colors.white,
-                      child: Text('Confirmar'),
-                      onPressed: editUser,
-                    )
-                  ],
-                ),
+                  ),
+                  RaisedButton(
+                    color: Colors.deepOrange,
+                    textColor: Colors.white,
+                    child: Text('Confirmar'),
+                    onPressed: editUser,
+                  )
+                ],
               ),
             );
           }),

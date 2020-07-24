@@ -184,7 +184,7 @@ class _PostListsStreamState extends State<PostListsStream> with AutomaticKeepAli
         if (snapshot.hasError) print(snapshot.error);
         if (!snapshot.hasData) return Loading();
         List<PostList> postlists = snapshot.data;
-        if (postlists.length == 0)
+        if (postlists.isEmpty)
           return Center(child: Text('Usuario sin listas',style:Theme.of(context).textTheme.bodyText1));
         return ListView.builder(
           shrinkWrap: true,
@@ -268,6 +268,7 @@ class _PostsStreamState extends State<PostsStream> with AutomaticKeepAliveClient
         if (snapshot.hasError) print(snapshot.error);
         if (!snapshot.hasData) return Loading();
         List<Post> posts = snapshot.data;
+        if(posts.isEmpty)return Center(child: Text('Usuario sin publicaciones',style:Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 16)));
         return ListView.builder(
           physics: NeverScrollableScrollPhysics(),
           itemCount: posts.length,

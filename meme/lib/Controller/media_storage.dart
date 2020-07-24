@@ -37,6 +37,10 @@ class MediaStorage {
   Future<void> deleteFile(String path) async {
     if (path != null) await ref.child(path).delete();
   }
+
+  Future<String> downloadFile(String path) async{
+    if(path != null) return await ref.child(path).getDownloadURL();
+  }
 }
 
 MediaStorage mediaStorage = MediaStorage();

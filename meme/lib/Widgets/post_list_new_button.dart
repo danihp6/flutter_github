@@ -17,7 +17,7 @@ class PostListNewButton extends StatelessWidget {
               SizedBox(
                 width: 10,
               ),
-              Text('Añadir nueva categoria'),
+              Text('Añadir nueva categoria',style:Theme.of(context).textTheme.bodyText1),
             ],
           ),
         ),
