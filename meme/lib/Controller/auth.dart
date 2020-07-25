@@ -31,6 +31,11 @@ class Auth {
     return user != null ? user.uid : null;
   }
 
+  Future<String> currentUserEmail() async {
+    FirebaseUser user = await _firebaseAuth.currentUser();
+    return user.email;
+  }
+
   Future<void> signOut() async {
     return _firebaseAuth.signOut();
   }
@@ -43,9 +48,7 @@ class Auth {
     return (await user.reauthenticateWithCredential(credential)).user;
   }
 
-  Future deleteUser(String password) async {
-    FirebaseUser user = await reauthCurrentUser(password);
-
+  Future deleteUser(FirebaseUser user) async {
     db.deleteUser(db.userId);
     user.delete();
   }
@@ -71,16 +74,13 @@ class Auth {
     await _firebaseAuth.sendPasswordResetEmail(email: email);
   }
 
-  Future changePassword(String password, String newPassword) async {
-    FirebaseUser user = await reauthCurrentUser(password);
+  Future changePassword(FirebaseUser user, String newPassword) async {
     user.updatePassword(newPassword);
   }
 
-  Future changeEmail(String password, String newEmail) async {
-    FirebaseUser user = await reauthCurrentUser(password);
+  Future changeEmail(FirebaseUser user, String newEmail) async {
     user.updateEmail(newEmail);
   }
-  
 }
 
 Auth auth = new Auth();

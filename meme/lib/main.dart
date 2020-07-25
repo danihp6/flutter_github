@@ -88,8 +88,8 @@ class MaterialAppWithTheme extends StatelessWidget {
       inputDecorationTheme: InputDecorationTheme(
         labelStyle: TextStyle(color: Colors.black),
         errorStyle: TextStyle(color: Colors.red),
-        enabledBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: Colors.black26)),
+        // enabledBorder:
+        //     OutlineInputBorder(borderSide: BorderSide(color: Colors.black26)),
       ),
       sliderTheme: SliderThemeData(
           valueIndicatorColor: Colors.white, thumbColor: Colors.black),
@@ -120,8 +120,8 @@ class MaterialAppWithTheme extends StatelessWidget {
       inputDecorationTheme: InputDecorationTheme(
         labelStyle: TextStyle(color: Colors.white),
         errorStyle: TextStyle(color: Colors.red),
-        enabledBorder:
-            OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+        // enabledBorder:
+        //     OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
       ),
       sliderTheme: SliderThemeData(
           valueIndicatorColor: Colors.black, thumbColor: Colors.white),
