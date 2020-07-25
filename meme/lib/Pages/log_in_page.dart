@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/app_availability.dart';
 import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Pages/sign_in_page.dart';
 import 'package:meme/Widgets/scroll_column_expandable.dart';
@@ -19,6 +20,7 @@ class _LogInPageState extends State<LogInPage> {
   TextEditingController _emailController;
   TextEditingController _passwordController;
   bool _isLogIn = false;
+  GlobalKey<ScaffoldState> scaffoldState = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -38,6 +40,7 @@ class _LogInPageState extends State<LogInPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        key: scaffoldState,
         body: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -160,7 +163,30 @@ class _LogInPageState extends State<LogInPage> {
                                   ),
                                 ),
                                 FlatButton(
-                                    onPressed: () {},
+                                    onPressed: () async {
+                                      try {
+                                        await auth.resetPassword(_email);
+                                        scaffoldState.currentState.showSnackBar(
+                                          SnackBar(
+                                            duration: Duration(seconds: 2),
+                                            content: Container(
+                                              height: 70,
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Center(child: Text('Revisa tu correo para cambiar de contraseña',style:TextStyle(fontSize: 16))),
+                                                  FlatButton(
+                                                    onPressed: () async => await apps.openEmailApp(context), 
+                                                    child: Text('Abrir gmail',style:TextStyle(fontSize: 18,color:Colors.blue))
+                                                    )
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        );
+                                      } catch (e) {
+                                        showError(e);
+                                      }
+                                    } ,
                                     child: Text(
                                       'Has olvidado tu contraseña?',
                                       style: TextStyle(
@@ -217,7 +243,7 @@ class _LogInPageState extends State<LogInPage> {
                                       height: 40,
                                       child: Image.asset(
                                           'assets/images/google.png')),
-                                  onTap: () {},
+                                  onTap: () async => await auth.signInWithGoogle(),
                                 )
                               ],
                             ),

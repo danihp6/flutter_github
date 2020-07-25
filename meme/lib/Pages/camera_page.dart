@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:media_gallery/media_gallery.dart';
+import 'package:meme/Controller/datetime_functions.dart';
 import 'package:meme/Controller/gallery.dart';
 import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Pages/upload_publication_page.dart';
@@ -40,7 +41,7 @@ class _CameraPageState extends State<CameraPage> {
     });
   }
 
-  String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
+  
 
   Future<String> takePicture() async {
     final Directory extDir = await getApplicationDocumentsDirectory();

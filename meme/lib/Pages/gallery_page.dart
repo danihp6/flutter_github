@@ -40,7 +40,6 @@ class _GalleryPageState extends State<GalleryPage> {
   @override
   void initState() {
     gallery.getMediaGallery().then((_) {
-      print(gallery);
       collections = gallery.collections;
       selectedCollection = collections.first;
       if (selectedCollection.media.isNotEmpty)

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/downloader.dart';
 import 'package:meme/Controller/local_storage.dart';
 import 'package:meme/Controller/media_storage.dart';
 import 'package:meme/Controller/navigator.dart';
@@ -12,6 +13,7 @@ import 'package:meme/Models/Report.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/select_post_list_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'report_modal_bottom_sheet.dart';
 
 class PostMoreButton extends StatelessWidget {
@@ -36,46 +38,56 @@ class PostMoreButton extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       FlatButton(
-                          onPressed: () async {
+                        onPressed: () async {
+                          if (await Permission.storage.request().isGranted) {
                             navigator.pop(context);
-                            ImageGallerySaver.saveFile(File.fromUri(Uri(path: await mediaStorage.downloadFile(post.mediaLocation))).path);
-                          } ,
-                          child: Row(
-                            children: [
-                              Icon(Icons.file_download,color: Theme.of(context).accentColor,),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text('Descargar')
-                            ],
-                          ),
+                            downloader.download(post.media);
+                          }
+                        },
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.file_download,
+                              color: Theme.of(context).accentColor,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text('Descargar')
+                          ],
                         ),
-                        FlatButton(
-                          onPressed: () {
-                            navigator.pop(context);
-                            navigator.goSelectPostList(context, post.id, post.author);
-                          } ,
-                          child: Row(
-                            children: [
-                              Icon(Icons.add,color: Theme.of(context).accentColor,),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text('Añadir a categoria')
-                            ],
-                          ),
+                      ),
+                      FlatButton(
+                        onPressed: () {
+                          navigator.pop(context);
+                          navigator.goSelectPostList(
+                              context, post.id, post.author);
+                        },
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.add,
+                              color: Theme.of(context).accentColor,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text('Añadir a categoria')
+                          ],
                         ),
-                      if (
-                          postList == null &&
-                          post.author == db.userId)
+                      ),
+                      if (postList == null && post.author == db.userId)
                         FlatButton(
                           onPressed: () {
                             db.deletePost(db.userId, post.id);
                             navigator.pop(context);
-                          } ,
+                          },
                           child: Row(
                             children: [
-                              Icon(Icons.delete,color: Theme.of(context).accentColor,),
+                              Icon(
+                                Icons.delete,
+                                color: Theme.of(context).accentColor,
+                              ),
                               SizedBox(
                                 width: 5,
                               ),
@@ -83,15 +95,13 @@ class PostMoreButton extends StatelessWidget {
                             ],
                           ),
                         ),
-                      if (
-                          postList != null &&
-                          postList.author == db.userId)
+                      if (postList != null && postList.author == db.userId)
                         FlatButton(
                           onPressed: () {
                             db.deletePostPathInPostList(
-                              db.userId, postList.id, post.author, post.id);
-                              navigator.pop(context);
-                          } ,
+                                db.userId, postList.id, post.author, post.id);
+                            navigator.pop(context);
+                          },
                           child: Row(
                             children: [
                               Icon(Icons.remove),
@@ -123,7 +133,7 @@ class PostMoreButton extends StatelessWidget {
                               builder: (context) => ReportModalBottomSheet(
                                     reportedUserId: post.id,
                                     scaffoldState: scaffoldState,
-                                    reportType:  ReportType.Post,
+                                    reportType: ReportType.Post,
                                   ));
                         },
                       )

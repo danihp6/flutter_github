@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meme/Models/User.dart';
 import 'db.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Auth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   Stream<FirebaseUser> get getAuthStatus => _firebaseAuth.onAuthStateChanged;
 
@@ -43,10 +45,42 @@ class Auth {
 
   Future deleteUser(String password) async {
     FirebaseUser user = await reauthCurrentUser(password);
-    
+
     db.deleteUser(db.userId);
     user.delete();
   }
+
+  Future<String> signInWithGoogle() async {
+    final GoogleSignInAccount googleSignInAccount =
+        await _googleSignIn.signIn();
+    final GoogleSignInAuthentication googleSignInAuthentication =
+        await googleSignInAccount.authentication;
+
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: googleSignInAuthentication.accessToken,
+      idToken: googleSignInAuthentication.idToken,
+    );
+
+    final AuthResult result =
+        await _firebaseAuth.signInWithCredential(credential);
+    FirebaseUser user = result.user;
+    return user.uid;
+  }
+
+  Future<void> resetPassword(String email) async {
+    await _firebaseAuth.sendPasswordResetEmail(email: email);
+  }
+
+  Future changePassword(String password, String newPassword) async {
+    FirebaseUser user = await reauthCurrentUser(password);
+    user.updatePassword(newPassword);
+  }
+
+  Future changeEmail(String password, String newEmail) async {
+    FirebaseUser user = await reauthCurrentUser(password);
+    user.updateEmail(newEmail);
+  }
+  
 }
 
 Auth auth = new Auth();

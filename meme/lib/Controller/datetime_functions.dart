@@ -17,3 +17,5 @@
       pastTime = 0.toString() + ' s';
     return pastTime;
   }
+
+  String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();

@@ -259,7 +259,7 @@ class _SearchPageState extends State<SearchPage>
                             ),
                             onSearch: search,
                             searchBarController: searchBarController,
-                            focusNode: focusNode,
+                            // focusNode: focusNode,
                             icon: isRecentsView
                                 ? SizedBox(
                                     width: 25,

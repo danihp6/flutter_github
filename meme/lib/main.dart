@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meme/Controller/configuration.dart';
+import 'package:meme/Controller/downloader.dart';
 import 'package:meme/Controller/push_notification_provider.dart';
 import 'package:meme/Pages/post_page.dart';
 import 'package:meme/Pages/root_page.dart';
@@ -30,6 +31,8 @@ class _MyAppState extends State<MyApp> {
     configuration.mainNavigatorKey = GlobalKey<NavigatorState>();
     pushProvider.initNotifications();
     storage.initStorage();
+    WidgetsFlutterBinding.ensureInitialized();
+    downloader.initialize();
     dynamicLinks.initDynamicLinks((Uri link) {
       Map linkParameters = link.queryParameters;
       print('-----------------------------------');
