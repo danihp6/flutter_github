@@ -137,15 +137,8 @@ class _UserPageState extends State<UserPage>
                                             child: Text('Usuario sin favoritos',style:Theme.of(context).textTheme.bodyText1)),
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        children: <Widget>[
-                                          PostListNewButton(),
-                                          Expanded(
-                                            child: PostListsStream(
-                                              userId: user.id,
-                                            ),
-                                          ),
-                                        ],
+                                      child: PostListsStream(
+                                        userId: user.id,
                                       ),
                                     )
                                   ]),

@@ -23,13 +23,14 @@ class NotificationWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (notification.post != null)
+    
       return StreamBuilder(
           stream: db.getUser(notification.sender),
           builder: (context, snapshot) {
             if (snapshot.hasError) print(snapshot.error);
             if (!snapshot.hasData) return Loading();
             User user = snapshot.data;
+            if (notification.post != null)
             return StreamBuilder(
                 stream: db.getPost(notification.sender, notification.post),
                 builder: (context, snapshot) {
@@ -81,14 +82,7 @@ class NotificationWidget extends StatelessWidget {
                     ]),
                   );
                 });
-          });
-    return StreamBuilder(
-        stream: db.getUser(notification.sender),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) print(snapshot.error);
-          if (!snapshot.hasData) return Loading();
-          User user = snapshot.data;
-          return Slidable(
+                return  Slidable(
             actionPane: SlidableDrawerActionPane(),
             actionExtentRatio: 0.25,
             actions: <Widget>[
@@ -127,5 +121,8 @@ class NotificationWidget extends StatelessWidget {
             ]),
           );
         });
+          
+          
+    
   }
 }

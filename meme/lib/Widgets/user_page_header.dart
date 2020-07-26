@@ -89,7 +89,7 @@ class UserFollowedPoints extends StatelessWidget {
         Row(
           children: <Widget>[
             // Text('Reputación',style:Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 14)),
-            Text(user.getTotalPoints().toString(),
+            Text(user.totalPoints.toString(),
                 style: Theme.of(context).textTheme.bodyText1),
                 SizedBox(width:2),
             Icon(Icons.whatshot)

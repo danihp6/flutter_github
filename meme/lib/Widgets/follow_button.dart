@@ -9,14 +9,17 @@ class FollowButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool userFollowed = user.followed.contains(user.id);
-    return RaisedButton(
-      onPressed: () => userFollowed
-          ? db.unfollow(db.userId, user.id)
-          : db.follow(db.userId, user.id),
-      child: Text(userFollowed ? 'Siguiendo' : 'Seguir'),
-      color: userFollowed ? Colors.blueAccent : Theme.of(context).accentColor,
-      textColor: Colors.white,
+    bool userFollowed = user.followers.contains(db.userId);
+    return SizedBox(
+      width: 100,
+          child: RaisedButton(
+        onPressed: () => userFollowed
+            ? db.unfollow(db.userId, user.id)
+            : db.follow(db.userId, user.id),
+        child: Text(userFollowed ? 'Siguiendo' : 'Seguir'),
+        color: userFollowed ? Colors.blueAccent : Theme.of(context).accentColor,
+        textColor: Colors.white,
+      ),
     );
   }
 }

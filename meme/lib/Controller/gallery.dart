@@ -8,7 +8,7 @@ const int NEXT_PAGE = 50;
 class Gallery {
   List<MediaCollection> _mediaCollections;
 
-  List<MyMediaCollection> _collections;
+  List<MyMediaCollection> _collections = [MyMediaCollection('Images'),MyMediaCollection('Videos')];
 
   List<MyMediaCollection> get collections => this._collections;
 
@@ -17,9 +17,9 @@ class Gallery {
       mediaTypes: [MediaType.image, MediaType.video],
     );
 
-    _collections = _mediaCollections
-        .map((collection) => MyMediaCollection(collection.name))
-        .toList();
+    // _collections = _mediaCollections
+    //     .map((collection) => MyMediaCollection(collection.name))
+    //     .toList();
 
     await loadMedia(0);
   }
@@ -30,8 +30,8 @@ class Gallery {
 
   Future loadMedia(int index) async {
     _collections[index].media.addAll(await Future.wait(
-        (await _mediaCollections[index].getMedias(
-          mediaType: MediaType.image,
+        (await _mediaCollections.first.getMedias(
+          mediaType: index == 0 ? MediaType.image:MediaType.video,
                 skip: _collections[index]._pagination,
                 take: _collections[index]._pagination + NEXT_PAGE))
             .items

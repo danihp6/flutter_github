@@ -82,6 +82,7 @@ class UserMoreButton extends StatelessWidget {
                                                   child: Text('Cancelar')),
                                               FlatButton(
                                                   onPressed: () {
+                                                    db.unfollow(db.userId, user.id);
                                                     db.block(
                                                         db.userId, user.id);
                                                     navigator.pop(context);

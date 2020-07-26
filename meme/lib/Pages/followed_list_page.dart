@@ -20,23 +20,25 @@ class FollowedListPage extends StatelessWidget {
           title: Text('Seguidos'),
         ),
         body: StreamBuilder(
-            stream: db.getUser(db.userId),
+            stream: db.getUser(userId),
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
               if (!snapshot.hasData) return Loading();
-              User currentUser = snapshot.data;
-              List<String> yourBlockedUsers = currentUser.blockedUsers;
+              User user = snapshot.data;
+              List<String> followed = user.followed;
+              if(followed.isNotEmpty)
               return StreamBuilder(
-                  stream: db.getUser(userId),
+                  stream: db.getUser(db.userId),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) print(snapshot.error);
                     if (!snapshot.hasData) return Loading();
-                    User user = snapshot.data;
-                    List<String> followed = user.followed;
+                    User currentUser = snapshot.data;
+                    List<String> yourBlockedUsers = currentUser.blockedUsers;
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: ListView.builder(
+                      child: ListView.separated(
                         itemCount: followed.length,
+                        separatorBuilder: (context, index) => SizedBox(height: 5,),
                         itemBuilder: (context, index) {
                           return StreamBuilder(
                             stream: db.getUser(followed[index]),
@@ -52,13 +54,12 @@ class FollowedListPage extends StatelessWidget {
                                   blockedUsers.contains(db.userId);
                               return SizedBox(
                                 height: 40,
-                                                              child: UserRow(
-                                  user: followedUser,
-                                  currentUser:
-                                  blocked: blocked,
-                                  youAreBlocked: youAreBlocked,
-                                  onTap: () => navigator.goUser(context, userId)
-                                ),
+                                child: UserRow(
+                                    user: followedUser,
+                                    blocked: blocked,
+                                    youAreBlocked: youAreBlocked,
+                                    onTap: () => navigator.goUser(
+                                        context, followedUser.id)),
                               );
                             },
                           );
@@ -66,6 +67,7 @@ class FollowedListPage extends StatelessWidget {
                       ),
                     );
                   });
+                return Center(child: Text('${user.userName} no sigue a ningun usuario',style: Theme.of(context).textTheme.bodyText1,));
             }));
   }
 }

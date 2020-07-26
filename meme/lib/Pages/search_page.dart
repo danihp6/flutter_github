@@ -176,31 +176,42 @@ class _SearchPageState extends State<SearchPage>
                                 : recentsView(),
                             onItemFound: (item, index) {
                               if (typeSearched == 'users') {
-                                bool blocked =
-                                    yourBlockedUsers.contains(item.id);
-                                List<String> blockedUsers = item.blockedUsers;
-                                bool youAreBlocked =
-                                    blockedUsers.contains(db.userId);
-                                return Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 8.0, right: 8),
-                                    child: GestureDetector(
-                                        child: SizedBox(
-                                      height: 50,
-                                      child: UserRow(
-                                        user: item,
-                                        blocked: blocked,
-                                        youAreBlocked: youAreBlocked,
-                                        onTap: () {
-                                          if (!storage.recentUsers
-                                              .contains(item.id))
-                                            storage.recentUsers =
-                                                storage.recentUsers + [item.id];
-                                          setState(() {});
-                                          navigator.goUser(context, item.id);
-                                        },
-                                      ),
-                                    )));
+                                return StreamBuilder(
+                                    stream: db.getUser(item),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasError)
+                                        print(snapshot.error);
+                                      if (!snapshot.hasData) return Loading();
+                                      User user = snapshot.data;
+                                      bool blocked =
+                                          yourBlockedUsers.contains(user.id);
+                                      List<String> blockedUsers =
+                                          user.blockedUsers;
+                                      bool youAreBlocked =
+                                          blockedUsers.contains(db.userId);
+                                      return Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 8.0, right: 8),
+                                          child: GestureDetector(
+                                              child: SizedBox(
+                                            height: 50,
+                                            child: UserRow(
+                                              user: user,
+                                              blocked: blocked,
+                                              youAreBlocked: youAreBlocked,
+                                              onTap: () {
+                                                if (!storage.recentUsers
+                                                    .contains(user.id))
+                                                  storage.recentUsers =
+                                                      storage.recentUsers +
+                                                          [user.id];
+                                                setState(() {});
+                                                navigator.goUser(
+                                                    context, user.id);
+                                              },
+                                            ),
+                                          )));
+                                    });
                               }
 
                               if (typeSearched == 'tags')
@@ -307,45 +318,43 @@ class _RecentsPostListsStreamState extends State<RecentsPostListsStream> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: CombineLatestStream.list(storage.recentPostLists
-                .map((postList) => db.getTag(postList)))
-            .asBroadcastStream(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) print(snapshot.error);
-          if (!snapshot.hasData) return Loading();
-          List<PostList> postLists = snapshot.data;
+      stream: CombineLatestStream.list(
+              storage.recentPostLists.map((postList) => db.getTag(postList)))
+          .asBroadcastStream(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) print(snapshot.error);
+        if (!snapshot.hasData) return Loading();
+        List<PostList> postLists = snapshot.data;
 
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView.builder(
-              itemCount: postLists.length,
-              itemBuilder: (context, index) => GestureDetector(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    PostListWidget(
-                      postList: postLists[index],
-                      activeMoreOptions: false,
-                      onTap: () => navigator.goPostList(context,
-                          postLists[index].id, postLists[index].author),
-                    ),
-                    IconButton(
-                        icon: Icon(Icons.clear),
-                        onPressed: () {
-                          var newRecentPostLists =
-                              storage.recentPostLists;
-                          newRecentPostLists
-                              .remove(postLists[index].id);
-                          storage.recentPostLists = newRecentPostLists;
-                          setState(() {});
-                        })
-                  ],
-                ),
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.builder(
+            itemCount: postLists.length,
+            itemBuilder: (context, index) => GestureDetector(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  PostListWidget(
+                    postList: postLists[index],
+                    activeMoreOptions: false,
+                    onTap: () => navigator.goPostList(
+                        context, postLists[index].id, postLists[index].author),
+                  ),
+                  IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        var newRecentPostLists = storage.recentPostLists;
+                        newRecentPostLists.remove(postLists[index].id);
+                        storage.recentPostLists = newRecentPostLists;
+                        setState(() {});
+                      })
+                ],
               ),
             ),
-          );
-        },
-      );
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -362,41 +371,39 @@ class _RecentsTagsStreamState extends State<RecentsTagsStream> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: CombineLatestStream.list(
-                storage.recentTags.map((tag) => db.getTag(tag)))
-            .asBroadcastStream(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) print(snapshot.error);
-          if (!snapshot.hasData) return Loading();
-          List<Tag> tags = snapshot.data;
+      stream: CombineLatestStream.list(
+          storage.recentTags.map((tag) => db.getTag(tag))).asBroadcastStream(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) print(snapshot.error);
+        if (!snapshot.hasData) return Loading();
+        List<Tag> tags = snapshot.data;
 
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView.builder(
-              itemCount: tags.length,
-              itemBuilder: (context, index) => GestureDetector(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    TagWidget(
-                        tag: tags[index],
-                        onTap: () =>
-                            navigator.goTag(context, tags[index].id)),
-                    IconButton(
-                        icon: Icon(Icons.clear),
-                        onPressed: () {
-                          var newRecentTags = storage.recentTags;
-                          newRecentTags.remove(tags[index].id);
-                          storage.recentTags = newRecentTags;
-                          setState(() {});
-                        })
-                  ],
-                ),
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.builder(
+            itemCount: tags.length,
+            itemBuilder: (context, index) => GestureDetector(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  TagWidget(
+                      tag: tags[index],
+                      onTap: () => navigator.goTag(context, tags[index].id)),
+                  IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        var newRecentTags = storage.recentTags;
+                        newRecentTags.remove(tags[index].id);
+                        storage.recentTags = newRecentTags;
+                        setState(() {});
+                      })
+                ],
               ),
             ),
-          );
-        },
-      );
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -413,48 +420,47 @@ class _RecentsUsersStreamState extends State<RecentsUsersStream> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: CombineLatestStream.list(
-                storage.recentUsers.map((user) => db.getUser(user)))
-            .asBroadcastStream(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) print(snapshot.error);
-          if (!snapshot.hasData) return Loading();
-          List<User> users = snapshot.data;
+      stream: CombineLatestStream.list(
+              storage.recentUsers.map((user) => db.getUser(user)))
+          .asBroadcastStream(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) print(snapshot.error);
+        if (!snapshot.hasData) return Loading();
+        List<User> users = snapshot.data;
 
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView.builder(
-              itemCount: users.length,
-              itemBuilder: (context, index) => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  GestureDetector(
-                    child: Row(
-                      children: <Widget>[
-                        SizedBox(height: 40,child: UserAvatar(user: users[index])),
-                        SizedBox(width: 10),
-                        Text(users[index].userName,
-                            style:
-                                Theme.of(context).textTheme.bodyText1),
-                      ],
-                    ),
-                    onTap: () =>
-                        navigator.goUser(context, users[index].id),
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.builder(
+            itemCount: users.length,
+            itemBuilder: (context, index) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                GestureDetector(
+                  child: Row(
+                    children: <Widget>[
+                      SizedBox(
+                          height: 40, child: UserAvatar(user: users[index])),
+                      SizedBox(width: 10),
+                      Text(users[index].userName,
+                          style: Theme.of(context).textTheme.bodyText1),
+                    ],
                   ),
-                  IconButton(
-                      icon: Icon(Icons.clear),
-                      onPressed: () {
-                        var newRecentUsers = storage.recentUsers;
-                        newRecentUsers.remove(users[index].id);
-                        storage.recentUsers = newRecentUsers;
-                        setState(() {});
-                      })
-                ],
-              ),
+                  onTap: () => navigator.goUser(context, users[index].id),
+                ),
+                IconButton(
+                    icon: Icon(Icons.clear),
+                    onPressed: () {
+                      var newRecentUsers = storage.recentUsers;
+                      newRecentUsers.remove(users[index].id);
+                      storage.recentUsers = newRecentUsers;
+                      setState(() {});
+                    })
+              ],
             ),
-          );
-        },
-      );
+          ),
+        );
+      },
+    );
   }
 }
 

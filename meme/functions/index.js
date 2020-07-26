@@ -43,12 +43,28 @@ exports.onDeletePost = functions.region('europe-west2').firestore.document('user
   // bucket.file(mediaPath).delete()
 
   tagsSnapshot = await db.collection('tags').orderBy('__name__').limit(batchSize).get()
-
+  var postId = context.params.postId
 
   tagsSnapshot.docs.forEach(function (doc) {
+    var points = doc.data()['points']
+    var totalPoints= doc.data()['totalPoints']
+    delete points[postId]
     doc.ref.update({
-      'posts': admin.firestore.FieldValue.arrayRemove(path)
+      'posts': admin.firestore.FieldValue.arrayRemove(path),
+      'points': points,
+      'totalPoints': totalPoints - snap.data()['totalPoints']
     })
+  })
+
+  var userId = context.params.userId
+  var userRef = db.doc(`users/${userId}`)
+  var points = (await userRef.get()).data()['points']
+  var totalPoints= doc.data()['totalPoints']
+  delete points[postId]
+
+  userRef.update({
+    'points': points,
+    'totalPoints':totalPoints - snap.data()['totalPoints']
   })
 
 })
@@ -225,41 +241,37 @@ exports.onCreateReport = functions.region('europe-west2').firestore.document('us
 })
 
 exports.onChangePostPoints = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onUpdate(async (change, context) => {
-  var newPoints = getTotalPoints(change.after.data()['points'])
-  var oldPoints = getTotalPoints(change.before.data()['points'])
+  var postId = context.params.postId
+  var newPoints = change.after.data()['points']
+  var oldPoints = change.before.data()['points']
   console.log(oldPoints)
   console.log(newPoints)
   if (newPoints != oldPoints) {
     var userId = context.params.userId
-    var postId = context.params.postId
+    
     var userRef = db.doc(`users/${userId}`)
-    var userPoints = (await userRef.get()).data()['points']
+    var userData = (await userRef.get()).data()
+      var userPoints = userData['points']
+      var totalPoints = userData['totalPoints']
     userPoints[postId] = newPoints
     userRef.update({
-      points: userPoints
+      'points': userPoints,
+      'totalPoints':totalPoints - oldPoints + newPoints
     })
 
     var tags = change.before.data()['tags']
-    console.log(tags)
     tags.forEach(async tag => {
       var tagRef = db.doc(`tags/${tag}`)
-      var tagPoints = (await tagRef.get()).data()['points']
+      var tagData = (await tagRef.get()).data()
+      var tagPoints = tagData['points']
+      var totalPoints = tagData['totalPoints']
       tagPoints[postId] = newPoints
-      totalPoints = getTotalPoints(tagPoints)
+
       tagRef.update({
-        points: tagPoints,
-        totalPoints: totalPoints
+        'points': tagPoints,
+        'totalPoints': totalPoints - oldPoints + newPoints
       })
 
     });
   }
 })
-
-function getTotalPoints(points) {
-  if (points == null) return 0;
-  res = 0;
-  for (const key in points) {
-    res += points[key];
-  }
-  return res;
-}

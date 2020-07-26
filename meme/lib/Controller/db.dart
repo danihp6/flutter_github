@@ -63,12 +63,13 @@ class DataBase {
       .snapshots()
       .map((doc) => List<String>.from(doc.data['followed']));
 
-  Future<List<User>> userSearch(String search) async {
+  Future<List<String>> userSearch(String search) async {
     var query = await _firestore
         .collection('users')
         .where('keyWords', arrayContains: search)
+        .orderBy('followers',descending: true)
         .getDocuments();
-    return query.documents.map((doc) => User.fromFirestore(doc)).toList();
+    return query.documents.map((doc) => doc.documentID).toList();
   }
 
   Future newUser(User user) =>

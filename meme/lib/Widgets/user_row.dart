@@ -11,6 +11,7 @@ class UserRow extends StatelessWidget {
   Function onTap;
   bool blocked;
   bool youAreBlocked;
+
   UserRow({
     @required this.user,
     @required this.onTap,
@@ -38,6 +39,7 @@ class UserRow extends StatelessWidget {
           ),
           onTap: onTap,
         ),
+        if(user.id != db.userId)
         if(!blocked && !youAreBlocked)
         FollowButton(user: user)
         else UnblockButton(user:user)
@@ -52,11 +54,14 @@ class UnblockButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RaisedButton(
-      onPressed: () => db.unblock(db.userId, user.id),
-      child: Text('Bloqueado'),
-      color: Colors.red,
-      textColor: Colors.white,
+    return SizedBox(
+      width: 100,
+          child: RaisedButton(
+        onPressed: () => db.unblock(db.userId, user.id),
+        child: Text('Bloqueado'),
+        color: Colors.red,
+        textColor: Colors.white,
+      ),
     );
   }
 }

@@ -20,48 +20,58 @@ class FollowersListPage extends StatelessWidget {
           title: Text('Seguidores'),
         ),
         body: StreamBuilder(
-            stream: db.getUser(db.userId),
+            stream: db.getUser(userId),
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
               if (!snapshot.hasData) return Loading();
-              User currentUser = snapshot.data;
-              List<String> yourBlockedUsers = currentUser.blockedUsers;
-              return StreamBuilder(
-                  stream: db.getUser(userId),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) print(snapshot.error);
-                    if (!snapshot.hasData) return Loading();
-                    User user = snapshot.data;
-                    List<String> followers = user.followers;
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ListView.builder(
-                        itemCount: followers.length,
-                        itemBuilder: (context, index) {
-                          return StreamBuilder(
-                            stream: db.getUser(followers[index]),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasError) print(snapshot.error);
-                              if (!snapshot.hasData) return Loading();
-                              User followerUser = snapshot.data;
-                              bool blocked =
-                                  yourBlockedUsers.contains(followerUser.id);
-                              List<String> blockedUsers =
-                                  followerUser.blockedUsers;
-                              bool youAreBlocked =
-                                  blockedUsers.contains(db.userId);
-                              return UserRow(
-                                user: followerUser,
-                                blocked: blocked,
-                                youAreBlocked: youAreBlocked,
-                                onTap: () => navigator.goUser(context, userId),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    );
-                  });
+              User user = snapshot.data;
+              List<String> followers = user.followers;
+              if (followers.isNotEmpty)
+                return StreamBuilder(
+                    stream: db.getUser(db.userId),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) print(snapshot.error);
+                      if (!snapshot.hasData) return Loading();
+                      User currentUser = snapshot.data;
+                      List<String> yourBlockedUsers = currentUser.blockedUsers;
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListView.builder(
+                          itemCount: followers.length,
+                          itemBuilder: (context, index) {
+                            return StreamBuilder(
+                              stream: db.getUser(followers[index]),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) print(snapshot.error);
+                                if (!snapshot.hasData) return Loading();
+                                User followerUser = snapshot.data;
+                                bool blocked =
+                                    yourBlockedUsers.contains(followerUser.id);
+                                List<String> blockedUsers =
+                                    followerUser.blockedUsers;
+                                bool youAreBlocked =
+                                    blockedUsers.contains(db.userId);
+                                return SizedBox(
+                                  height: 40,
+                                  child: UserRow(
+                                    user: followerUser,
+                                    blocked: blocked,
+                                    youAreBlocked: youAreBlocked,
+                                    onTap: () =>
+                                        navigator.goUser(context, userId),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      );
+                    });
+              return Center(
+                  child: Text(
+                '${user.userName} no tiene seguidores',
+                style: Theme.of(context).textTheme.bodyText1,
+              ));
             }));
   }
 }
