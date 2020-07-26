@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/gallery.dart';
+import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/Template.dart';
 import 'package:meme/Pages/account_page.dart';
 import 'package:meme/Pages/comments_page.dart';
@@ -88,13 +89,13 @@ class MyNavigator {
             postListId: postListId,
           )));
 
-  goPost(BuildContext context, String postId, String authorId) =>
+  goPost(BuildContext context,Post post) =>
       Navigator.push(
           context,
           SlideLeftRoute(
               page: PostPage(
-            authorId: authorId,
-            postId: postId,
+            authorId: post.author,
+            postId: post.id,
           )));
 
   goSelectPost(BuildContext context, Function onSelected) => Navigator.push(

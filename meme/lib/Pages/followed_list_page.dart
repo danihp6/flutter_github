@@ -50,11 +50,15 @@ class FollowedListPage extends StatelessWidget {
                                   followedUser.blockedUsers;
                               bool youAreBlocked =
                                   blockedUsers.contains(db.userId);
-                              return UserRow(
-                                user: followedUser,
-                                blocked: blocked,
-                                youAreBlocked: youAreBlocked,
-                                onTap: () => navigator.goUser(context, userId)
+                              return SizedBox(
+                                height: 40,
+                                                              child: UserRow(
+                                  user: followedUser,
+                                  currentUser:
+                                  blocked: blocked,
+                                  youAreBlocked: youAreBlocked,
+                                  onTap: () => navigator.goUser(context, userId)
+                                ),
                               );
                             },
                           );

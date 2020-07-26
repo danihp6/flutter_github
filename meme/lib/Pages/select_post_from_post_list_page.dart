@@ -38,7 +38,7 @@ SelectPostFromPostListPage({@required this.onTap});
                           postList: postLists[index],
                           activeMoreOptions: false,
                           onTapPost: onTap,
-                          onTapPostList: (postList)=>print(postList),
+                          onTapPostList: (context, postListId, authorId) {},
                         );
                       },
                     ),

@@ -23,6 +23,7 @@ class PostListMoreButton extends StatelessWidget {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
+                      if(postList.author == db.userId)
                       FlatButton(
                         child: Row(
                           children: <Widget>[
@@ -41,6 +42,25 @@ class PostListMoreButton extends StatelessWidget {
                           if (postList.imageLocation != '')
                             mediaStorage.deleteFile(postList.imageLocation);
                           db.deletePostList(db.userId, postList.id);
+                          navigator.pop(context);
+                        },
+                      ),
+                      FlatButton(
+                        child: Row(
+                          children: <Widget>[
+                            Icon(
+                              Icons.content_copy,
+                              color: Theme.of(context).accentColor,
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              'Copiar',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                        onPressed: () {
+                          db.copyPostList(db.userId, postList);
                           navigator.pop(context);
                         },
                       )

@@ -274,6 +274,10 @@ class DataBase {
         .add(postList.toFirestore());
   }
 
+  Future copyPostList(String userId, PostList postList) => _firestore
+      .collection('users/$userId/postLists')
+      .add(postList.toFirestore());
+
   Future deletePostList(String userId, String postListId) =>
       _firestore.document('users/$userId/postLists/$postListId').delete();
 
@@ -312,12 +316,14 @@ class DataBase {
       _firestore
           .collection('users/$userId/posts/$postId/comments')
           .where('level', isEqualTo: 0)
+          .orderBy('likes', descending: true)
+          .orderBy('dateTime', descending: true)
           .snapshots()
           .map(toCommentList);
 
   Stream<Comment> getBestComment(String userId, String postId) => _firestore
       .collection('users/$userId/posts/$postId/comments')
-      .orderBy('likes')
+      .orderBy('likes', descending: true)
       .limit(1)
       .snapshots()
       .map((snap) => Comment.fromFirestore(snap.documents.first));

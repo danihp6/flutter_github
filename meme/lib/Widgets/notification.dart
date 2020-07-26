@@ -76,7 +76,7 @@ class NotificationWidget extends StatelessWidget {
                       GestureDetector(
                         child: Image.network(post.media),
                         onTap: () =>
-                            navigator.goPost(context, post.id, post.author),
+                            navigator.goPost(context, post),
                       )
                     ]),
                   );

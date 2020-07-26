@@ -54,7 +54,7 @@ class Auth {
   }
 
   Future<String> signInWithGoogle() async {
-    final GoogleSignInAccount googleSignInAccount =
+      final GoogleSignInAccount googleSignInAccount =
         await _googleSignIn.signIn();
     final GoogleSignInAuthentication googleSignInAuthentication =
         await googleSignInAccount.authentication;
@@ -68,6 +68,7 @@ class Auth {
         await _firebaseAuth.signInWithCredential(credential);
     FirebaseUser user = result.user;
     return user.uid;
+    
   }
 
   Future<void> resetPassword(String email) async {

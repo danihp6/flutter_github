@@ -16,8 +16,8 @@ import 'slide_left_route.dart';
 class PostListCarousel extends StatefulWidget {
   PostList postList;
   bool activeMoreOptions;
-  Function onTapPostList;
-  Function onTapPost;
+  Function(BuildContext context, String postListId, String authorId) onTapPostList;
+  Function(BuildContext context, Post post) onTapPost;
 
   PostListCarousel(
       {@required this.postList,
@@ -76,7 +76,7 @@ class _PostListCarouselState extends State<PostListCarousel> {
                   : Container()
             ],
           ),
-          onTap: () => widget.onTapPostList(context,_postList),
+          onTap: () => widget.onTapPostList(context,_postList.id,_postList.author),
         ),
         SizedBox(
           height: 5,

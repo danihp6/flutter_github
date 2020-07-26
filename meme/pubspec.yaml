@@ -61,6 +61,7 @@ dependencies:
   flutter_downloader: ^1.4.4
   google_sign_in: ^4.5.1
   flutter_appavailability: ^0.0.21
+  splashscreen: ^1.2.0
   flutter:
     sdk: flutter
 
@@ -101,9 +102,9 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Maian
+    - family: AvocadoCreamy
       fonts:
-        - asset: assets/fonts/Maian.ttf
+        - asset: assets/fonts/Avocado_Creamy.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

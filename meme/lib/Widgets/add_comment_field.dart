@@ -81,21 +81,21 @@ class _AddCommentFieldState extends State<AddCommentField> {
             widget.postAuthorId,
             widget.postId,
             widget.commentResponse.id,
-            new Comment(text, <String>[], db.userId, DateTime.now(), <String>[],
-                1, media, mediaType!=null?mediaType:''));
+             Comment(text, <String>[], db.userId, DateTime.now(), <String>[],
+                1, media, mediaType!=null?mediaType:mediaType));
         widget.cancelResponse();
       } else
         db.newOuterComment(
             widget.postAuthorId,
             widget.postId,
-            new Comment(text, <String>[], db.userId, DateTime.now(), <String>[],
+             Comment(text, <String>[], db.userId, DateTime.now(), <String>[],
                 0, media, mediaType));
       userMentions.forEach((userName) async {
         String id =
             await db.userIdByUserName(userName.substring(1, userName.length));
         db.newNotification(
             id,
-            new mynotification.Notification(
+             mynotification.Notification(
                 'Te han mencionado',
                 widget.user.userName + ' te ha mencionado',
                 widget.postAuthorId,
@@ -108,7 +108,7 @@ class _AddCommentFieldState extends State<AddCommentField> {
       widget.focusNode.unfocus();
     }
 
-    selectMedia(Post post) {
+    selectMedia(BuildContext context,Post post) {
       setState(() {
         media = post.media;
         mediaType = post.mediaType;
@@ -156,11 +156,19 @@ class _AddCommentFieldState extends State<AddCommentField> {
                 );
               }),
         if (widget.commentResponse != null)
-          Dismissible(
-            key: UniqueKey(),
-            onDismissed: (direction) => widget.cancelResponse(),
-            child: Text(
-                'Respondiendo al comentario: ${widget.commentResponse.text}'),
+          StreamBuilder(
+            stream: db.getUser(widget.commentResponse.authorId),
+            builder: (context, snapshot) {
+              if (snapshot.hasError) print(snapshot.error);
+                          if (!snapshot.hasData) return Loading();
+                          User user = snapshot.data;
+              return Dismissible(
+                key: UniqueKey(),
+                onDismissed: (direction) => widget.cancelResponse(),
+                child: Text(
+                    'Respondiendo a ${user.userName}'),
+              );
+            }
           ),
         if (media != '')
           Padding(
@@ -227,7 +235,7 @@ class _AddCommentFieldState extends State<AddCommentField> {
               IconButton(
                   icon: Icon(Icons.image),
                   onPressed: () => navigator.goSelectPost(context, selectMedia)),
-            if (text.length > 0)
+            if (text.length > 0 || media != '')
               IconButton(
                 icon: Icon(Icons.send),
                 onPressed: sendComment,

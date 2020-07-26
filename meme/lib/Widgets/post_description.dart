@@ -180,6 +180,7 @@ class _PostDescriptionState extends State<PostDescription> {
                         CommentWidget(
                           comment: bestComment,
                           activeInnerComments: false,
+                          activeResponse: false,
                         ),
                       ],
                     );

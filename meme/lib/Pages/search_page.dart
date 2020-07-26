@@ -45,6 +45,7 @@ class _SearchPageState extends State<SearchPage>
     searchBarController = SearchBarController();
     focusNode = FocusNode();
     focusNode.addListener(() {
+      print('hola');
       if (focusNode.hasFocus)
         isRecentsView = true;
       else {
@@ -101,137 +102,21 @@ class _SearchPageState extends State<SearchPage>
     Widget recentsView() {
       if (tabController.index == 0)
         return storage.recentUsers.isNotEmpty
-            ? StreamBuilder(
-                stream: CombineLatestStream.list(
-                        storage.recentUsers.map((user) => db.getUser(user)))
-                    .asBroadcastStream(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) print(snapshot.error);
-                  if (!snapshot.hasData) return Loading();
-                  List<User> users = snapshot.data;
-
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListView.builder(
-                      itemCount: users.length,
-                      itemBuilder: (context, index) => Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          GestureDetector(
-                            child: Row(
-                              children: <Widget>[
-                                UserAvatar(user: users[index]),
-                                SizedBox(width: 10),
-                                Text(users[index].userName,
-                                    style:
-                                        Theme.of(context).textTheme.bodyText1),
-                              ],
-                            ),
-                            onTap: () =>
-                                navigator.goUser(context, users[index].id),
-                          ),
-                          IconButton(
-                              icon: Icon(Icons.clear),
-                              onPressed: () {
-                                var newRecentUsers = storage.recentUsers;
-                                newRecentUsers.remove(users[index].id);
-                                storage.recentUsers = newRecentUsers;
-                                setState(() {});
-                              })
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              )
+            ? RecentsUsersStream()
             : Center(
                 child: Text('No hay busquedas de usuarios recientes',
                     style: Theme.of(context).textTheme.bodyText1),
               );
       if (tabController.index == 1)
         return storage.recentTags.isNotEmpty
-            ? StreamBuilder(
-                stream: CombineLatestStream.list(
-                        storage.recentTags.map((tag) => db.getTag(tag)))
-                    .asBroadcastStream(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) print(snapshot.error);
-                  if (!snapshot.hasData) return Loading();
-                  List<Tag> tags = snapshot.data;
-
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListView.builder(
-                      itemCount: tags.length,
-                      itemBuilder: (context, index) => GestureDetector(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            TagWidget(
-                                tag: tags[index],
-                                onTap: () =>
-                                    navigator.goTag(context, tags[index].id)),
-                            IconButton(
-                                icon: Icon(Icons.clear),
-                                onPressed: () {
-                                  var newRecentTags = storage.recentTags;
-                                  newRecentTags.remove(tags[index].id);
-                                  storage.recentTags = newRecentTags;
-                                  setState(() {});
-                                })
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              )
+            ? RecentsTagsStream()
             : Center(
                 child: Text('No hay busquedas de tags recientes',
                     style: Theme.of(context).textTheme.bodyText1),
               );
       if (tabController.index == 2)
         return storage.recentPostLists.isNotEmpty
-            ? StreamBuilder(
-                stream: CombineLatestStream.list(storage.recentPostLists
-                        .map((postList) => db.getTag(postList)))
-                    .asBroadcastStream(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) print(snapshot.error);
-                  if (!snapshot.hasData) return Loading();
-                  List<PostList> postLists = snapshot.data;
-
-                  return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListView.builder(
-                      itemCount: postLists.length,
-                      itemBuilder: (context, index) => GestureDetector(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            PostListWidget(
-                              postList: postLists[index],
-                              activeMoreOptions: false,
-                              onTap: () => navigator.goPostList(context,
-                                  postLists[index].id, postLists[index].author),
-                            ),
-                            IconButton(
-                                icon: Icon(Icons.clear),
-                                onPressed: () {
-                                  var newRecentPostLists =
-                                      storage.recentPostLists;
-                                  newRecentPostLists
-                                      .remove(postLists[index].id);
-                                  storage.recentPostLists = newRecentPostLists;
-                                  setState(() {});
-                                })
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              )
+            ? RecentsPostListsStream()
             : Center(
                 child: Text('No hay busquedas de listas recientes',
                     style: Theme.of(context).textTheme.bodyText1),
@@ -255,11 +140,12 @@ class _SearchPageState extends State<SearchPage>
                         child: SearchBar(
                             textStyle: Theme.of(context).textTheme.bodyText1,
                             searchBarStyle: SearchBarStyle(
-                              backgroundColor: Theme.of(context).backgroundColor,
+                              backgroundColor:
+                                  Theme.of(context).backgroundColor,
                             ),
                             onSearch: search,
                             searchBarController: searchBarController,
-                            // focusNode: focusNode,
+                            focusNode: focusNode,
                             icon: isRecentsView
                                 ? SizedBox(
                                     width: 25,
@@ -270,9 +156,11 @@ class _SearchPageState extends State<SearchPage>
                                           focusNode.unfocus();
                                         }),
                                   )
-                                : Icon(Icons.search,
-                                color: Theme.of(context).unselectedWidgetColor,
-                                ),
+                                : Icon(
+                                    Icons.search,
+                                    color:
+                                        Theme.of(context).unselectedWidgetColor,
+                                  ),
                             emptyWidget: Center(
                                 child: Text('No se han encontrado resultados',
                                     style:
@@ -365,7 +253,10 @@ class _SearchPageState extends State<SearchPage>
                                         height: 30,
                                         child: TabBar(
                                             controller: tabController,
-                                            labelStyle: Theme.of(context).textTheme.bodyText1.copyWith(fontSize: 16),
+                                            labelStyle: Theme.of(context)
+                                                .textTheme
+                                                .bodyText1
+                                                .copyWith(fontSize: 16),
                                             onTap: (value) {
                                               if (value == 0)
                                                 typeSearched = 'users';
@@ -400,6 +291,170 @@ class _SearchPageState extends State<SearchPage>
             );
           }),
     );
+  }
+}
+
+class RecentsPostListsStream extends StatefulWidget {
+  const RecentsPostListsStream({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  _RecentsPostListsStreamState createState() => _RecentsPostListsStreamState();
+}
+
+class _RecentsPostListsStreamState extends State<RecentsPostListsStream> {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+        stream: CombineLatestStream.list(storage.recentPostLists
+                .map((postList) => db.getTag(postList)))
+            .asBroadcastStream(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+          if (!snapshot.hasData) return Loading();
+          List<PostList> postLists = snapshot.data;
+
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView.builder(
+              itemCount: postLists.length,
+              itemBuilder: (context, index) => GestureDetector(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    PostListWidget(
+                      postList: postLists[index],
+                      activeMoreOptions: false,
+                      onTap: () => navigator.goPostList(context,
+                          postLists[index].id, postLists[index].author),
+                    ),
+                    IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: () {
+                          var newRecentPostLists =
+                              storage.recentPostLists;
+                          newRecentPostLists
+                              .remove(postLists[index].id);
+                          storage.recentPostLists = newRecentPostLists;
+                          setState(() {});
+                        })
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+  }
+}
+
+class RecentsTagsStream extends StatefulWidget {
+  const RecentsTagsStream({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  _RecentsTagsStreamState createState() => _RecentsTagsStreamState();
+}
+
+class _RecentsTagsStreamState extends State<RecentsTagsStream> {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+        stream: CombineLatestStream.list(
+                storage.recentTags.map((tag) => db.getTag(tag)))
+            .asBroadcastStream(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+          if (!snapshot.hasData) return Loading();
+          List<Tag> tags = snapshot.data;
+
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView.builder(
+              itemCount: tags.length,
+              itemBuilder: (context, index) => GestureDetector(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    TagWidget(
+                        tag: tags[index],
+                        onTap: () =>
+                            navigator.goTag(context, tags[index].id)),
+                    IconButton(
+                        icon: Icon(Icons.clear),
+                        onPressed: () {
+                          var newRecentTags = storage.recentTags;
+                          newRecentTags.remove(tags[index].id);
+                          storage.recentTags = newRecentTags;
+                          setState(() {});
+                        })
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+  }
+}
+
+class RecentsUsersStream extends StatefulWidget {
+  const RecentsUsersStream({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  _RecentsUsersStreamState createState() => _RecentsUsersStreamState();
+}
+
+class _RecentsUsersStreamState extends State<RecentsUsersStream> {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+        stream: CombineLatestStream.list(
+                storage.recentUsers.map((user) => db.getUser(user)))
+            .asBroadcastStream(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+          if (!snapshot.hasData) return Loading();
+          List<User> users = snapshot.data;
+
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView.builder(
+              itemCount: users.length,
+              itemBuilder: (context, index) => Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  GestureDetector(
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(height: 40,child: UserAvatar(user: users[index])),
+                        SizedBox(width: 10),
+                        Text(users[index].userName,
+                            style:
+                                Theme.of(context).textTheme.bodyText1),
+                      ],
+                    ),
+                    onTap: () =>
+                        navigator.goUser(context, users[index].id),
+                  ),
+                  IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        var newRecentUsers = storage.recentUsers;
+                        newRecentUsers.remove(users[index].id);
+                        storage.recentUsers = newRecentUsers;
+                        setState(() {});
+                      })
+                ],
+              ),
+            ),
+          );
+        },
+      );
   }
 }
 

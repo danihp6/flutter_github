@@ -13,7 +13,7 @@ class UserAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (user.avatar == '')
-      return SizedBox(width: 30, child: Image.asset('assets/images/user.png'));
+      return Image.asset('assets/images/user.png');
 
     
 

@@ -44,92 +44,93 @@ class _MyUserPageState extends State<MyUserPage>
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: StreamBuilder(
-            stream: db.getUser(db.userId),
-            builder: (context, snapshot) {
-              if (snapshot.hasError) print(snapshot.error);
-              if (!snapshot.hasData) return Loading();
-              User user = snapshot.data;
-              List<String> favourites = user.favourites;
-              return Scaffold(
-                  appBar: PreferredSize(
-                    preferredSize: Size.fromHeight(40),
-                    child: AppBar(
-                      title: Text(user.userName),
-                    ),
-                  ),
-                  endDrawer: MyDrawer(),
-                  body: NestedScrollView(
-                    headerSliverBuilder: (context, _) => [
-                      SliverToBoxAdapter(
-                          child: UserPageHeader(
-                        user: user,
-                        scaffoldState: _scaffoldState,
-                      ))
-                    ],
-                    body: Column(
-                      children: <Widget>[
-                        TabBar(
-                          controller: tabController,
-                          tabs: [
-                            Tab(
-                              icon: Icon(
-                                Icons.photo_library,
-                                size: 30,
-                              ),
+    return StreamBuilder(
+        stream: db.getUser(db.userId),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+          if (!snapshot.hasData) return Loading();
+          User user = snapshot.data;
+          List<String> favourites = user.favourites;
+          return Scaffold(
+              appBar: PreferredSize(
+                preferredSize: Size.fromHeight(40),
+                child: AppBar(
+                  title: Text(user.userName),
+                ),
+              ),
+              endDrawer: MyDrawer(),
+              body: SafeArea(
+                              child: NestedScrollView(
+                  headerSliverBuilder: (context, _) => [
+                    SliverToBoxAdapter(
+                        child: UserPageHeader(
+                      user: user,
+                      scaffoldState: _scaffoldState,
+                    ))
+                  ],
+                  body: Column(
+                    children: <Widget>[
+                      TabBar(
+                        controller: tabController,
+                        tabs: [
+                          Tab(
+                            icon: Icon(
+                              Icons.photo_library,
+                              size: 30,
                             ),
-                            Tab(
-                              icon: Icon(
-                                Icons.star,
-                                size: 30,
-                              ),
+                          ),
+                          Tab(
+                            icon: Icon(
+                              Icons.star,
+                              size: 30,
                             ),
-                            Tab(
-                              icon: Icon(
-                                Icons.perm_media,
-                                size: 30,
-                              ),
+                          ),
+                          Tab(
+                            icon: Icon(
+                              Icons.perm_media,
+                              size: 30,
                             ),
-                          ],
-                          labelColor: Colors.deepOrange,
-                          unselectedLabelColor:
-                              Theme.of(context).iconTheme.color,
-                        ),
-                        Expanded(
-                          child: TabBarView(
-                              controller: tabController,
-                              physics: NeverScrollableScrollPhysics(),
-                              children: [
-                                PostsStream(
-                                  scaffoldState: _scaffoldState,
-                                  userId: user.id,
-                                ),
-                                favourites.isNotEmpty
-                                    ? FavouritesStream(
-                                        favourites: favourites,
-                                        scaffoldState: _scaffoldState)
-                                    : Center(
-                                        child: Text('Usuario sin favoritos',style:Theme.of(context).textTheme.bodyText1)),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Column(
-                                    children: <Widget>[
-                                      PostListNewButton(),
-                                      Expanded(
-                                        child: PostListsStream(
-                                          userId: user.id,
-                                        ),
+                          ),
+                        ],
+                        labelColor: Colors.deepOrange,
+                        unselectedLabelColor:
+                            Theme.of(context).iconTheme.color,
+                      ),
+                      Expanded(
+                        child: TabBarView(
+                            controller: tabController,
+                            physics: NeverScrollableScrollPhysics(),
+                            children: [
+                              PostsStream(
+                                scaffoldState: _scaffoldState,
+                                userId: user.id,
+                              ),
+                              favourites.isNotEmpty
+                                  ? FavouritesStream(
+                                      favourites: favourites,
+                                      scaffoldState: _scaffoldState)
+                                  : Center(
+                                      child: Text('Usuario sin favoritos',style:Theme.of(context).textTheme.bodyText1)),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: <Widget>[
+                                    PostListNewButton(),
+                                    Expanded(
+                                      child: PostListsStream(
+                                        userId: user.id,
                                       ),
-                                    ],
-                                  ),
-                                )
-                              ]),
-                        ),
-                      ],
-                    ),
-                  ));
-            }));
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ]),
+                      ),
+                    ],
+                  ),
+                ),
+              ));
+        });
   }
 }
 

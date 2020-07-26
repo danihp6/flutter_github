@@ -5,6 +5,7 @@ import 'package:meme/Widgets/scroll_column_expandable.dart';
 import '../Controller/auth.dart';
 import '../Controller/db.dart';
 import '../Controller/push_notification_provider.dart';
+import '../Widgets/memes_header.dart';
 
 class SignInPage extends StatefulWidget {
   @override
@@ -36,8 +37,11 @@ class _SignInPageState extends State<SignInPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          title: Text('Registrarse'),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(40),
+                  child: AppBar(
+            title: Text('Registrarse'),
+          ),
         ),
         body: Container(
           decoration: BoxDecoration(
@@ -58,23 +62,7 @@ class _SignInPageState extends State<SignInPage> {
             key: _formKey,
             child: ScrollColumnExpandable(
               children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(left: 60, right: 60, top: 40),
-                        child: Image.asset(
-                          'assets/images/bufon.png',
-                        ),
-                      ),
-                      Text(
-                        'JokeNet',
-                        style: TextStyle(fontSize: 50, fontFamily: 'Maian'),
-                      )
-                    ],
-                  ),
-                ),
+                MemesHeader(),
                 Expanded(
                   flex: 2,
                   child: Column(
@@ -85,7 +73,7 @@ class _SignInPageState extends State<SignInPage> {
                           children: [
                             Padding(
                               padding:
-                                  const EdgeInsets.only(left: 50, right: 50),
+                                  const EdgeInsets.only(left: 50, right: 50,top:5),
                               child: TextFormField(
                                 controller: _userNameController,
                                 decoration: InputDecoration(
@@ -122,7 +110,7 @@ class _SignInPageState extends State<SignInPage> {
                             ),
                             Padding(
                               padding:
-                                  const EdgeInsets.only(left: 50, right: 50),
+                                  const EdgeInsets.only(left: 50, right: 50,top:5),
                               child: TextFormField(
                                 controller: _emailController,
                                 decoration: InputDecoration(
@@ -155,7 +143,7 @@ class _SignInPageState extends State<SignInPage> {
                             ),
                             Padding(
                               padding:
-                                  const EdgeInsets.only(left: 50, right: 50),
+                                  const EdgeInsets.only(left: 50, right: 50,top:5),
                               child: TextFormField(
                                 controller: _passwordController,
                                 decoration: InputDecoration(
@@ -262,7 +250,10 @@ class _SignInPageState extends State<SignInPage> {
                                       height: 40,
                                       child: Image.asset(
                                           'assets/images/google.png')),
-                                  onTap: () {},
+                                  onTap: () async {
+                                    navigator.pop(context);
+                                    await auth.signInWithGoogle();
+                                  } 
                                 )
                               ],
                             ),

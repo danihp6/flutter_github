@@ -5,6 +5,7 @@ import 'package:meme/Pages/sign_in_page.dart';
 import 'package:meme/Widgets/scroll_column_expandable.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import '../Controller/auth.dart';
+import '../Widgets/memes_header.dart';
 
 class LogInPage extends StatefulWidget {
   @override
@@ -58,28 +59,13 @@ class _LogInPageState extends State<LogInPage> {
                   end: FractionalOffset.bottomCenter)),
           child: ScrollColumnExpandable(
             children: [
-              Expanded(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 60, right: 60, top: 40),
-                      child: Image.asset(
-                        'assets/images/bufon.png',
-                      ),
-                    ),
-                    Text(
-                      'JokeNet',
-                      style: TextStyle(fontSize: 60, fontFamily: 'Maian'),
-                    )
-                  ],
-                ),
-              ),
+              MemesHeader(),
               Expanded(
                 flex: 2,
                 child: Form(
                   key: _formKey,
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Expanded(
                         child: Column(
@@ -87,7 +73,7 @@ class _LogInPageState extends State<LogInPage> {
                           children: [
                             Padding(
                               padding:
-                                  const EdgeInsets.only(left: 50, right: 50),
+                                  const EdgeInsets.only(left: 50, right: 50,top:5),
                               child: TextFormField(
                                 decoration: InputDecoration(
                                     border: OutlineInputBorder(
@@ -100,6 +86,7 @@ class _LogInPageState extends State<LogInPage> {
                                             icon: Icon(Icons.clear),
                                             onPressed: () {
                                               setState(() {
+                                                _email = '';
                                                 _emailError = '';
                                                 _emailController.clear();
                                               });
@@ -120,81 +107,81 @@ class _LogInPageState extends State<LogInPage> {
                                 controller: _emailController,
                               ),
                             ),
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 50, right: 50),
-                                  child: TextFormField(
-                                    controller: _passwordController,
-                                    decoration: InputDecoration(
-                                        border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20)),
-                                        labelText: 'contraseña',
-                                        prefixIcon: Icon(Icons.lock),
-                                        suffixIcon:
-                                            _passwordController.text.length > 0
-                                                ? IconButton(
-                                                    icon: Icon(Icons.clear),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        _password = '';
-                                                        _passwordError = '';
-                                                        _passwordController
-                                                            .clear();
-                                                      });
-                                                    })
-                                                : null,
-                                        errorText: _passwordError != ''
-                                            ? _passwordError
-                                            : null),
-                                    obscureText: true,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _password = value;
-                                      });
-                                    },
-                                    validator: (value) {
-                                      if (value.isEmpty)
-                                        return 'La contraseña no puede estar vacia';
-                                      return null;
-                                    },
-                                  ),
-                                ),
-                                FlatButton(
-                                    onPressed: () async {
-                                      try {
-                                        await auth.resetPassword(_email);
-                                        scaffoldState.currentState.showSnackBar(
-                                          SnackBar(
-                                            duration: Duration(seconds: 2),
-                                            content: Container(
-                                              height: 70,
-                                              child: Column(
-                                                children: <Widget>[
-                                                  Center(child: Text('Revisa tu correo para cambiar de contraseña',style:TextStyle(fontSize: 16))),
-                                                  FlatButton(
-                                                    onPressed: () async => await apps.openEmailApp(context), 
-                                                    child: Text('Abrir gmail',style:TextStyle(fontSize: 18,color:Colors.blue))
-                                                    )
-                                                ],
-                                              ),
-                                            ),
-                                          )
-                                        );
-                                      } catch (e) {
-                                        showError(e);
-                                      }
-                                    } ,
-                                    child: Text(
-                                      'Has olvidado tu contraseña?',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.blue[600]),
-                                    ))
-                              ],
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 50, right: 50,top:5),
+                              child: TextFormField(
+                                controller: _passwordController,
+                                decoration: InputDecoration(
+                                    border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20)),
+                                    labelText: 'contraseña',
+                                    prefixIcon: Icon(Icons.lock),
+                                    suffixIcon:
+                                        _passwordController.text.length > 0
+                                            ? IconButton(
+                                                icon: Icon(Icons.clear),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _password = '';
+                                                    _passwordError = '';
+                                                    _passwordController
+                                                        .clear();
+                                                  });
+                                                })
+                                            : null,
+                                    errorText: _passwordError != ''
+                                        ? _passwordError
+                                        : null),
+                                obscureText: true,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _password = value;
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value.isEmpty)
+                                    return 'La contraseña no puede estar vacia';
+                                  return null;
+                                },
+                              ),
                             ),
+                            FlatButton(
+                                onPressed: _email.isNotEmpty?() async {
+                                  try {
+                                    await auth.resetPassword(_email);
+                                    scaffoldState.currentState.showSnackBar(
+                                      SnackBar(
+                                        duration: Duration(seconds: 2),
+                                        content: Container(
+                                          height: 70,
+                                          child: Column(
+                                            children: <Widget>[
+                                              Center(child: Text('Revisa tu correo para cambiar de contraseña',style:TextStyle(fontSize: 16))),
+                                              FlatButton(
+                                                onPressed: () async => await apps.openEmailApp(context), 
+                                                child: Text('Abrir gmail',style:TextStyle(fontSize: 18,color:Colors.blue))
+                                                )
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    );
+                                  } catch (e) {
+                                    showError(e);
+                                  }
+                                } :(){
+                                  setState(() {
+                                    _emailError = 'El email no puede estar vacio';
+                                  });
+                                },
+                                child: Text(
+                                  'Has olvidado tu contraseña?',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.blue[600]),
+                                )),
                           ],
                         ),
                       ),
@@ -243,7 +230,13 @@ class _LogInPageState extends State<LogInPage> {
                                       height: 40,
                                       child: Image.asset(
                                           'assets/images/google.png')),
-                                  onTap: () async => await auth.signInWithGoogle(),
+                                  onTap: () async {
+                                    try {
+                                      await auth.signInWithGoogle();
+                                    } catch (e) {
+                                      print('problemas de conexion');
+                                    }
+                                  } 
                                 )
                               ],
                             ),
@@ -292,7 +285,10 @@ class _LogInPageState extends State<LogInPage> {
         case 'ERROR_OPERATION_NOT_ALLOWED':
           _email = 'Email no permitido';
           break;
+        default : print('problemas de conexión');
       }
     });
   }
 }
+
+
