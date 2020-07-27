@@ -53,7 +53,7 @@ class Auth {
     user.delete();
   }
 
-  Future<String> signInWithGoogle() async {
+  Future<FirebaseUser> signInWithGoogle() async {
       final GoogleSignInAccount googleSignInAccount =
         await _googleSignIn.signIn();
     final GoogleSignInAuthentication googleSignInAuthentication =
@@ -67,7 +67,7 @@ class Auth {
     final AuthResult result =
         await _firebaseAuth.signInWithCredential(credential);
     FirebaseUser user = result.user;
-    return user.uid;
+    return user;
     
   }
 

@@ -13,14 +13,14 @@ exports.onDeletePost = functions.region('europe-west2').firestore.document('user
 
   deleteCollection(db, commentsRef, batchSize)
 
-  var usersSnapshot = await db.collection('users').orderBy('__name__').limit(batchSize).get()
+  var usersSnapshot = await db.collection('users').orderBy('__name__').get()
 
   usersSnapshot.docs.forEach(async (doc) => {
     doc.ref.update({
       'favourites': admin.firestore.FieldValue.arrayRemove(path)
     })
 
-    var postListsSnapshot = await doc.ref.collection('postLists').orderBy('__name__').limit(batchSize).get()
+    var postListsSnapshot = await doc.ref.collection('postLists').orderBy('__name__').get()
 
     postListsSnapshot.docs.forEach((doc) => {
       doc.ref.update({
@@ -28,7 +28,7 @@ exports.onDeletePost = functions.region('europe-west2').firestore.document('user
       })
     })
 
-    var notificationsSnapshot = await doc.ref.collection('notifications').orderBy('__name__').limit(batchSize).get()
+    var notificationsSnapshot = await doc.ref.collection('notifications').orderBy('__name__').get()
 
     notificationsSnapshot.docs.forEach((doc) => {
       var post = doc.data()['post']
@@ -38,12 +38,16 @@ exports.onDeletePost = functions.region('europe-west2').firestore.document('user
 
   })
 
-  // var mediaPath = snap.data()['mediaLocation']
-  // var bucket = admin.storage().bucket()
-  // bucket.file(mediaPath).delete()
-
-  tagsSnapshot = await db.collection('tags').orderBy('__name__').limit(batchSize).get()
+  var userId = context.params.userId
   var postId = context.params.postId
+
+  var bucket = admin.storage().bucket()
+  bucket.file(`${userId}/media/${postId}`).delete()
+
+  tagsSnapshot = await db.collection('tags').orderBy('__name__').get()
+
+  postPoints = snap.data()['totalPoints']
+  console.log(postPoints)
 
   tagsSnapshot.docs.forEach(function (doc) {
     var points = doc.data()['points']
@@ -52,19 +56,20 @@ exports.onDeletePost = functions.region('europe-west2').firestore.document('user
     doc.ref.update({
       'posts': admin.firestore.FieldValue.arrayRemove(path),
       'points': points,
-      'totalPoints': totalPoints - snap.data()['totalPoints']
+      'totalPoints': totalPoints - postPoints
     })
   })
 
-  var userId = context.params.userId
+  
   var userRef = db.doc(`users/${userId}`)
-  var points = (await userRef.get()).data()['points']
-  var totalPoints = doc.data()['totalPoints']
+  var userData = (await userRef.get()).data()
+  var points = userData['points']
+  var totalPoints = userData['totalPoints']
   delete points[postId]
 
   userRef.update({
     'points': points,
-    'totalPoints': totalPoints - snap.data()['totalPoints']
+    'totalPoints': totalPoints - postPoints
   })
 
 })
@@ -242,12 +247,11 @@ exports.onCreateReport = functions.region('europe-west2').firestore.document('us
 
 exports.onChangePostPoints = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onUpdate(async (change, context) => {
 
-  var newTotalPoints = change.after.data()['totalPoints']
-  var oldTotalPoints = change.before.data()['totalPoints'] ?? 0
+  var newTotalPoints = change.after.data()['totalPoints'] || 0
+  var oldTotalPoints = change.before.data()['totalPoints'] || 0
   
   if (newTotalPoints != oldTotalPoints) {
     var postId = context.params.postId
-    var postRef = change.after.ref
     var userId = context.params.userId
     var userRef = db.doc(`users/${userId}`)
 

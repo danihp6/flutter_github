@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/app_availability.dart';
+import 'package:meme/Controller/db.dart';
 import 'package:meme/Controller/navigator.dart';
+import 'package:meme/Controller/push_notification_provider.dart';
+import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/sign_in_page.dart';
 import 'package:meme/Widgets/scroll_column_expandable.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
@@ -72,8 +75,8 @@ class _LogInPageState extends State<LogInPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 50, right: 50,top:5),
+                              padding: const EdgeInsets.only(
+                                  left: 50, right: 50, top: 5),
                               child: TextFormField(
                                 decoration: InputDecoration(
                                     border: OutlineInputBorder(
@@ -109,7 +112,7 @@ class _LogInPageState extends State<LogInPage> {
                             ),
                             Padding(
                               padding: const EdgeInsets.only(
-                                  left: 50, right: 50,top:5),
+                                  left: 50, right: 50, top: 5),
                               child: TextFormField(
                                 controller: _passwordController,
                                 decoration: InputDecoration(
@@ -126,8 +129,7 @@ class _LogInPageState extends State<LogInPage> {
                                                   setState(() {
                                                     _password = '';
                                                     _passwordError = '';
-                                                    _passwordController
-                                                        .clear();
+                                                    _passwordController.clear();
                                                   });
                                                 })
                                             : null,
@@ -148,39 +150,50 @@ class _LogInPageState extends State<LogInPage> {
                               ),
                             ),
                             FlatButton(
-                                onPressed: _email.isNotEmpty?() async {
-                                  try {
-                                    await auth.resetPassword(_email);
-                                    scaffoldState.currentState.showSnackBar(
-                                      SnackBar(
-                                        duration: Duration(seconds: 2),
-                                        content: Container(
-                                          height: 70,
-                                          child: Column(
-                                            children: <Widget>[
-                                              Center(child: Text('Revisa tu correo para cambiar de contraseña',style:TextStyle(fontSize: 16))),
-                                              FlatButton(
-                                                onPressed: () async => await apps.openEmailApp(context), 
-                                                child: Text('Abrir gmail',style:TextStyle(fontSize: 18,color:Colors.blue))
-                                                )
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                    );
-                                  } catch (e) {
-                                    showError(e);
-                                  }
-                                } :(){
-                                  setState(() {
-                                    _emailError = 'El email no puede estar vacio';
-                                  });
-                                },
+                                onPressed: _email.isNotEmpty
+                                    ? () async {
+                                        try {
+                                          await auth.resetPassword(_email);
+                                          scaffoldState.currentState
+                                              .showSnackBar(SnackBar(
+                                            duration: Duration(seconds: 2),
+                                            content: Container(
+                                              height: 70,
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Center(
+                                                      child: Text(
+                                                          'Revisa tu correo para cambiar de contraseña',
+                                                          style: TextStyle(
+                                                              fontSize: 16))),
+                                                  FlatButton(
+                                                      onPressed: () async =>
+                                                          await apps
+                                                              .openEmailApp(
+                                                                  context),
+                                                      child: Text('Abrir gmail',
+                                                          style: TextStyle(
+                                                              fontSize: 18,
+                                                              color:
+                                                                  Colors.blue)))
+                                                ],
+                                              ),
+                                            ),
+                                          ));
+                                        } catch (e) {
+                                          showError(e);
+                                        }
+                                      }
+                                    : () {
+                                        setState(() {
+                                          _emailError =
+                                              'El email no puede estar vacio';
+                                        });
+                                      },
                                 child: Text(
                                   'Has olvidado tu contraseña?',
                                   style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.blue[600]),
+                                      fontSize: 16, color: Colors.blue[600]),
                                 )),
                           ],
                         ),
@@ -190,21 +203,23 @@ class _LogInPageState extends State<LogInPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             RaisedButton(
-                              onPressed: !_isLogIn?() async {
-                                if (_formKey.currentState.validate()) {
-                                  _isLogIn = true;
-                                  setState(() {
-                                    _emailError = '';
-                                    _passwordError = '';
-                                  });
-                                  try {
-                                    await auth.signIn(_email, _password);
-                                  } catch (error) {
-                                    showError(error);
-                                  }
-                                  _isLogIn = false;
-                                }
-                              }:null,
+                              onPressed: !_isLogIn
+                                  ? () async {
+                                      if (_formKey.currentState.validate()) {
+                                        _isLogIn = true;
+                                        setState(() {
+                                          _emailError = '';
+                                          _passwordError = '';
+                                        });
+                                        try {
+                                          await auth.signIn(_email, _password);
+                                        } catch (error) {
+                                          showError(error);
+                                        }
+                                        _isLogIn = false;
+                                      }
+                                    }
+                                  : null,
                               color: Colors.deepOrange,
                               textColor: Colors.white,
                               child: Padding(
@@ -226,18 +241,38 @@ class _LogInPageState extends State<LogInPage> {
                                   width: 10,
                                 ),
                                 GestureDetector(
-                                  child: SizedBox(
-                                      height: 40,
-                                      child: Image.asset(
-                                          'assets/images/google.png')),
-                                  onTap: () async {
-                                    try {
-                                      await auth.signInWithGoogle();
-                                    } catch (e) {
-                                      print('problemas de conexion');
-                                    }
-                                  } 
-                                )
+                                    child: SizedBox(
+                                        height: 40,
+                                        child: Image.asset(
+                                            'assets/images/google.png')),
+                                    onTap: () async {
+                                      try {
+                                        final user =
+                                            await auth.signInWithGoogle();
+                                        if (await db
+                                                .getUserByEmail(user.email) ==
+                                            null) {
+                                          String token =
+                                              await pushProvider.getToken();
+                                          await db.newUser(
+                                            User(
+                                                user.email.substring(
+                                                    0,
+                                                    user.email.indexOf('@')),
+                                                '',
+                                                <String>[],
+                                                <String>[],
+                                                <String>[],
+                                                '',
+                                                DateTime.now(),
+                                                user.email,
+                                                [token]),
+                                          );
+                                        }
+                                      } catch (e) {
+                                        print('problemas de conexion');
+                                      }
+                                    })
                               ],
                             ),
                             FlatButton(
@@ -285,10 +320,9 @@ class _LogInPageState extends State<LogInPage> {
         case 'ERROR_OPERATION_NOT_ALLOWED':
           _email = 'Email no permitido';
           break;
-        default : print('problemas de conexión');
+        default:
+          print('problemas de conexión');
       }
     });
   }
 }
-
-

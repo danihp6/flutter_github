@@ -39,7 +39,7 @@ class _TabsPageState extends State<TabsPage>
           physics: NeverScrollableScrollPhysics(),
           controller: tabController,
           children: [
-            HomePage(userId: db.userId,scaffoldState:widget.scaffoldState),
+            HomePage(scaffoldState:widget.scaffoldState),
             SearchPage(),
             NotificationsPage(
               userId: db.userId,

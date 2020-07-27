@@ -7,9 +7,9 @@ import 'package:meme/Widgets/post.dart';
 const int NEXT_POSTS_HOME_PAGE = 10;
 
 class HomePage extends StatefulWidget {
-  String userId;
+
   GlobalKey<ScaffoldState> scaffoldState;
-  HomePage({@required this.userId, @required this.scaffoldState});
+  HomePage({@required this.scaffoldState});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -52,6 +52,7 @@ class HomeStream extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(db.userId);
     return StreamBuilder(
         stream: db.getUser(db.userId),
         builder: (context, snapshot) {

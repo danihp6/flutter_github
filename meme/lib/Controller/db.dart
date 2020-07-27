@@ -34,10 +34,12 @@ class DataBase {
         .collection('users')
         .where('email', isEqualTo: email)
         .getDocuments();
+    if (query.documents.isEmpty) return null;
     return query.documents.first.documentID;
   }
 
-  Future editUser(String userId, String name, String description, String avatar, ImageMedia imageMedia) async {
+  Future editUser(String userId, String name, String description, String avatar,
+      ImageMedia imageMedia) async {
     if (imageMedia != null) {
       if (avatar != '') mediaStorage.deleteAvatar(userId);
       avatar = await mediaStorage.uploadAvatar(imageMedia, userId);
@@ -231,7 +233,10 @@ class DataBase {
     int totalPoints = data['totalPoints'];
     int oldPoints = points[userId] ?? 0;
     points[userId] = pointsUser;
-    ref.updateData({'points': points,'totalPoints': totalPoints - oldPoints + pointsUser});
+    ref.updateData({
+      'points': points,
+      'totalPoints': totalPoints - oldPoints + pointsUser
+    });
   }
 
   Stream<List<Post>> getFollowedPosts(List<String> followed) {
@@ -269,10 +274,9 @@ class DataBase {
 
     if (imageMedia != null) {
       String id = ref.documentID;
-      String postListImageUrl = await mediaStorage.uploadMedia(imageMedia, userId,id);
-      ref.updateData({
-        'image': postListImageUrl
-      });
+      String postListImageUrl =
+          await mediaStorage.uploadMedia(imageMedia, userId, id);
+      ref.updateData({'image': postListImageUrl});
     }
   }
 
