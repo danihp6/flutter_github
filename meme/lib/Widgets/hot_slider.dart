@@ -79,7 +79,7 @@ class _HotSliderState extends State<HotSlider> {
           color: Theme.of(context).sliderTheme.thumbColor,
           shape: BoxShape.circle
         ),
-          child: Icon(Icons.whatshot, color: _color, size: 30), opacity: 0.8),
+          child: Icon(Icons.whatshot, color: _color, size: 30)),
       trackBar:
           FlutterSliderTrackBar(activeTrackBar: BoxDecoration(color: _color),inactiveTrackBar: BoxDecoration(color: Theme.of(context).sliderTheme.thumbColor)),
       step: FlutterSliderStep(

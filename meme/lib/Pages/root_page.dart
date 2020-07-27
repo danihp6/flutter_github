@@ -34,8 +34,7 @@ class _RootPageState extends State<RootPage> {
             future: db.getUserByEmail(firebaseUser.email),
             builder: (context, snapshot) {
               if (snapshot.hasError) print(snapshot.error);
-              if (!snapshot.hasData)
-                return SplashScreen();
+              if (!snapshot.hasData) return SplashScreen();
               db.userId = snapshot.data;
               return MainPage();
             });
@@ -52,11 +51,13 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(child: AppBar(
-        title: Text('Cargando...'),
-      ), preferredSize: Size.fromHeight(40)),
+      appBar: PreferredSize(
+          child: AppBar(
+            title: Text('Cargando...'),
+          ),
+          preferredSize: Size.fromHeight(40)),
       body: SafeArea(
-                          child: Container(
+        child: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
                   colors: [
@@ -72,10 +73,7 @@ class SplashScreen extends StatelessWidget {
                   begin: FractionalOffset.topCenter,
                   end: FractionalOffset.bottomCenter)),
           child: Column(
-            children: <Widget>[
-              MemesHeader(),
-              Expanded(child: Loading())
-            ],
+            children: <Widget>[MemesHeader(), Expanded(child: Loading())],
           ),
         ),
       ),

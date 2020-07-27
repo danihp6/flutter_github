@@ -54,7 +54,7 @@ exports.onDeletePost = functions.region('europe-west2').firestore.document('user
     var totalPoints = doc.data()['totalPoints']
     delete points[postId]
     doc.ref.update({
-      'posts': admin.firestore.FieldValue.arrayRemove(path),
+      'posts': admin.firestore.FieldValue.arrayRemove(postId),
       'points': points,
       'totalPoints': totalPoints - postPoints
     })

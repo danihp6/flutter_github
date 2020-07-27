@@ -490,8 +490,7 @@ class _TendTagsStreamState extends State<TendTagsStream> {
               itemCount: tags.length,
               itemBuilder: (context, index) {
                 Tag tag = tags[index];
-                List<String> postPaths = tag.posts;
-                if (postPaths.isEmpty) return Loading();
+                if (tag.posts.isEmpty) return Loading();
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -509,7 +508,7 @@ class _TendTagsStreamState extends State<TendTagsStream> {
                       SizedBox(
                         height: 5,
                       ),
-                      StreamPosts(postPaths: postPaths)
+                      StreamPosts(tagId:tag.id)
                     ],
                   ),
                 );
@@ -521,10 +520,10 @@ class _TendTagsStreamState extends State<TendTagsStream> {
 class StreamPosts extends StatefulWidget {
   const StreamPosts({
     Key key,
-    @required this.postPaths,
+    @required this.tagId,
   }) : super(key: key);
 
-  final List<String> postPaths;
+  final String tagId;
 
   @override
   _StreamPostsState createState() => _StreamPostsState();
@@ -535,9 +534,10 @@ class _StreamPostsState extends State<StreamPosts>
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: CombineLatestStream.list(
-                widget.postPaths.map((postPath) => db.getPostByPath(postPath)))
-            .asBroadcastStream(),
+        // stream: CombineLatestStream.list(
+        //         widget.postPaths.map((postPath) => db.getPostByPath(postPath)))
+        //     .asBroadcastStream(),
+        stream: db.getGroupPost(widget.tagId),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return Loading();

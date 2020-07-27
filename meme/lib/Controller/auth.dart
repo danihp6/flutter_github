@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:meme/Controller/push_notification_provider.dart';
 import 'package:meme/Models/User.dart';
 import 'db.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -54,7 +55,7 @@ class Auth {
   }
 
   Future<FirebaseUser> signInWithGoogle() async {
-      final GoogleSignInAccount googleSignInAccount =
+    final GoogleSignInAccount googleSignInAccount =
         await _googleSignIn.signIn();
     final GoogleSignInAuthentication googleSignInAuthentication =
         await googleSignInAccount.authentication;
@@ -63,12 +64,10 @@ class Auth {
       accessToken: googleSignInAuthentication.accessToken,
       idToken: googleSignInAuthentication.idToken,
     );
-
     final AuthResult result =
         await _firebaseAuth.signInWithCredential(credential);
     FirebaseUser user = result.user;
     return user;
-    
   }
 
   Future<void> resetPassword(String email) async {

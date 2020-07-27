@@ -39,7 +39,7 @@ class _SignInPageState extends State<SignInPage> {
       child: Scaffold(
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(40),
-                  child: AppBar(
+          child: AppBar(
             title: Text('Registrarse'),
           ),
         ),
@@ -72,8 +72,8 @@ class _SignInPageState extends State<SignInPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 50, right: 50,top:5),
+                              padding: const EdgeInsets.only(
+                                  left: 50, right: 50, top: 5),
                               child: TextFormField(
                                 controller: _userNameController,
                                 decoration: InputDecoration(
@@ -88,6 +88,7 @@ class _SignInPageState extends State<SignInPage> {
                                                 icon: Icon(Icons.clear),
                                                 onPressed: () {
                                                   setState(() {
+                                                    _userName = '';
                                                     _userNameError = '';
                                                     _userNameController.clear();
                                                   });
@@ -109,8 +110,8 @@ class _SignInPageState extends State<SignInPage> {
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 50, right: 50,top:5),
+                              padding: const EdgeInsets.only(
+                                  left: 50, right: 50, top: 5),
                               child: TextFormField(
                                 controller: _emailController,
                                 decoration: InputDecoration(
@@ -142,8 +143,8 @@ class _SignInPageState extends State<SignInPage> {
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 50, right: 50,top:5),
+                              padding: const EdgeInsets.only(
+                                  left: 50, right: 50, top: 5),
                               child: TextFormField(
                                 controller: _passwordController,
                                 decoration: InputDecoration(
@@ -210,7 +211,8 @@ class _SignInPageState extends State<SignInPage> {
                                                   '',
                                                   DateTime.now(),
                                                   _email,
-                                                  [token]),
+                                                  [token],
+                                                  <String>[]),
                                               _password);
 
                                           navigator.pop(context);
@@ -245,15 +247,14 @@ class _SignInPageState extends State<SignInPage> {
                                   width: 10,
                                 ),
                                 GestureDetector(
-                                  child: SizedBox(
-                                      height: 40,
-                                      child: Image.asset(
-                                          'assets/images/google.png')),
-                                  onTap: () async {
-                                    navigator.pop(context);
-                                    await auth.signInWithGoogle();
-                                  } 
-                                )
+                                    child: SizedBox(
+                                        height: 40,
+                                        child: Image.asset(
+                                            'assets/images/google.png')),
+                                    onTap: () async {
+                                      navigator.pop(context);
+                                      await auth.signInWithGoogle();
+                                    })
                               ],
                             ),
                           ],

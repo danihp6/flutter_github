@@ -45,8 +45,8 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
   @override
   Widget build(BuildContext context) {
     Future uploadPublication() async {
+      print(tags);
       List<String> tagsId = await db.createTags(tags);
-      print('-----------------TAGS');
       print(tagsId);
       Post post = Post(
           '',
@@ -64,8 +64,6 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
       tagsId.forEach((id) {
         db.addPostToTag(id, db.userId, postId);
       });
-      print('-----------------TAGS');
-      print(tagsId);
     }
 
     setTag(String text) {

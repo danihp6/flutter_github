@@ -17,7 +17,7 @@ class User {
   int _totalPoints;
 
   User(userName, avatar, followers, followed,favourites, description,
-      dateTime, email,tokens) {
+      dateTime, email,tokens,blockedUsers) {
     this._userName = userName;
     this._avatar = avatar;
     this._followers = followers;
@@ -27,6 +27,7 @@ class User {
     this._dateTime = dateTime;
     this._email = email;
     this._tokens = tokens;
+    this._blockedUsers = blockedUsers;
   }
 
   User.fromFirestore(DocumentSnapshot doc)
@@ -55,7 +56,7 @@ class User {
         'keyWords': generateKeyWords(_userName),
         'email': _email,
         'tokens':_tokens,
-        'blokedUsers':[],
+        'blokedUsers':_blockedUsers,
         'points': Map(),
         'totalPoints':0
       };
@@ -101,8 +102,6 @@ class User {
   set tokens(tokens) => this._tokens = tokens;
 
   List<String> get blockedUsers => this._blockedUsers;
-
-  set blockedUsers(blockedUsers) => this._blockedUsers = blockedUsers;
 
   get points => this._points;
 

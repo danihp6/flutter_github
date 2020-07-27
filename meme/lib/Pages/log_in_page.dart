@@ -247,29 +247,9 @@ class _LogInPageState extends State<LogInPage> {
                                             'assets/images/google.png')),
                                     onTap: () async {
                                       try {
-                                        final user =
-                                            await auth.signInWithGoogle();
-                                        if (await db
-                                                .getUserByEmail(user.email) ==
-                                            null) {
-                                          String token =
-                                              await pushProvider.getToken();
-                                          await db.newUser(
-                                            User(
-                                                user.email.substring(
-                                                    0,
-                                                    user.email.indexOf('@')),
-                                                '',
-                                                <String>[],
-                                                <String>[],
-                                                <String>[],
-                                                '',
-                                                DateTime.now(),
-                                                user.email,
-                                                [token]),
-                                          );
-                                        }
+                                        await auth.signInWithGoogle();
                                       } catch (e) {
+                                        print(e.toString());
                                         print('problemas de conexion');
                                       }
                                     })

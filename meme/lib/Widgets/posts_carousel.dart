@@ -32,23 +32,23 @@ class _PostsCarouselState extends State<PostsCarousel> {
     _visible = false;
   }
 
-  List<Widget> carousel(List<Post> posts) => posts
-      .map((post) => GestureDetector(
-          child: post.mediaType == MediaType.image
-              ? AspectRatio(
-                aspectRatio: post.aspectRatio,
-                              child: FadeInImage(
-                    fit: BoxFit.cover,
-                    placeholder: MemoryImage(kTransparentImage),
-                    image: CachedNetworkImageProvider(post.media)),
-              )
-              : VideoPlayerWidget(
-                  url: post.media,
-                  isPausable: false,
-                  aspectRatio: post.aspectRatio,
-                ),
-          onTap: () => widget.onTap(context,post)))
-      .toList();
+  // List<Widget> carousel(List<Post> posts) => posts
+  //     .map((post) => GestureDetector(
+  //         child: post.mediaType == MediaType.image
+  //             ? AspectRatio(
+  //                 aspectRatio: post.aspectRatio,
+  //                 child: FadeInImage(
+  //                     fit: BoxFit.cover,
+  //                     placeholder: MemoryImage(kTransparentImage),
+  //                     image: CachedNetworkImageProvider(post.media)),
+  //               )
+  //             : VideoPlayerWidget(
+  //                 url: post.media,
+  //                 isPausable: false,
+  //                 aspectRatio: post.aspectRatio,
+  //               ),
+  //         onTap: () => widget.onTap(context, post)))
+  //     .toList();
 
   @override
   Widget build(BuildContext context) {
@@ -72,19 +72,34 @@ class _PostsCarouselState extends State<PostsCarousel> {
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
-          CarouselSlider(
-            options: CarouselOptions(
-                enlargeCenterPage: false,
-                enableInfiniteScroll: false,
-                initialPage: 0,
-                autoPlay: _visible,
-                autoPlayAnimationDuration: Duration(seconds: 5),
-                autoPlayInterval: Duration(seconds: 8),
-                autoPlayCurve: Curves.decelerate,
-                pauseAutoPlayOnManualNavigate: true,
-                height: widget.height),
-            items: carousel(widget.posts),
-          ),
+          CarouselSlider.builder(
+              options: CarouselOptions(
+                  enlargeCenterPage: false,
+                  enableInfiniteScroll: false,
+                  initialPage: 0,
+                  autoPlay: _visible,
+                  autoPlayAnimationDuration: Duration(seconds: 5),
+                  autoPlayInterval: Duration(seconds: 8),
+                  autoPlayCurve: Curves.decelerate,
+                  pauseAutoPlayOnManualNavigate: true,
+                  height: widget.height),
+              itemCount: widget.posts.length,
+              itemBuilder: (context, index) => GestureDetector(
+                  child: widget.posts[index].mediaType == MediaType.image
+                      ? AspectRatio(
+                          aspectRatio: widget.posts[index].aspectRatio,
+                          child: FadeInImage(
+                              fit: BoxFit.cover,
+                              placeholder: MemoryImage(kTransparentImage),
+                              image: CachedNetworkImageProvider(
+                                  widget.posts[index].media)),
+                        )
+                      : VideoPlayerWidget(
+                          url: widget.posts[index].media,
+                          isPausable: false,
+                          aspectRatio: widget.posts[index].aspectRatio,
+                        ),
+                  onTap: () => widget.onTap(context, widget.posts[index]))),
           if (widget.posts.length > 1)
             AnimatedOpacity(
                 opacity: _visible ? 0 : 1,

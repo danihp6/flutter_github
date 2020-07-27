@@ -11,7 +11,7 @@ class EditProfileButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
-      onPressed: () => navigator.goEditProfile(context),
+      onPressed: () => navigator.goEditProfile(context,user),
       color: Theme.of(context).accentColor,
       textColor: Colors.white,
       child: Text('Editar'),

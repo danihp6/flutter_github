@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meme/Controller/gallery.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/Template.dart';
+import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/account_page.dart';
 import 'package:meme/Pages/comments_page.dart';
 import 'package:meme/Pages/contact_page.dart';
@@ -105,8 +106,8 @@ class MyNavigator {
         onTap: onSelected,
       )));
 
-  goEditProfile(BuildContext context) =>
-      Navigator.push(context, SlideLeftRoute(page: EditProfilePage()));
+  goEditProfile(BuildContext context,User user) =>
+      Navigator.push(context, SlideLeftRoute(page: EditProfilePage(user: user,)));
 
   goComments(BuildContext context, String postId, String authorId,
           String description) =>

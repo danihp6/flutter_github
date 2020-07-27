@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage>
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(40),
         child: AppBar(
-          title: Text('Meme'),
+          title: Text('Memes'),
           actions: [
             IconButton(
                 icon: Icon(
@@ -52,13 +52,14 @@ class HomeStream extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(db.userId);
+    print('-----------------home');
     return StreamBuilder(
         stream: db.getUser(db.userId),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return Loading();
           User user = snapshot.data;
+          print(user);
           List<String> followed = user.followed;
           followed.add(db.userId);
           return StreamBuilder(

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meme/Controller/gallery.dart';
+import 'package:meme/Controller/push_notification_provider.dart';
 import 'package:meme/Models/Comment.dart';
 import 'package:meme/Models/Post.dart';
 import 'package:meme/Models/PostList.dart';
@@ -29,12 +30,21 @@ class DataBase {
       .snapshots()
       .map((doc) => User.fromFirestore(doc));
 
+  Future<User> getUserFuture(String userId) async =>
+      User.fromFirestore(await _firestore.document('users/$userId').get());
+
   Future<String> getUserByEmail(String email) async {
     QuerySnapshot query = await _firestore
         .collection('users')
         .where('email', isEqualTo: email)
         .getDocuments();
-    if (query.documents.isEmpty) return null;
+    if (query.documents.isEmpty) {
+      String token = await pushProvider.getToken();
+      return await db.newUser(
+        User(email.substring(0, email.indexOf('@')), '', <String>[], <String>[],
+            <String>[], '', DateTime.now(), email, [token], <String>[]),
+      );
+    }
     return query.documents.first.documentID;
   }
 
@@ -45,7 +55,7 @@ class DataBase {
       avatar = await mediaStorage.uploadAvatar(imageMedia, userId);
     }
     _firestore.document('users/$userId').updateData({
-      'name': name,
+      'userName': name,
       'description': description,
       'avatar': avatar,
     });
@@ -70,8 +80,8 @@ class DataBase {
     return query.documents.map((doc) => doc.documentID).toList();
   }
 
-  Future newUser(User user) =>
-      _firestore.collection('users').add(user.toFirestore());
+  Future<String> newUser(User user) async =>
+      (await _firestore.collection('users').add(user.toFirestore())).documentID;
 
   Future<bool> userNameExists(String userName) async {
     QuerySnapshot query = await _firestore
@@ -135,6 +145,12 @@ class DataBase {
       .document(postPath)
       .snapshots()
       .map((doc) => Post.fromFirestore(doc));
+
+    Stream<List<Post>> getGroupPost(String tagId) => _firestore
+      .collectionGroup('posts')
+      .where('tags',arrayContains: tagId)
+      .snapshots()
+      .map(toPosts);
 
   Stream<List<Post>> getPosts(String userId) => _firestore
       .collection('users/$userId/posts')
@@ -435,20 +451,18 @@ class DataBase {
   }
 
   Future<List<String>> createTags(List<Tag> tags) async {
-    List<String> tagsId = <String>[];
-    tags.forEach((tag) async {
+    return Future.wait(tags.map((tag) async {
       String id = await getTagId(tag.name);
       if (id != '')
-        tagsId.add(id);
+        return id;
       else
-        tagsId.add(await addTag(tag));
-    });
-    return tagsId;
+        return await addTag(tag);
+    }));
   }
 
   Future addPostToTag(String tagId, String postAuthorId, String postId) {
     _firestore.document('tags/$tagId').updateData({
-      'posts': FieldValue.arrayUnion(['users/$postAuthorId/posts/$postId'])
+      'posts': FieldValue.arrayUnion([postId])
     });
   }
 
