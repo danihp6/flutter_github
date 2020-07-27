@@ -37,19 +37,15 @@ class DataBase {
     return query.documents.first.documentID;
   }
 
-  Future editUser(String userId, String name, String description, String avatar,
-      String avatarLocation, ImageMedia imageMedia) async {
+  Future editUser(String userId, String name, String description, String avatar, ImageMedia imageMedia) async {
     if (imageMedia != null) {
-      if (avatar != '') mediaStorage.deleteFile(avatarLocation);
-      Map map = await mediaStorage.uploadAvatar(imageMedia, userId);
-      avatar = map['media'];
-      avatarLocation = map['location'];
+      if (avatar != '') mediaStorage.deleteAvatar(userId);
+      avatar = await mediaStorage.uploadAvatar(imageMedia, userId);
     }
     _firestore.document('users/$userId').updateData({
       'name': name,
       'description': description,
       'avatar': avatar,
-      'avatarLocation': avatarLocation
     });
   }
 
@@ -67,7 +63,7 @@ class DataBase {
     var query = await _firestore
         .collection('users')
         .where('keyWords', arrayContains: search)
-        .orderBy('followers',descending: true)
+        .orderBy('followers', descending: true)
         .getDocuments();
     return query.documents.map((doc) => doc.documentID).toList();
   }
@@ -185,13 +181,13 @@ class DataBase {
   }
 
   Future<String> newPost(String userId, Post post, MyMedia media) async {
-    Map map = await mediaStorage.uploadMedia(media, userId);
-    post.media = map['media'];
-    post.mediaLocation = map['location'];
-    String id = (await _firestore
-            .collection('users/$userId/posts')
-            .add(post.toFirestore()))
-        .documentID;
+    DocumentReference ref = await _firestore
+        .collection('users/$userId/posts')
+        .add(post.toFirestore());
+    String id = ref.documentID;
+
+    String mediaUrl = await mediaStorage.uploadMedia(media, userId, id);
+    ref.updateData({'media': mediaUrl});
     return id;
   }
 
@@ -265,14 +261,17 @@ class DataBase {
 
   Future newPostList(
       String userId, PostList postList, ImageMedia imageMedia) async {
-    if (imageMedia != null) {
-      Map map = await mediaStorage.uploadMedia(imageMedia, userId);
-      postList.image = map['media'];
-      postList.imageLocation = map['location'];
-    }
-    _firestore
+    DocumentReference ref = await _firestore
         .collection('users/$userId/postLists')
         .add(postList.toFirestore());
+
+    if (imageMedia != null) {
+      String id = ref.documentID;
+      String postListImageUrl = await mediaStorage.uploadMedia(imageMedia, userId,id);
+      ref.updateData({
+        'image': postListImageUrl
+      });
+    }
   }
 
   Future copyPostList(String userId, PostList postList) => _firestore

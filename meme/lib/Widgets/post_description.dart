@@ -117,7 +117,7 @@ class _PostDescriptionState extends State<PostDescription> {
                       _isHotSliderActived = !_isHotSliderActived;
                     });
                   }),
-              Text(widget.post.getTotalPoints().toString(),
+              Text(widget.post.totalPoints.toString(),
                   style: Theme.of(context).textTheme.bodyText1),
               IconButton(
                 icon: Icon(Icons.comment),

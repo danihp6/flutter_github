@@ -40,7 +40,7 @@ class PostListMoreButton extends StatelessWidget {
                         ),
                         onPressed: () {
                           if (postList.imageLocation != '')
-                            mediaStorage.deleteFile(postList.imageLocation);
+                            mediaStorage.deletePostListImage(db.userId, postList.id);
                           db.deletePostList(db.userId, postList.id);
                           navigator.pop(context);
                         },

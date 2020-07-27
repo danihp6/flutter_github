@@ -20,7 +20,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String _userName;
   String _description;
   String _avatar;
-  String _avatarLocation;
   ImageMedia _media;
   TextEditingController _nameController, _descriptionController;
 
@@ -35,7 +34,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   Widget build(BuildContext context) {
     editUser() {
       db.editUser(
-          db.userId, _userName, _description, _avatar, _avatarLocation, _media);
+          db.userId, _userName, _description, _avatar, _media);
       navigator.pop(context);
     }
 
@@ -72,7 +71,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
             _descriptionController =
                 new TextEditingController(text: _description);
             _avatar = user.avatar;
-            _avatarLocation = user.avatarLocation;
 
             return Padding(
               padding: const EdgeInsets.all(8.0),

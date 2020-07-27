@@ -11,24 +11,24 @@ class Post {
   String _description;
   List<String> _favourites;
   DateTime _dateTime;
-  String _mediaLocation;
   String _author;
   List<String> _tags;
   Map<String, dynamic> _points;
+  int _totalPoints;
   double _aspectRatio;
   String _template;
 
-  Post(media, description, mediaType, favourites, mediaLocation,
+  Post(media, description, mediaType, favourites,
       authorId, tags, points, aspectRatio, template) {
     this._media = media;
     this._mediaType = mediaType;
     this._description = description;
     this._favourites = favourites;
     this._dateTime = DateTime.now();
-    this._mediaLocation = mediaLocation;
     this._author = authorId;
     this._tags = tags;
     this._points = points;
+    this._totalPoints = 0;
     this._aspectRatio = aspectRatio;
     this._template = template;
   }
@@ -40,10 +40,10 @@ class Post {
         _description = doc.data['description'],
         _favourites = List<String>.from(doc.data['favourites']),
         _dateTime = (doc.data['dateTime'] as Timestamp).toDate(),
-        _mediaLocation = doc.data['mediaLocation'],
         _author = doc.reference.parent().parent().documentID,
         _tags = List<String>.from(doc.data['tags']),
         _points = doc.data['points'],
+        _totalPoints = doc.data['totalPoints'],
         _aspectRatio = doc.data['aspectRatio'].toDouble(),
         _template = doc.data['template'];
 
@@ -53,9 +53,9 @@ class Post {
         'description': _description,
         'favourites': _favourites,
         'dateTime': _dateTime,
-        'mediaLocation': _mediaLocation,
         'tags': _tags,
         'points': _points,
+        'totalPoints':_totalPoints,
         'aspectRatio': _aspectRatio,
         'author': _author,
         'template': _template
@@ -85,10 +85,6 @@ class Post {
 
   set dateTime(dateTime) => this._dateTime = dateTime;
 
-  get mediaLocation => this._mediaLocation;
-
-  set mediaLocation(mediaLocation) => this._mediaLocation = mediaLocation;
-
   get author => this._author;
 
   set author(author) => this._author = author;
@@ -99,7 +95,7 @@ class Post {
 
   get points => this._points;
 
-  set points(points) => this._points = points;
+  get totalPoints => this._totalPoints;
 
   get aspectRatio => this._aspectRatio;
 
@@ -107,13 +103,7 @@ class Post {
 
   get template => this._template;
 
-  int getTotalPoints() {
-    int res = 0;
-    _points.forEach((id, points) {
-      res += points;
-    });
-    return res;
-  }
+
 }
 
 List<Post> toPosts(QuerySnapshot query) {

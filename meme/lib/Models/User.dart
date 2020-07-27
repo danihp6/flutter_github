@@ -5,7 +5,6 @@ class User {
   String _id;
   String _userName;
   String _avatar;
-  String _avatarLocation;
   List<String> _followers;
   List<String> _followed;
   String _description;
@@ -17,11 +16,10 @@ class User {
   Map<String, dynamic> _points;
   int _totalPoints;
 
-  User(userName, avatar, avatarLocation, followers, followed,favourites, description,
+  User(userName, avatar, followers, followed,favourites, description,
       dateTime, email,tokens) {
     this._userName = userName;
     this._avatar = avatar;
-    this._avatarLocation = avatarLocation;
     this._followers = followers;
     this._followed = followed;
     this._favourites = favourites;
@@ -35,7 +33,6 @@ class User {
       : _id = doc.documentID,
         _userName = doc.data['userName'],
         _avatar = doc.data['avatar'],
-        _avatarLocation = doc.data['avatarLocation'],
         _followers = List<String>.from(doc.data['followers']),
         _followed = List<String>.from(doc.data['followed']),
         _description = doc.data['description'],
@@ -50,7 +47,6 @@ class User {
   Map<String, dynamic> toFirestore() => {
         'userName': _userName,
         'avatar': _avatar,
-        'avatarLocation': _avatarLocation,
         'followers': _followers,
         'followed': _followed,
         'description': _description,
@@ -75,10 +71,6 @@ class User {
   get avatar => this._avatar;
 
   set avatar(avatar) => this._avatar = avatar;
-
-  get avatarLocation => this._avatarLocation;
-
-  set avatarLocation(avatarLocation) => this._avatarLocation = avatarLocation;
 
   get followers => this._followers;
 

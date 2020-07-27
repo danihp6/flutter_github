@@ -204,7 +204,6 @@ class _SignInPageState extends State<SignInPage> {
                                               new User(
                                                   _userName,
                                                   '',
-                                                  '',
                                                   <String>[],
                                                   <String>[],
                                                   <String>[],

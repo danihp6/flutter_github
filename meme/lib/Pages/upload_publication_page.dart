@@ -46,23 +46,26 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
   Widget build(BuildContext context) {
     Future uploadPublication() async {
       List<String> tagsId = await db.createTags(tags);
-      String postId = await db.newPost(
+      print('-----------------TAGS');
+      print(tagsId);
+      Post post = Post(
+          '',
+          _description,
+          _media is ImageMedia ? MediaType.image : MediaType.video,
+          <String>[],
           db.userId,
-          new Post(
-              '',
-              _description,
-              _media is ImageMedia ? MediaType.image : MediaType.video,
-              <String>[],
-              '',
-              db.userId,
-              tagsId,
-              Map<String, dynamic>(),
-              _media.aspectRatio,
-              widget.template != null ? widget.template.id : null),
-          _media);
+          tagsId,
+          Map<String, dynamic>(),
+          _media.aspectRatio,
+          widget.template != null ? widget.template.id : null);
+
+      String postId = await db.newPost(db.userId, post, _media);
+
       tagsId.forEach((id) {
         db.addPostToTag(id, db.userId, postId);
       });
+      print('-----------------TAGS');
+      print(tagsId);
     }
 
     setTag(String text) {
@@ -96,7 +99,6 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
         body: _media != null
             ? ScrollColumnExpandable(
                 children: <Widget>[
-                  
                   _media is ImageMedia
                       ? AspectRatio(
                           aspectRatio: _media.aspectRatio,
@@ -139,7 +141,7 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
                               onClearTag: removeKeyWord,
                               tag: tag,
                               setTag: setTag,
-                              focusNode:focusNode),
+                              focusNode: focusNode),
                           Expanded(
                             child: Padding(
                               padding: const EdgeInsets.only(top: 8.0),
@@ -163,7 +165,8 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
                                       onPressed: () async {
                                         focusNode.unfocus();
                                         if (tag.isNotEmpty)
-                                          await showModalTag(context, addKeyWord);
+                                          await showModalTag(
+                                              context, addKeyWord);
                                         uploadPublication();
                                         navigator.pop(context);
                                         navigator.pop(context);
@@ -185,54 +188,40 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
 
   Future showModalTag(BuildContext context, void addKeyWord()) {
     return showModalBottomSheet(
-                                            context: context,
-                                            builder: (context) {
-                                              return Container(
-                                                height: 100,
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  children: <Widget>[
-                                                    Text('Añadir el tag:',
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white,
-                                                            fontSize: 16)),
-                                                    Text(
-                                                      '#$tag',
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 16),
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceEvenly,
-                                                      children: <Widget>[
-                                                        IconButton(
-                                                          iconSize: 30,
-                                                          color: Colors.red,
-                                                            icon: Icon(
-                                                                Icons.clear),
-                                                            onPressed: () =>
-                                                                Navigator.pop(
-                                                                    context)),
-                                                        IconButton(
-                                                          iconSize: 30,
-                                                          color: Theme.of(context).accentColor,
-                                                            icon: Icon(
-                                                                Icons.done),
-                                                            onPressed: () {
-                                                              addKeyWord();
-                                                              Navigator.pop(
-                                                                  context);
-                                                            })
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              );
-                                            });
+        context: context,
+        builder: (context) {
+          return Container(
+            height: 100,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text('Añadir el tag:',
+                    style: TextStyle(color: Colors.white, fontSize: 16)),
+                Text(
+                  '#$tag',
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    IconButton(
+                        iconSize: 30,
+                        color: Colors.red,
+                        icon: Icon(Icons.clear),
+                        onPressed: () => Navigator.pop(context)),
+                    IconButton(
+                        iconSize: 30,
+                        color: Theme.of(context).accentColor,
+                        icon: Icon(Icons.done),
+                        onPressed: () {
+                          addKeyWord();
+                          Navigator.pop(context);
+                        })
+                  ],
+                )
+              ],
+            ),
+          );
+        });
   }
 }

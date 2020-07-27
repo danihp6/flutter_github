@@ -58,9 +58,9 @@ class _MyUserPageState extends State<MyUserPage>
                   title: Text(user.userName),
                 ),
               ),
-              endDrawer: MyDrawer(),
+              endDrawer: SafeArea(child: MyDrawer()),
               body: SafeArea(
-                              child: NestedScrollView(
+                child: NestedScrollView(
                   headerSliverBuilder: (context, _) => [
                     SliverToBoxAdapter(
                         child: UserPageHeader(
@@ -93,8 +93,7 @@ class _MyUserPageState extends State<MyUserPage>
                           ),
                         ],
                         labelColor: Colors.deepOrange,
-                        unselectedLabelColor:
-                            Theme.of(context).iconTheme.color,
+                        unselectedLabelColor: Theme.of(context).iconTheme.color,
                       ),
                       Expanded(
                         child: TabBarView(
@@ -110,7 +109,10 @@ class _MyUserPageState extends State<MyUserPage>
                                       favourites: favourites,
                                       scaffoldState: _scaffoldState)
                                   : Center(
-                                      child: Text('Usuario sin favoritos',style:Theme.of(context).textTheme.bodyText1)),
+                                      child: Text('Usuario sin favoritos',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyText1)),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Column(
