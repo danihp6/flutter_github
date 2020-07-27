@@ -242,34 +242,20 @@ exports.onCreateReport = functions.region('europe-west2').firestore.document('us
 
 exports.onChangePostPoints = functions.region('europe-west2').firestore.document('users/{userId}/posts/{postId}').onUpdate(async (change, context) => {
 
-  var newPoints = change.after.data()['points']
-  var oldPoints = change.before.data()['points']
+  var newTotalPoints = change.after.data()['totalPoints']
+  var oldTotalPoints = change.before.data()['totalPoints'] ?? 0
   
-  const userKey = differentPoints(oldPoints, newPoints)
-  if (userKey != null) {
+  if (newTotalPoints != oldTotalPoints) {
     var postId = context.params.postId
     var postRef = change.after.ref
     var userId = context.params.userId
     var userRef = db.doc(`users/${userId}`)
 
-    var oldUserPoints = oldPoints[userKey] || 0;
-    var newUserPoints = newPoints[userKey];
-    console.log(oldUserPoints)
-  console.log(newUserPoints)
-
-    var postOldTotalPoints = change.before.data()['totalPoints']
-    var postNewTotalPoints = postOldTotalPoints - oldUserPoints + newUserPoints
-    console.log(postOldTotalPoints)
-  console.log(postNewTotalPoints)
-    // postRef.update({
-    //   'totalPoints': postNewTotalPoints
-    // })
-
     var userData = (await userRef.get()).data()
     var userPoints = userData['points']
-    userPoints[postId] = postNewTotalPoints
+    userPoints[postId] = newTotalPoints
     var userOldTotalPoints = userData['totalPoints']
-    var userNewTotalPoints = userOldTotalPoints - postOldTotalPoints + postNewTotalPoints
+    var userNewTotalPoints = userOldTotalPoints - oldTotalPoints + newTotalPoints
 
     userRef.update({
       'points': userPoints,
@@ -281,9 +267,9 @@ exports.onChangePostPoints = functions.region('europe-west2').firestore.document
       var tagRef = db.doc(`tags/${tag}`)
       var tagData = (await tagRef.get()).data()
       var tagPoints = tagData['points']
-      tagPoints[postId] = postNewTotalPoints
+      tagPoints[postId] = newTotalPoints
       var tagOldTotalPoints = userData['totalPoints']
-      var tagNewTotalPoints = tagOldTotalPoints - postOldTotalPoints + postNewTotalPoints
+      var tagNewTotalPoints = tagOldTotalPoints - oldTotalPoints + newTotalPoints
 
       tagRef.update({
         'points': tagPoints,
@@ -293,15 +279,3 @@ exports.onChangePostPoints = functions.region('europe-west2').firestore.document
     });
   }
 })
-
-function differentPoints(oldPoints, newPoints) {
-  for (const key in newPoints) {
-    if (!oldPoints.hasOwnProperty(key)) return key
-    else {
-      const oldElement = oldPoints[key]
-      const newElement = newPoints[key]
-      if (oldElement != newElement) return key
-    }
-  }
-  return null
-}

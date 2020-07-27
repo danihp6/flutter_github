@@ -226,10 +226,12 @@ class DataBase {
       String authorId, String postId, String userId, int pointsUser) async {
     DocumentReference ref =
         _firestore.document('users/$authorId/posts/$postId');
-    DocumentSnapshot snapshot = await ref.get();
-    Map<String, dynamic> points = snapshot.data['points'];
+    final data = (await ref.get()).data;
+    Map<String, dynamic> points = data['points'];
+    int totalPoints = data['totalPoints'];
+    int oldPoints = points[userId] ?? 0;
     points[userId] = pointsUser;
-    ref.updateData({'points': points});
+    ref.updateData({'points': points,'totalPoints': totalPoints - oldPoints + pointsUser});
   }
 
   Stream<List<Post>> getFollowedPosts(List<String> followed) {
