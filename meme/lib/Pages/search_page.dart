@@ -537,7 +537,7 @@ class _StreamPostsState extends State<StreamPosts>
         // stream: CombineLatestStream.list(
         //         widget.postPaths.map((postPath) => db.getPostByPath(postPath)))
         //     .asBroadcastStream(),
-        stream: db.getGroupPost(widget.tagId),
+        stream: db.getTagGroupPost(widget.tagId),
         builder: (context, snapshot) {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return Loading();

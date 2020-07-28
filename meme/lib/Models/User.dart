@@ -56,7 +56,7 @@ class User {
         'keyWords': generateKeyWords(_userName),
         'email': _email,
         'tokens':_tokens,
-        'blokedUsers':_blockedUsers,
+        'blockedUsers':_blockedUsers,
         'points': Map(),
         'totalPoints':0
       };

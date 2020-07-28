@@ -131,7 +131,7 @@ class _UserPageState extends State<UserPage>
                                         scaffoldState: scaffoldState, userId: user.id,),
                                     favourites.isNotEmpty
                                         ? FavouritesStream(
-                                            favourites: favourites,
+                                            userId: user.id,
                                             scaffoldState: scaffoldState)
                                         : Center(
                                             child: Text('Usuario sin favoritos',style:Theme.of(context).textTheme.bodyText1)),
@@ -202,11 +202,11 @@ class _PostListsStreamState extends State<PostListsStream> with AutomaticKeepAli
 class FavouritesStream extends StatefulWidget {
   const FavouritesStream({
     Key key,
-    @required this.favourites,
+    @required this.userId,
     @required this.scaffoldState,
   }) : super(key: key);
 
-  final List<String> favourites;
+  final String userId;
   final GlobalKey<ScaffoldState> scaffoldState;
 
   @override
@@ -217,9 +217,7 @@ class _FavouritesStreamState extends State<FavouritesStream> with AutomaticKeepA
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: CombineLatestStream.list(
-              widget.favourites.map((favourite) => db.getPostByPath(favourite)))
-          .asBroadcastStream(),
+      stream: db.getFavouriteGroupPost(widget.userId),
       builder: (context, snapshot) {
         if (snapshot.hasError) print(snapshot.error);
         if (!snapshot.hasData) return Loading();

@@ -108,7 +108,7 @@ class MaterialAppWithTheme extends StatelessWidget {
       tabBarTheme: TabBarTheme(
         labelColor: Colors.deepOrange,
         unselectedLabelColor: Colors.black,
-      ));
+      ),);
 
   final darkTheme = ThemeData(
       primaryColor: Colors.deepOrange,

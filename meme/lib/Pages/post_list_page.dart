@@ -11,8 +11,7 @@ import '../Controller/db.dart';
 class PostListPage extends StatelessWidget {
   String postListId;
   String authorId;
-  PostListPage({@required this.postListId,@required this.authorId});
-
+  PostListPage({@required this.postListId, @required this.authorId});
 
   GlobalKey<ScaffoldState> scaffoldState = GlobalKey<ScaffoldState>();
   @override
@@ -25,7 +24,6 @@ class PostListPage extends StatelessWidget {
               if (snapshot.hasError) print(snapshot.error);
               if (!snapshot.hasData) return Loading();
               PostList postList = snapshot.data;
-              List<String> posts = postList.posts;
               return CustomScrollView(slivers: [
                 SliverAppBar(
                   backgroundColor: Colors.deepOrange,
@@ -46,23 +44,22 @@ class PostListPage extends StatelessWidget {
                         : Container(),
                   ),
                 ),
-                SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                  return StreamBuilder(
-                      stream: db.getPostByPath(posts[index]),
+                SliverFillRemaining(
+                  child: StreamBuilder(
+                      stream: db.getPostListGroupPost(postListId),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) print(snapshot.error);
                         if (!snapshot.hasData) return Loading();
-                        Post post = snapshot.data;
-                        return Column(children: [
-                          PostWidget(
-                            post: post,
-                            postList: postList,
-                            scaffoldState: scaffoldState,
-                          )
-                        ]);
-                      });
-                }, childCount: posts.length)),
+                        List<Post> posts = snapshot.data;
+                        return ListView.builder(
+                            itemBuilder: (context, index) => PostWidget(
+                                  post: posts[index],
+                                  postList: postList,
+                                  scaffoldState: scaffoldState,
+                                ),
+                            itemCount: posts.length);
+                      }),
+                ),
                 SliverToBoxAdapter(
                   child: SizedBox(
                     height: 100,

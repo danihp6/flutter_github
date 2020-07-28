@@ -98,8 +98,8 @@ class PostMoreButton extends StatelessWidget {
                       if (postList != null && postList.author == db.userId)
                         FlatButton(
                           onPressed: () {
-                            db.deletePostPathInPostList(
-                                db.userId, postList.id, post.author, post.id);
+                            db.deletePostInPostList(
+                                db.userId, postList.id,post.author,  post.id);
                             navigator.pop(context);
                           },
                           child: Row(

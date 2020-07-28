@@ -52,9 +52,7 @@ class UserPageHeader extends StatelessWidget {
                 SizedBox(
                   height: 10,
                 ),
-                SizedBox(
-                  height: 10,
-                ),
+                if(user.description != '')
                 Align(
                   alignment: Alignment.topLeft,
                   child: Text(user.description,

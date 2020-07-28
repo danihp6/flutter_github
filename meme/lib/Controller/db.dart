@@ -1,7 +1,6 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:meme/Controller/gallery.dart';
 import 'package:meme/Controller/push_notification_provider.dart';
 import 'package:meme/Models/Comment.dart';
@@ -10,7 +9,7 @@ import 'package:meme/Models/PostList.dart';
 import 'package:meme/Models/Tag.dart';
 import 'package:meme/Models/Template.dart';
 import 'package:meme/Models/User.dart';
-import '../Models/Notification.dart';
+import '../Models/Notification.dart' as mynotification;
 import 'media_storage.dart';
 import '../Models/Report.dart';
 
@@ -25,24 +24,28 @@ class DataBase {
 
 //---------------USER----------------//
 
-  Stream<User> getUser(String userId) => _firestore
-      .document('users/$userId')
-      .snapshots()
-      .map((doc) => User.fromFirestore(doc));
+  Stream<User> getUser(String userId) {
+    return _firestore
+        .document('users/$userId')
+        .snapshots()
+        .map((doc) => User.fromFirestore(doc));
+  }
 
   Future<User> getUserFuture(String userId) async =>
       User.fromFirestore(await _firestore.document('users/$userId').get());
 
-  Future<String> getUserByEmail(String email) async {
+  Future<String> getUserByEmail(
+      Function showDialogUserName, String email) async {
     QuerySnapshot query = await _firestore
         .collection('users')
         .where('email', isEqualTo: email)
         .getDocuments();
     if (query.documents.isEmpty) {
+      String userName = await showDialogUserName();
       String token = await pushProvider.getToken();
       return await db.newUser(
-        User(email.substring(0, email.indexOf('@')), '', <String>[], <String>[],
-            <String>[], '', DateTime.now(), email, [token], <String>[]),
+        User(userName, '', <String>[], <String>[], <String>[], '',
+            DateTime.now(), email, [token], <String>[]),
       );
     }
     return query.documents.first.documentID;
@@ -141,14 +144,26 @@ class DataBase {
       .snapshots()
       .map((doc) => Post.fromFirestore(doc));
 
-  Stream<Post> getPostByPath(String postPath) => _firestore
-      .document(postPath)
-      .snapshots()
-      .map((doc) => Post.fromFirestore(doc));
+  // Stream<Post> getPostByPath(String postPath) => _firestore
+  //     .document(postPath)
+  //     .snapshots()
+  //     .map((doc) => Post.fromFirestore(doc));
 
-    Stream<List<Post>> getGroupPost(String tagId) => _firestore
+  Stream<List<Post>> getTagGroupPost(String tagId) => _firestore
       .collectionGroup('posts')
-      .where('tags',arrayContains: tagId)
+      .where('tags', arrayContains: tagId)
+      .snapshots()
+      .map(toPosts);
+
+  Stream<List<Post>> getPostListGroupPost(String postListId) => _firestore
+      .collectionGroup('posts')
+      .where('postLists', arrayContains: postListId)
+      .snapshots()
+      .map(toPosts);
+
+    Stream<List<Post>> getFavouriteGroupPost(String userId) => _firestore
+      .collectionGroup('posts')
+      .where('favourites', arrayContains: userId)
       .snapshots()
       .map(toPosts);
 
@@ -165,36 +180,43 @@ class DataBase {
       .snapshots()
       .map(toPosts);
 
-  Future addPostPathInPostList(String userId, String postId,
-          String postAuthorId, String postListId) =>
-      _firestore.document('users/$userId/postLists/$postListId').updateData({
-        'posts': FieldValue.arrayUnion(['users/$postAuthorId/posts/$postId'])
-      });
+  Future addPostInPostList(
+      String userId, String postId, String authorPostId, String postListId) {
+    _firestore.document('users/$authorPostId/posts/$postId').updateData({
+      'postLists': FieldValue.arrayUnion([postListId])
+    });
+    _firestore.document('users/$userId/postLists/$postListId').updateData({
+      'posts': FieldValue.arrayUnion([postId])
+    });
+  }
 
-  Future deletePostPathInPostList(String userId, String postListId,
-          String postAuthorId, String postId) =>
-      _firestore.document('users/$userId/postLists/$postListId').updateData({
-        'posts': FieldValue.arrayRemove(['users/$postAuthorId/posts/$postId'])
-      });
+  Future deletePostInPostList(
+      String userId, String postListId, String authorPostId, String postId) {
+    _firestore.document('users/$authorPostId/posts/$postId').updateData({
+      'postLists': FieldValue.arrayRemove([postListId])
+    });
+    _firestore.document('users/$userId/postLists/$postListId').updateData({
+      'posts': FieldValue.arrayRemove([postId])
+    });
+  }
 
-  Future addPostPathInFavourites(
+  Future addPostInFavourites(
       String userId, String postAuthorId, String postId) {
     _firestore.document('users/$postAuthorId/posts/$postId').updateData({
       'favourites': FieldValue.arrayUnion([userId])
     });
     _firestore.document('users/$userId').updateData({
-      'favourites': FieldValue.arrayUnion(['users/$postAuthorId/posts/$postId'])
+      'favourites': FieldValue.arrayUnion([postId])
     });
   }
 
-  Future deletePostPathInFavourites(
+  Future deletePostInFavourites(
       String userId, String postAuthorId, String postId) {
     _firestore.document('users/$postAuthorId/posts/$postId').updateData({
       'favourites': FieldValue.arrayRemove([userId])
     });
     _firestore.document('users/$userId').updateData({
-      'favourites':
-          FieldValue.arrayRemove(['users/$postAuthorId/posts/$postId'])
+      'favourites': FieldValue.arrayRemove([postId])
     });
   }
 
@@ -271,10 +293,10 @@ class DataBase {
       .snapshots()
       .map((doc) => PostList.fromFirestore(doc));
 
-  Stream<PostList> getPostListByPath(String postListPath) => _firestore
-      .document(postListPath)
-      .snapshots()
-      .map((doc) => PostList.fromFirestore(doc));
+  // Stream<PostList> getPostListByPath(String postListPath) => _firestore
+  //     .document(postListPath)
+  //     .snapshots()
+  //     .map((doc) => PostList.fromFirestore(doc));
 
   Stream<List<PostList>> getPostLists(String userId) => _firestore
       .collection('users/$userId/postLists')
@@ -408,14 +430,17 @@ class DataBase {
 
 //---------------NOTIFICATIONS----------------//
 
-  Stream<List<Notification>> getNotifications(String userId) => _firestore
-      .collection('users/$userId/notifications')
-      .snapshots()
-      .map((toNotificationList));
+  Stream<List<mynotification.Notification>> getNotifications(String userId) =>
+      _firestore
+          .collection('users/$userId/notifications')
+          .snapshots()
+          .map((mynotification.toNotificationList));
 
-  Future newNotification(String userId, Notification notification) => _firestore
-      .collection('users/$userId/notifications')
-      .add(notification.toFirestore());
+  Future newNotification(
+          String userId, mynotification.Notification notification) =>
+      _firestore
+          .collection('users/$userId/notifications')
+          .add(notification.toFirestore());
 
   Future deleteNotification(String userId, String notificationId) => _firestore
       .document('users/$userId/notifications/$notificationId')

@@ -20,35 +20,37 @@ class TagPage extends StatelessWidget {
           if (snapshot.hasError) print(snapshot.error);
           if (!snapshot.hasData) return Loading();
           Tag tag = snapshot.data;
-          List<String> posts = tag.posts;
           return Scaffold(
             key: scaffoldState,
             appBar: PreferredSize(
               preferredSize: Size.fromHeight(40),
-                          child: AppBar(
+              child: AppBar(
                 title: Text('#' + tag.name),
                 actions: <Widget>[
-                  Center(child: Text(tag.totalPoints.toString(),style:TextStyle(
-                    fontSize: 16
-                  ))),
-                  SizedBox(width: 5,),
+                  Center(
+                      child: Text(tag.totalPoints.toString(),
+                          style: TextStyle(fontSize: 16))),
+                  SizedBox(
+                    width: 5,
+                  ),
                   Icon(Icons.whatshot),
-                  SizedBox(width:5)
+                  SizedBox(width: 5)
                 ],
               ),
             ),
-            body: ListView.builder(
-              itemCount: posts.length,
-              itemBuilder: (context, index) => StreamBuilder(
-                stream: db.getPostByPath(posts[index]),
+            body: StreamBuilder<Object>(
+                stream: db.getTagGroupPost(tagId),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) print(snapshot.error);
                   if (!snapshot.hasData) return Loading();
-                  Post post = snapshot.data;
-                  return PostWidget(post: post,scaffoldState: scaffoldState,);
-                },
-              ),
-            ),
+                  List<Post> posts = snapshot.data;
+                  return ListView.builder(
+                      itemCount: posts.length,
+                      itemBuilder: (context, index) => PostWidget(
+                            post: posts[index],
+                            scaffoldState: scaffoldState,
+                          ));
+                }),
           );
         });
   }

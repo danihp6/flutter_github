@@ -5,7 +5,8 @@ import '../Controller/db.dart';
 
 class FavouriteButton extends StatefulWidget {
   Post post;
-  FavouriteButton({@required this.post});
+  Function setOpacity;
+  FavouriteButton({@required this.post,@required this.setOpacity});
 
   @override
   _FavouriteButtonState createState() => _FavouriteButtonState();
@@ -21,7 +22,7 @@ class _FavouriteButtonState extends State<FavouriteButton> {
           iconSize: 35,
           onPressed: () {
             setState(() {
-              db.deletePostPathInFavourites(
+              db.deletePostInFavourites(
                   db.userId, widget.post.author,widget.post.id);
             });
           });
@@ -30,8 +31,9 @@ class _FavouriteButtonState extends State<FavouriteButton> {
         icon: Icon(Icons.star_border),
         iconSize: 35,
         onPressed: () {
+          widget.setOpacity();
           setState(() {
-            db.addPostPathInFavourites(
+            db.addPostInFavourites(
                 db.userId, widget.post.author,widget.post.id);
           });
         });

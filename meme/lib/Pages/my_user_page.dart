@@ -44,6 +44,7 @@ class _MyUserPageState extends State<MyUserPage>
 
   @override
   Widget build(BuildContext context) {
+    print(db.userId);
     return StreamBuilder(
         stream: db.getUser(db.userId),
         builder: (context, snapshot) {
@@ -106,7 +107,7 @@ class _MyUserPageState extends State<MyUserPage>
                               ),
                               favourites.isNotEmpty
                                   ? FavouritesStream(
-                                      favourites: favourites,
+                                      userId: user.id,
                                       scaffoldState: _scaffoldState)
                                   : Center(
                                       child: Text('Usuario sin favoritos',

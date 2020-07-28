@@ -33,7 +33,7 @@ class _PostListCarouselState extends State<PostListCarousel> {
   @override
   Widget build(BuildContext context) {
     PostList _postList = widget.postList;
-    List<String> postPaths = _postList.posts;
+    List<String> posts = _postList.posts;
     return Column(
       children: <Widget>[
         GestureDetector(
@@ -81,10 +81,9 @@ class _PostListCarouselState extends State<PostListCarousel> {
         SizedBox(
           height: 5,
         ),
-        if (postPaths.length > 0)
+        if (posts.length > 0)
           StreamBuilder(
-              stream: CombineLatestStream.list(
-                  postPaths.map((post) => db.getPostByPath(post))),
+              stream: db.getPostListGroupPost(widget.postList.id),
               builder: (context, snapshot) {
                 if (snapshot.hasError) print(snapshot.error);
                 if (!snapshot.hasData) return Loading();

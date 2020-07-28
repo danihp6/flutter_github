@@ -17,7 +17,7 @@ class SelectPostList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     addPublicationAndGoBack( String postListId) {
-      db.addPostPathInPostList(db.userId, postId, authorId, postListId);
+      db.addPostInPostList(db.userId, postId,authorId, postListId);
       navigator.pop(context);
     }
 

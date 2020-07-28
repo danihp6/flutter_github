@@ -17,6 +17,7 @@ class Post {
   int _totalPoints;
   double _aspectRatio;
   String _template;
+  List<String> _postLists;
 
   Post(media, description, mediaType, favourites,
       authorId, tags, points, aspectRatio, template) {
@@ -31,6 +32,7 @@ class Post {
     this._totalPoints = 0;
     this._aspectRatio = aspectRatio;
     this._template = template;
+    _postLists = <String>[];
   }
 
   Post.fromFirestore(DocumentSnapshot doc)
@@ -45,7 +47,8 @@ class Post {
         _points = doc.data['points'],
         _totalPoints = doc.data['totalPoints'],
         _aspectRatio = doc.data['aspectRatio'].toDouble(),
-        _template = doc.data['template'];
+        _template = doc.data['template'],
+        _postLists = List<String>.from(doc.data['postLists']);
 
   Map<String, dynamic> toFirestore() => {
         'media': _media,
@@ -58,7 +61,8 @@ class Post {
         'totalPoints':_totalPoints,
         'aspectRatio': _aspectRatio,
         'author': _author,
-        'template': _template
+        'template': _template,
+        'postLists':_postLists
       };
 
   get id => this._id;
@@ -103,7 +107,7 @@ class Post {
 
   get template => this._template;
 
-
+  get postLists => this._postLists;
 }
 
 List<Post> toPosts(QuerySnapshot query) {

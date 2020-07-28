@@ -8,7 +8,8 @@ import 'package:meme/Models/Template.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Widgets/loading.dart';
 import 'package:meme/Widgets/post_description.dart';
-import 'package:meme/Widgets/post_header.dart';import 'package:meme/Widgets/video_player.dart';
+import 'package:meme/Widgets/post_header.dart';
+import 'package:meme/Widgets/video_player.dart';
 import '../Controller/db.dart';
 
 class PostWidget extends StatefulWidget {
@@ -28,16 +29,28 @@ class PostWidget extends StatefulWidget {
 
 class _PostWidgetState extends State<PostWidget>
     with AutomaticKeepAliveClientMixin {
+  double _opacity = 0;
   @override
   Widget build(BuildContext context) {
     List<String> favourites = widget.post.favourites;
 
+    Future setOpacity() async {
+      setState(() {
+        _opacity = 1.0;
+      });
+      await Future.delayed(Duration(milliseconds: 500));
+      setState(() {
+        _opacity = 0;
+      });
+    }
+
     addOrRemoveFavourite(String userId, String postAuthorId, String postId) {
       print(favourites.contains(db.userId));
-      if (!favourites.contains(db.userId))
-        db.addPostPathInFavourites(userId, postAuthorId, postId);
-      else
-        db.deletePostPathInFavourites(userId, postAuthorId, postId);
+      if (!favourites.contains(db.userId)) {
+        setOpacity();
+        db.addPostInFavourites(userId, postAuthorId, postId);
+      } else
+        db.deletePostInFavourites(userId, postAuthorId, postId);
     }
 
     return StreamBuilder(
@@ -62,10 +75,21 @@ class _PostWidgetState extends State<PostWidget>
               aspectRatio: widget.post.aspectRatio,
               child: widget.post.mediaType == MediaType.image
                   ? GestureDetector(
-                      child: CachedNetworkImage(
-                        imageUrl: widget.post.media,
-                        placeholder: (context, url) => Loading(),
-                      ),
+                      child:
+                          Stack(alignment: Alignment.center, children: <Widget>[
+                        CachedNetworkImage(
+                          imageUrl: widget.post.media,
+                          placeholder: (context, url) => Loading(),
+                        ),
+                        AnimatedOpacity(
+                            duration: Duration(milliseconds: 300),
+                            opacity: _opacity,
+                            child: Icon(
+                              Icons.star,
+                              color: Colors.black54,
+                              size: 250,
+                            ))
+                      ]),
                       onDoubleTap: () => addOrRemoveFavourite(
                           db.userId, widget.post.author, widget.post.id))
                   : VideoPlayerWidget(
@@ -74,7 +98,8 @@ class _PostWidgetState extends State<PostWidget>
                     ),
             ),
             if (widget.isDescriptionShowed)
-              PostDescription(post: widget.post, author: author),
+              PostDescription(
+                  post: widget.post, author: author, setOpacity: setOpacity),
             SizedBox(
               height: 5,
             )

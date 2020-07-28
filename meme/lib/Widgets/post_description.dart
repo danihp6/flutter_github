@@ -23,8 +23,9 @@ import 'comment.dart';
 class PostDescription extends StatefulWidget {
   Post post;
   User author;
+  Function setOpacity;
 
-  PostDescription({@required this.post, @required this.author});
+  PostDescription({@required this.post, @required this.author,@required this.setOpacity});
 
   @override
   _PostDescriptionState createState() => _PostDescriptionState();
@@ -133,7 +134,7 @@ class _PostDescriptionState extends State<PostDescription> {
                     return Text(comments.length.toString(),
                         style: Theme.of(context).textTheme.bodyText1);
                   }),
-              FavouriteButton(post: widget.post),
+              FavouriteButton(post: widget.post,setOpacity:widget.setOpacity),
               Text(widget.post.favourites.length.toString(),
                   style: Theme.of(context).textTheme.bodyText1)
             ],

@@ -76,6 +76,7 @@ class _SignInPageState extends State<SignInPage> {
                                   left: 50, right: 50, top: 5),
                               child: TextFormField(
                                 controller: _userNameController,
+                                maxLength: 15,
                                 decoration: InputDecoration(
                                     border: OutlineInputBorder(
                                         borderRadius:
