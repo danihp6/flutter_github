@@ -249,9 +249,9 @@ packages:
   flappy_search_bar:
     dependency: "direct main"
     description:
-      name: flappy_search_bar
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "flappy_search_bar-1.7.2"
+      relative: true
+    source: path
     version: "1.7.2"
   flutter:
     dependency: "direct main"
