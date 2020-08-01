@@ -101,7 +101,7 @@ class _FloatingTextState extends State<FloatingText> {
                           elevation: 2,
                           child: Padding(
                               padding: const EdgeInsets.all(2),
-                              child: Icon(Icons.delete)),
+                              child: Icon(Icons.delete,color: Colors.black,)),
                         ),
                       ),
                     ),
@@ -122,7 +122,7 @@ class _FloatingTextState extends State<FloatingText> {
                           elevation: 2,
                           child: Padding(
                               padding: const EdgeInsets.all(2),
-                              child: Icon(Icons.format_size)),
+                              child: Icon(Icons.format_size,color:Colors.black)),
                         ),
                       ),
                     ),

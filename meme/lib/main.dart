@@ -10,6 +10,7 @@ import 'package:meme/Pages/user_page.dart';
 import 'package:meme/Widgets/slide_left_route.dart';
 import 'package:meme/Widgets/theme_changer.dart';
 import 'package:provider/provider.dart';
+import './Controller/local_storage.dart';
 
 import 'Controller/gallery.dart';
 import 'Controller/local_storage.dart';
@@ -30,7 +31,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     configuration.mainNavigatorKey = GlobalKey<NavigatorState>();
     pushProvider.initNotifications();
-    storage.initStorage();
+    
     WidgetsFlutterBinding.ensureInitialized();
     downloader.initialize();
     dynamicLinks.initDynamicLinks((Uri link) {
@@ -58,7 +59,7 @@ class _MyAppState extends State<MyApp> {
       DeviceOrientation.portraitDown,
     ]);
     return ChangeNotifierProvider<ThemeChanger>(
-      create: (context) => ThemeChanger(ThemeMode.light),
+      create: (context) => ThemeChanger(ThemeMode.system),
       child: MaterialAppWithTheme(),
     );
   }

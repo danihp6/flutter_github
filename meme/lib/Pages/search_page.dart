@@ -191,7 +191,7 @@ class _SearchPageState extends State<SearchPage>
                                           blockedUsers.contains(db.userId);
                                       return Padding(
                                           padding: const EdgeInsets.only(
-                                              left: 8.0, right: 8),
+                                              left: 8.0, right: 8,bottom: 4),
                                           child: GestureDetector(
                                               child: SizedBox(
                                             height: 50,

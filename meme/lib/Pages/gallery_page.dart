@@ -114,14 +114,14 @@ class _GalleryPageState extends State<GalleryPage> {
             ),
           if (selectedMedia is VideoMedia)
             Container(
-              color: Colors.white,
-              height: MediaQuery.of(context).size.width,
-              child: VideoPlayerWidget(
-                file: (media as VideoMedia).video,
-                key: videoPlayerKey,
-                aspectRatio: aspectRatio,
-              ),
-            ),
+                  color: Colors.white.withOpacity(0.7),
+                  height: MediaQuery.of(context).size.width,
+                  child: VideoPlayerWidget(
+                        file: (media as VideoMedia).video,
+                        key: videoPlayerKey,
+                        aspectRatio: aspectRatio,
+                      ),
+                ),
           Padding(
             padding: const EdgeInsets.all(15),
             child: Row(
@@ -135,6 +135,7 @@ class _GalleryPageState extends State<GalleryPage> {
                     fillColor: Colors.white.withOpacity(0.9),
                     child: Icon(
                       Icons.aspect_ratio,
+                      color: Colors.black,
                       size: 20,
                     ),
                     shape: CircleBorder(),
@@ -150,6 +151,7 @@ class _GalleryPageState extends State<GalleryPage> {
                       fillColor: Colors.white.withOpacity(0.9),
                       child: Icon(
                         Icons.edit,
+                        color: Colors.black,
                         size: 20,
                       ),
                       shape: CircleBorder(),
@@ -285,7 +287,6 @@ class _GalleryPageState extends State<GalleryPage> {
                       maxChildSize: maxChildSize,
                       builder: (context, scrollController) {
                         return Container(
-                          color: Colors.white.withOpacity(0.7),
                           child: SingleChildScrollView(
                             controller: scrollController,
                             child: _buildPreview(),

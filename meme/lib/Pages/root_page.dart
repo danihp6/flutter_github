@@ -1,12 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:meme/Controller/db.dart';
+import 'package:meme/Controller/local_storage.dart';
 import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Models/User.dart';
 import 'package:meme/Pages/log_in_page.dart';
 import 'package:meme/Pages/main_page.dart';
 import 'package:meme/Pages/tabs_page.dart';
 import 'package:meme/Widgets/loading.dart';
+import 'package:meme/Widgets/theme_changer.dart';
+import 'package:provider/provider.dart';
 import 'package:splashscreen/splashscreen.dart';
 import '../Widgets/memes_header.dart';
 
@@ -21,9 +24,15 @@ class _RootPageState extends State<RootPage> {
   @override
   void initState() {
     super.initState();
+    storage.initStorage().then((_) {
+      final theme = Provider.of<ThemeChanger>(context,listen: false);
+      theme.themeMode = storage.themeMode ?? ThemeMode.system;
+      print('eyyy');
+      setState(() {
+        
+      });
+    });
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -44,6 +53,7 @@ class _RootPageState extends State<RootPage> {
       },
     );
   }
+
   Future<String> showDialogUserName() {
     String userName = '';
     String userNameError = '';
@@ -110,7 +120,10 @@ class _RootPageState extends State<RootPage> {
                               userNameController.dispose();
                             }
                           },
-                          child: Text('Aceptar',style: TextStyle(fontSize: 18),))
+                          child: Text(
+                            'Aceptar',
+                            style: TextStyle(fontSize: 18),
+                          ))
                     ],
                   ),
                 ),

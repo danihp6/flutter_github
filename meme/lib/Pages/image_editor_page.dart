@@ -160,7 +160,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
           leading: IconButton(
               icon: Icon(
                 Icons.arrow_back,
-                color: Colors.white,
               ),
               onPressed: () => navigator.pop(context)),
           title: IconButton(icon: Icon(Icons.restore), onPressed: null),
@@ -185,6 +184,11 @@ class _ImageEditorPageState extends State<ImageEditorPage>
             key: _globalKey,
             child: Stack(
               children: <Widget>[
+                Container(
+                  height: MediaQuery.of(context).size.width,
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.white,
+                ),
                 AspectRatio(
                   aspectRatio: widget.imageMedia.aspectRatio,
                   child: LayoutBuilder(builder: (context, constraints) {
@@ -237,7 +241,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                           child: IconButton(
                               icon: Icon(
                                 Icons.settings_overscan,
-                                color: Colors.black,
                               ),
                               onPressed: changeFit),
                         ),
@@ -252,7 +255,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                             child: IconButton(
                                 icon: Icon(
                                   Icons.flip,
-                                  color: Colors.black,
                                 ),
                                 onPressed: flipHorizontally),
                           ),
@@ -269,7 +271,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                                           .matrix4,
                                       child: Icon(
                                         Icons.flip,
-                                        color: Colors.black,
                                       )),
                                 ),
                                 onPressed: flipVertically),
@@ -286,7 +287,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                             child: IconButton(
                                 icon: Icon(
                                   Icons.rotate_right,
-                                  color: Colors.black,
                                 ),
                                 onPressed: () => rotate(90)),
                           ),
@@ -296,7 +296,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                             child: IconButton(
                                 icon: Icon(
                                   Icons.rotate_left,
-                                  color: Colors.black,
                                 ),
                                 onPressed: () => rotate(-90)),
                           ),
@@ -317,7 +316,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                           child: IconButton(
                               icon: Icon(
                                 Icons.delete_forever,
-                                color: Colors.black,
                               ),
                               onPressed: removeAllFloatingButton),
                         ),
@@ -330,7 +328,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                                 isTextOptionsVisible
                                     ? Icons.visibility
                                     : Icons.visibility_off,
-                                color: Colors.black,
                               ),
                               onPressed: showTextOptions),
                         ),
@@ -341,7 +338,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                           child: IconButton(
                               icon: Icon(
                                 Icons.label,
-                                color: Colors.black,
                               ),
                               onPressed: activeLabelText),
                         ),
@@ -353,7 +349,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                       child: IconButton(
                           icon: Icon(
                             Icons.add,
-                            color: Colors.black,
                           ),
                           onPressed: addFloatingButton),
                     ),
@@ -402,7 +397,7 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                                           fontSize: 22,
                                           color: mode == blendMode
                                               ? Theme.of(context).accentColor
-                                              : Colors.black))))
+                                              : Theme.of(context).unselectedWidgetColor))))
                               .toList(),
                           onSelectedItemChanged: (index) {
                             setState(() {
@@ -418,14 +413,15 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                                 height: 100,
                                 decoration: BoxDecoration(
                                     border: Border.all(width: 1),
+                                    color: Theme.of(context).unselectedWidgetColor,
                                     shape: BoxShape.circle),
-                                child: FittedBox(child: Icon(Icons.remove)),
+                                child: FittedBox(child: Icon(Icons.remove,color:Theme.of(context).backgroundColor)),
                               )
                             : Container(
                                 height: 100,
                                 decoration: BoxDecoration(
-                                    border: colorFilter == Colors.white
-                                        ? Border.all(width: 1)
+                                    border: colorFilter == Colors.white || colorFilter == Colors.black
+                                        ? Border.all(width: 1,color: Theme.of(context).unselectedWidgetColor)
                                         : null,
                                     color: colorFilter,
                                     shape: BoxShape.circle),
@@ -487,7 +483,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
       ),
       bottomNavigationBar: TabBar(
           labelColor: Colors.deepOrange,
-          unselectedLabelColor: Colors.black,
           indicator: UnderlineTabIndicator(borderSide: BorderSide(width: 0)),
           controller: tabController,
           tabs: [

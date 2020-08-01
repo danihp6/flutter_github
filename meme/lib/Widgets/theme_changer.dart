@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meme/Controller/local_storage.dart';
 
 class ThemeChanger with ChangeNotifier {
   ThemeMode _themeMode;
@@ -9,6 +10,7 @@ class ThemeChanger with ChangeNotifier {
 
   set themeMode(ThemeMode themeMode) {
     this._themeMode = themeMode;
+    storage.themeMode = themeMode;
     notifyListeners();
   } 
 }
