@@ -82,6 +82,7 @@ class _SignInPageState extends State<SignInPage> {
                                         borderRadius:
                                             BorderRadius.circular(20)),
                                     labelText: 'nombre de usuario',
+                                    labelStyle: TextStyle(color: Colors.black),
                                     prefixIcon: Icon(Icons.person),
                                     suffixIcon:
                                         _userNameController.text.length > 0
@@ -120,6 +121,7 @@ class _SignInPageState extends State<SignInPage> {
                                         borderRadius:
                                             BorderRadius.circular(20)),
                                     labelText: 'email',
+                                    labelStyle: TextStyle(color: Colors.black),
                                     prefixIcon: Icon(Icons.email),
                                     suffixIcon: _emailController.text.length > 0
                                         ? IconButton(
@@ -153,6 +155,7 @@ class _SignInPageState extends State<SignInPage> {
                                         borderRadius:
                                             BorderRadius.circular(20)),
                                     labelText: 'password',
+                                    labelStyle: TextStyle(color: Colors.black),
                                     prefixIcon: Icon(Icons.lock),
                                     suffixIcon:
                                         _passwordController.text.length > 0

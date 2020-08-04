@@ -1,14 +1,17 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:image_editor/image_editor.dart';
 import 'package:matrix4_transform/matrix4_transform.dart';
 import 'package:meme/Controller/navigator.dart';
 import 'package:meme/Widgets/scroll_column_expandable.dart';
 
 import '../Controller/gallery.dart';
 import '../Widgets/floating_text.dart';
+import 'gallery_page.dart';
 
 List<BlendMode> blendModes = [
   BlendMode.color,
@@ -28,9 +31,6 @@ class _ImageEditorPageState extends State<ImageEditorPage>
     with SingleTickerProviderStateMixin {
   ImageMedia _imageMedia;
   TabController tabController;
-  double sat;
-  double bright;
-  double con;
   GlobalKey _globalKey = new GlobalKey();
   bool isTextOptionsVisible = true;
   List<Key> floatingTexts = [];
@@ -39,7 +39,7 @@ class _ImageEditorPageState extends State<ImageEditorPage>
   Matrix4Transform transform = Matrix4Transform();
   Size imageSize;
   BoxFit imageFit = BoxFit.cover;
-
+  double aspectRatio = myAspectRatios[0];
   Color textColor = Colors.white;
   bool labelTextActived = false;
   double labelTextHeight = 100;
@@ -59,15 +59,22 @@ class _ImageEditorPageState extends State<ImageEditorPage>
     }
   }
 
+  changeAspectRatio() {
+    setState(() {
+      int indexAspectRatio = myAspectRatios.indexOf(aspectRatio);
+      if (indexAspectRatio == myAspectRatios.length - 1)
+        indexAspectRatio = 0;
+      else
+        indexAspectRatio++;
+      aspectRatio = myAspectRatios[indexAspectRatio];
+    });
+  }
+
   @override
   void initState() {
     _imageMedia = widget.imageMedia;
     // _image = widget.imageMedia.image;
-    tabController = TabController(length: 3, vsync: this);
-
-    sat = 1;
-    bright = 1;
-    con = 1;
+    tabController = TabController(length: 4, vsync: this);
     super.initState();
   }
 
@@ -128,10 +135,10 @@ class _ImageEditorPageState extends State<ImageEditorPage>
       setState(() {});
     }
 
-    restore() {
-      _imageMedia = widget.imageMedia;
-      setState(() {});
-    }
+    // restore() {
+    //   _imageMedia = widget.imageMedia;
+    //   setState(() {});
+    // }
 
     changeFit() {
       setState(() {
@@ -151,6 +158,11 @@ class _ImageEditorPageState extends State<ImageEditorPage>
     Future<ImageMedia> getImageMedia() async {
       _imageMedia.image = await _capturePng();
       return _imageMedia;
+    }
+
+    resizeImage(Uint8List image) {
+      _imageMedia.image = image;
+      setState(() {});
     }
 
     return Scaffold(
@@ -190,7 +202,7 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                   color: Colors.white,
                 ),
                 AspectRatio(
-                  aspectRatio: widget.imageMedia.aspectRatio,
+                  aspectRatio: aspectRatio,
                   child: LayoutBuilder(builder: (context, constraints) {
                     imageSize = constraints.biggest;
                     return Column(
@@ -232,21 +244,43 @@ class _ImageEditorPageState extends State<ImageEditorPage>
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      SizedBox(
-                        height: 80,
-                        child: FittedBox(
-                          child: IconButton(
-                              icon: Icon(
-                                Icons.settings_overscan,
-                              ),
-                              onPressed: changeFit),
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Expanded(
+                          child: FittedBox(
+                            child: IconButton(
+                                icon: Icon(
+                                  Icons.settings_overscan,
+                                ),
+                                onPressed: changeFit),
+                          ),
                         ),
-                      ),
-                    ],
+                        Expanded(
+                          child: FittedBox(
+                            child: IconButton(
+                                icon: Icon(
+                                  Icons.content_cut,
+                                ),
+                                onPressed: () => showDialog(
+                                      context: context,
+                                      builder: (context) => ResizeImageDialog(
+                                          image: _imageMedia.image,
+                                          aspectRatio: aspectRatio,
+                                          changeAspectRatio: changeAspectRatio,
+                                          resizeImage: resizeImage),
+                                    )),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                ],
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
                   Expanded(
                     child: Row(
                       children: <Widget>[
@@ -362,21 +396,31 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
-                        GestureDetector(
-                          child: Container(
-                            height: 50,
-                            decoration: BoxDecoration(
-                                border: Border.all(width: 1),
-                                shape: BoxShape.circle),
-                            child: FittedBox(child: Icon(Icons.clear)),
-                          ),
-                          onTap: colorFilter != null
+                        IconButton(
+                          iconSize: 50,
+                          icon: Icon(Icons.clear),
+                          onPressed: colorFilter != null
                               ? () {
                                   colorFilter = null;
                                   setState(() {});
                                 }
                               : null,
                         ),
+                        // GestureDetector(
+                        //   child: Container(
+                        //     height: 50,
+                        //     decoration: BoxDecoration(
+                        //         border: Border.all(width: 1),
+                        //         shape: BoxShape.circle),
+                        //     child: FittedBox(child: ),
+                        //   ),
+                        //   onTap: colorFilter != null
+                        //       ? () {
+                        //           colorFilter = null;
+                        //           setState(() {});
+                        //         }
+                        //       : null,
+                        // ),
                       ],
                     ),
                   ),
@@ -397,7 +441,8 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                                           fontSize: 22,
                                           color: mode == blendMode
                                               ? Theme.of(context).accentColor
-                                              : Theme.of(context).unselectedWidgetColor))))
+                                              : Theme.of(context)
+                                                  .unselectedWidgetColor))))
                               .toList(),
                           onSelectedItemChanged: (index) {
                             setState(() {
@@ -413,15 +458,23 @@ class _ImageEditorPageState extends State<ImageEditorPage>
                                 height: 100,
                                 decoration: BoxDecoration(
                                     border: Border.all(width: 1),
-                                    color: Theme.of(context).unselectedWidgetColor,
+                                    color:
+                                        Theme.of(context).unselectedWidgetColor,
                                     shape: BoxShape.circle),
-                                child: FittedBox(child: Icon(Icons.remove,color:Theme.of(context).backgroundColor)),
+                                child: FittedBox(
+                                    child: Icon(Icons.remove,
+                                        color:
+                                            Theme.of(context).backgroundColor)),
                               )
                             : Container(
                                 height: 100,
                                 decoration: BoxDecoration(
-                                    border: colorFilter == Colors.white || colorFilter == Colors.black
-                                        ? Border.all(width: 1,color: Theme.of(context).unselectedWidgetColor)
+                                    border: colorFilter == Colors.white ||
+                                            colorFilter == Colors.black
+                                        ? Border.all(
+                                            width: 1,
+                                            color: Theme.of(context)
+                                                .unselectedWidgetColor)
                                         : null,
                                     color: colorFilter,
                                     shape: BoxShape.circle),
@@ -486,6 +539,9 @@ class _ImageEditorPageState extends State<ImageEditorPage>
           indicator: UnderlineTabIndicator(borderSide: BorderSide(width: 0)),
           controller: tabController,
           tabs: [
+            Tab(
+              icon: Icon(Icons.settings_overscan),
+            ),
             Tab(icon: Icon(Icons.flip)),
             Tab(icon: Icon(Icons.text_fields)),
             Tab(icon: Icon(Icons.brightness_6)),
@@ -512,4 +568,111 @@ class _ImageEditorPageState extends State<ImageEditorPage>
   //   return colorWidgets;
   // }
 
+}
+
+class ResizeImageDialog extends StatefulWidget {
+  ResizeImageDialog(
+      {@required this.resizeImage,
+      @required this.image,
+      @required this.aspectRatio,
+      @required this.changeAspectRatio});
+  Function resizeImage;
+  Uint8List image;
+  double aspectRatio;
+  Function changeAspectRatio;
+
+  @override
+  _ResizeImageDialogState createState() => _ResizeImageDialogState();
+}
+
+class _ResizeImageDialogState extends State<ResizeImageDialog> {
+  ImageProvider provider;
+
+  GlobalKey<ExtendedImageEditorState> editorKey =
+      GlobalKey<ExtendedImageEditorState>();
+
+  Future<Uint8List> save() async {
+    final ExtendedImageEditorState state = editorKey.currentState;
+    final Rect rect = state.getCropRect();
+    final Uint8List img = state.rawImageData;
+
+    final ImageEditorOption option = ImageEditorOption();
+
+    option.addOption(ClipOption.fromRect(rect));
+
+    option.outputFormat = const OutputFormat.png(88);
+
+    final Uint8List result = await ImageEditor.editImage(
+      image: img,
+      imageEditorOption: option,
+    );
+
+    return result;
+  }
+
+  @override
+  void dispose() {
+    editorKey.currentState.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    provider = ExtendedMemoryImageProvider(widget.image);
+    return Dialog(
+      child: SizedBox(
+        height: 500,
+        child: Column(
+          children: <Widget>[
+            Stack(alignment: Alignment.bottomCenter, children: [
+              ExtendedImage(
+                height: MediaQuery.of(context).size.width,
+                image: provider,
+                extendedImageEditorKey: editorKey,
+                mode: ExtendedImageMode.editor,
+                fit: BoxFit.contain,
+                initEditorConfigHandler: (ExtendedImageState state) {
+                  return EditorConfig(
+                    maxScale: 3.0,
+                    cropRectPadding: const EdgeInsets.all(8),
+                    hitTestSize: 20.0,
+                    cropAspectRatio: widget.aspectRatio,
+                    initCropRectType: InitCropRectType.layoutRect,
+                  );
+                },
+              ),
+              SizedBox(
+                width: 50,
+                child: RawMaterialButton(
+                  onPressed: widget.changeAspectRatio,
+                  elevation: 1,
+                  fillColor: Colors.white.withOpacity(0.9),
+                  child: Icon(
+                    Icons.aspect_ratio,
+                    color: Colors.black,
+                    size: 20,
+                  ),
+                  shape: CircleBorder(),
+                ),
+              ),
+            ]),
+            Expanded(
+              child: Row(
+                children: <Widget>[
+                  IconButton(
+                    iconSize: 40,
+                    icon: Icon(Icons.done),
+                    onPressed: () async {
+                      widget.resizeImage(await save());
+                      navigator.pop(context);
+                    },
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
 }

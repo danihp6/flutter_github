@@ -183,6 +183,7 @@ Future showModalTemplate(BuildContext context, Template template) {
                         padding: const EdgeInsets.all(8.0),
                         child: Icon(
                           !exists ? Icons.file_download : Icons.clear,
+                          color: Colors.black,
                           size: 50,
                         ),
                       ),
@@ -196,6 +197,7 @@ Future showModalTemplate(BuildContext context, Template template) {
                         padding: const EdgeInsets.all(8.0),
                         child: Icon(
                           Icons.play_arrow,
+                          color: Colors.black,
                           size: 50,
                         ),
                       ),

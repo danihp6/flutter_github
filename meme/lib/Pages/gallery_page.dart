@@ -22,11 +22,12 @@ class GalleryPage extends StatefulWidget {
   _GalleryPageState createState() => _GalleryPageState();
 }
 
-class _GalleryPageState extends State<GalleryPage> {
+class _GalleryPageState extends State<GalleryPage>
+    with SingleTickerProviderStateMixin {
   List<MyMediaCollection> collections;
   MyMediaCollection selectedCollection;
   MyMedia selectedMedia;
-  ImageProvider provider;
+
   GlobalKey<ExtendedImageEditorState> editorKey =
       GlobalKey<ExtendedImageEditorState>();
   ImageEditorOption editorOption = ImageEditorOption();
@@ -36,6 +37,9 @@ class _GalleryPageState extends State<GalleryPage> {
   ScrollController scrollController = ScrollController();
   GlobalKey<VideoPlayerWidgetState> videoPlayerKey =
       GlobalKey<VideoPlayerWidgetState>();
+  AnimationController _controller;
+  Animation<Offset> _offsetAnimation;
+  bool _isPreviewShowed = false;
 
   @override
   void initState() {
@@ -47,10 +51,27 @@ class _GalleryPageState extends State<GalleryPage> {
       maxChildSize = (MediaQuery.of(context).size.width + 58) /
           MediaQuery.of(context).size.height;
       scrollController.addListener(_scrollListener);
+      _controller = AnimationController(
+        duration: const Duration(milliseconds: 500),
+        vsync: this,
+      );
+      _offsetAnimation = _offsetAnimation = Tween<Offset>(
+        begin: const Offset(0, 0.85),
+        end: const Offset(0, 0),
+      ).animate(CurvedAnimation(
+          parent: _controller,
+          curve: Curves.decelerate,
+          reverseCurve: Curves.decelerate));
       setState(() {});
     });
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   void _scrollListener() async {
@@ -83,85 +104,6 @@ class _GalleryPageState extends State<GalleryPage> {
         maxChildSize = (MediaQuery.of(context).size.width + 58) /
             MediaQuery.of(context).size.height;
       });
-    }
-
-    Widget _buildPreview() {
-      MyMedia media;
-      if (selectedMedia is ImageMedia) {
-        media = selectedMedia;
-        provider = ExtendedMemoryImageProvider((media as ImageMedia).image);
-      } else
-        media = selectedMedia;
-      return Stack(
-        alignment: Alignment.bottomRight,
-        children: <Widget>[
-          if (selectedMedia is ImageMedia)
-            ExtendedImage(
-              height: MediaQuery.of(context).size.width,
-              image: provider,
-              extendedImageEditorKey: editorKey,
-              mode: ExtendedImageMode.editor,
-              fit: BoxFit.contain,
-              initEditorConfigHandler: (ExtendedImageState state) {
-                return EditorConfig(
-                  maxScale: 3.0,
-                  cropRectPadding: const EdgeInsets.all(8),
-                  hitTestSize: 20.0,
-                  cropAspectRatio: aspectRatio,
-                  initCropRectType: InitCropRectType.layoutRect,
-                );
-              },
-            ),
-          if (selectedMedia is VideoMedia)
-            Container(
-                  color: Colors.white.withOpacity(0.7),
-                  height: MediaQuery.of(context).size.width,
-                  child: VideoPlayerWidget(
-                        file: (media as VideoMedia).video,
-                        key: videoPlayerKey,
-                        aspectRatio: aspectRatio,
-                      ),
-                ),
-          Padding(
-            padding: const EdgeInsets.all(15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                SizedBox(
-                  width: 50,
-                  child: RawMaterialButton(
-                    onPressed: changeAspectRatio,
-                    elevation: 1,
-                    fillColor: Colors.white.withOpacity(0.9),
-                    child: Icon(
-                      Icons.aspect_ratio,
-                      color: Colors.black,
-                      size: 20,
-                    ),
-                    shape: CircleBorder(),
-                  ),
-                ),
-                if (media is ImageMedia)
-                  SizedBox(
-                    width: 50,
-                    child: RawMaterialButton(
-                      onPressed: () => navigator.goImageEditor(
-                          context, widget.onMediaSelected, media),
-                      elevation: 1,
-                      fillColor: Colors.white.withOpacity(0.9),
-                      child: Icon(
-                        Icons.edit,
-                        color: Colors.black,
-                        size: 20,
-                      ),
-                      shape: CircleBorder(),
-                    ),
-                  ),
-              ],
-            ),
-          )
-        ],
-      );
     }
 
     Future<Uint8List> save() async {
@@ -238,6 +180,7 @@ class _GalleryPageState extends State<GalleryPage> {
         ),
         body: selectedCollection.media.isNotEmpty
             ? Stack(
+                alignment: Alignment.bottomCenter,
                 children: <Widget>[
                   GridView.builder(
                       controller: scrollController,
@@ -280,23 +223,156 @@ class _GalleryPageState extends State<GalleryPage> {
                               setState(() {});
                             });
                       }),
-                  if (selectedCollection.media.isNotEmpty)
-                    DraggableScrollableSheet(
-                      initialChildSize: 0.1,
-                      minChildSize: 0.1,
-                      maxChildSize: maxChildSize,
-                      builder: (context, scrollController) {
-                        return Container(
-                          child: SingleChildScrollView(
-                            controller: scrollController,
-                            child: _buildPreview(),
+                  Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: <Widget>[
+                      SlideTransition(
+                        position: _offsetAnimation,
+                        child: IgnorePointer(
+                            ignoring: !_isPreviewShowed,
+                            child: PreviewMedia(
+                              selectedMedia: selectedMedia,
+                              editorKey: editorKey,
+                              aspectRatio: aspectRatio,
+                              videoPlayerKey: videoPlayerKey,
+                              onMediaSelected: widget.onMediaSelected,
+                              changeAspectRatio: changeAspectRatio,
+                            )),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom:8.0),
+                        child: SizedBox(
+                          width: 50,
+                          child: RawMaterialButton(
+                            onPressed: showPreview,
+                            elevation: 1,
+                            fillColor: Colors.white.withOpacity(0.9),
+                            child: Icon(
+                              _isPreviewShowed
+                                  ? Icons.keyboard_arrow_down
+                                  : Icons.keyboard_arrow_up,
+                              color: Colors.black,
+                              size: 30,
+                            ),
+                            shape: CircleBorder(),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               )
             : Center(child: Text('No hay contenido disponible')));
+  }
+
+  showPreview() {
+    if (_isPreviewShowed) {
+      _controller..reverse();
+      _isPreviewShowed = false;
+      editorKey.currentState.reset();
+    } else {
+      _controller..forward();
+      _isPreviewShowed = true;
+    }
+    setState(() {});
+  }
+}
+
+class PreviewMedia extends StatelessWidget {
+  PreviewMedia(
+      {Key key,
+      @required this.selectedMedia,
+      @required this.editorKey,
+      @required this.aspectRatio,
+      @required this.videoPlayerKey,
+      @required this.onMediaSelected,
+      @required this.changeAspectRatio})
+      : super(key: key);
+
+  MyMedia selectedMedia;
+  ImageProvider provider;
+  GlobalKey<ExtendedImageEditorState> editorKey;
+  double aspectRatio;
+  GlobalKey<VideoPlayerWidgetState> videoPlayerKey;
+  Function onMediaSelected;
+  Function changeAspectRatio;
+
+  @override
+  Widget build(BuildContext context) {
+    if (selectedMedia is ImageMedia) {
+      provider =
+          ExtendedMemoryImageProvider((selectedMedia as ImageMedia).image);
+    }
+    return Stack(
+      alignment: Alignment.bottomRight,
+      children: <Widget>[
+        if (selectedMedia is ImageMedia)
+          ExtendedImage(
+            height: MediaQuery.of(context).size.width,
+            image: provider,
+            extendedImageEditorKey: editorKey,
+            mode: ExtendedImageMode.editor,
+            fit: BoxFit.contain,
+            initEditorConfigHandler: (ExtendedImageState state) {
+              return EditorConfig(
+                maxScale: 3.0,
+                cropRectPadding: const EdgeInsets.all(8),
+                hitTestSize: 20.0,
+                cropAspectRatio: aspectRatio,
+                initCropRectType: InitCropRectType.layoutRect,
+              );
+            },
+          ),
+        if (selectedMedia is VideoMedia)
+          Container(
+            color: Colors.white.withOpacity(0.7),
+            height: MediaQuery.of(context).size.width,
+            child: VideoPlayerWidget(
+              file: (selectedMedia as VideoMedia).video,
+              key: videoPlayerKey,
+              aspectRatio: aspectRatio,
+            ),
+          ),
+        Padding(
+          padding: const EdgeInsets.all(15),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: <Widget>[
+              SizedBox(
+                width: 50,
+                child: RawMaterialButton(
+                  onPressed: changeAspectRatio,
+                  elevation: 1,
+                  fillColor: Colors.white.withOpacity(0.9),
+                  child: Icon(
+                    Icons.aspect_ratio,
+                    color: Colors.black,
+                    size: 20,
+                  ),
+                  shape: CircleBorder(),
+                ),
+              ),
+              if (selectedMedia is ImageMedia)
+                SizedBox(
+                  width: 50,
+                  child: RawMaterialButton(
+                    onPressed: () => navigator.goImageEditor(
+                        context, onMediaSelected, selectedMedia),
+                    elevation: 1,
+                    fillColor: Colors.white.withOpacity(0.9),
+                    child: Icon(
+                      Icons.edit,
+                      color: Colors.black,
+                      size: 20,
+                    ),
+                    shape: CircleBorder(),
+                  ),
+                ),
+            ],
+          ),
+        )
+      ],
+    );
   }
 }
 

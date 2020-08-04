@@ -83,6 +83,7 @@ class _LogInPageState extends State<LogInPage> {
                                         borderRadius:
                                             BorderRadius.circular(20)),
                                     labelText: 'email',
+                                    labelStyle: TextStyle(color: Colors.black),
                                     prefixIcon: Icon(Icons.email),
                                     suffixIcon: _emailController.text.length > 0
                                         ? IconButton(
@@ -120,6 +121,7 @@ class _LogInPageState extends State<LogInPage> {
                                         borderRadius:
                                             BorderRadius.circular(20)),
                                     labelText: 'contraseña',
+                                    labelStyle: TextStyle(color: Colors.black),
                                     prefixIcon: Icon(Icons.lock),
                                     suffixIcon:
                                         _passwordController.text.length > 0

@@ -43,6 +43,12 @@ class _UploadPublicationPageState extends State<UploadPublicationPage> {
   }
 
   @override
+  void dispose() {
+    focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Future uploadPublication() async {
       print(tags);

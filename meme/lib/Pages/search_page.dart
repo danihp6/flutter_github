@@ -38,14 +38,13 @@ class _SearchPageState extends State<SearchPage>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(initialIndex: 0, length: 3, vsync: this);
+    tabController = TabController(initialIndex: 0, length: 2, vsync: this);
     tabController.addListener(() {
       if (tabController.index != tabController.previousIndex) setState(() {});
     });
     searchBarController = SearchBarController();
     focusNode = FocusNode();
     focusNode.addListener(() {
-      print('hola');
       if (focusNode.hasFocus)
         isRecentsView = true;
       else {
@@ -79,15 +78,11 @@ class _SearchPageState extends State<SearchPage>
         typeSearched = 'tags';
         return db.tagSearch(search.substring(1));
       }
-      if (search[0] == '&') {
-        typeSearched = 'postLists';
-        return db.postListSearch(search.substring(1));
-      }
+
       if (tabController.index == 0) return db.userSearch(search);
 
       if (tabController.index == 1) return db.tagSearch(search);
 
-      if (tabController.index == 2) return db.postListSearch(search);
     }
 
     Future<bool> onWillPop() async {
@@ -112,13 +107,6 @@ class _SearchPageState extends State<SearchPage>
             ? RecentsTagsStream()
             : Center(
                 child: Text('No hay busquedas de tags recientes',
-                    style: Theme.of(context).textTheme.bodyText1),
-              );
-      if (tabController.index == 2)
-        return storage.recentPostLists.isNotEmpty
-            ? RecentsPostListsStream()
-            : Center(
-                child: Text('No hay busquedas de listas recientes',
                     style: Theme.of(context).textTheme.bodyText1),
               );
     }
@@ -229,33 +217,7 @@ class _SearchPageState extends State<SearchPage>
                                   ),
                                 );
 
-                              if (typeSearched == 'postLists')
-                                return StreamBuilder(
-                                    stream:
-                                        db.getPostList(item.author, item.id),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.hasError)
-                                        print(snapshot.error);
-                                      if (!snapshot.hasData) return Loading();
-                                      PostList postList = snapshot.data;
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 8.0),
-                                        child: PostListWidget(
-                                          postList: postList,
-                                          onTap: () {
-                                            if (!storage.recentPostLists
-                                                .contains(item))
-                                              storage.recentPostLists =
-                                                  storage.recentPostLists +
-                                                      [item];
-                                            setState(() {});
-                                            navigator.goPostList(
-                                                context, item.id, item.author);
-                                          },
-                                        ),
-                                      );
-                                    });
+                              
                             },
                             header: isRecentsView
                                 ? Column(
@@ -273,8 +235,6 @@ class _SearchPageState extends State<SearchPage>
                                                 typeSearched = 'users';
                                               if (value == 1)
                                                 typeSearched = 'tags';
-                                              if (value == 2)
-                                                typeSearched = 'postLists';
                                               searchBarController
                                                   .replayLastSearch();
                                             },
@@ -285,9 +245,6 @@ class _SearchPageState extends State<SearchPage>
                                               Tab(
                                                 text: 'Tags',
                                               ),
-                                              Tab(
-                                                text: 'Listas',
-                                              )
                                             ]),
                                       ),
                                       SizedBox(
@@ -305,58 +262,6 @@ class _SearchPageState extends State<SearchPage>
   }
 }
 
-class RecentsPostListsStream extends StatefulWidget {
-  const RecentsPostListsStream({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  _RecentsPostListsStreamState createState() => _RecentsPostListsStreamState();
-}
-
-class _RecentsPostListsStreamState extends State<RecentsPostListsStream> {
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: CombineLatestStream.list(
-              storage.recentPostLists.map((postList) => db.getTag(postList)))
-          .asBroadcastStream(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) print(snapshot.error);
-        if (!snapshot.hasData) return Loading();
-        List<PostList> postLists = snapshot.data;
-
-        return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ListView.builder(
-            itemCount: postLists.length,
-            itemBuilder: (context, index) => GestureDetector(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  PostListWidget(
-                    postList: postLists[index],
-                    activeMoreOptions: false,
-                    onTap: () => navigator.goPostList(
-                        context, postLists[index].id, postLists[index].author),
-                  ),
-                  IconButton(
-                      icon: Icon(Icons.clear),
-                      onPressed: () {
-                        var newRecentPostLists = storage.recentPostLists;
-                        newRecentPostLists.remove(postLists[index].id);
-                        storage.recentPostLists = newRecentPostLists;
-                        setState(() {});
-                      })
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
 
 class RecentsTagsStream extends StatefulWidget {
   const RecentsTagsStream({
